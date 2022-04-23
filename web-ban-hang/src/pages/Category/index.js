@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     data10,
     data2,
@@ -16,6 +16,7 @@ import { useHistory, useParams } from 'react-router';
 import {
     categorySelector,
     handleSetLoadingCategory,
+    handleSetProducts,
     useGetAllCategoryQuery,
 } from '../../Store/Reducer/categoryReducer';
 import { toast } from 'react-toastify';
@@ -25,7 +26,6 @@ function Category(props) {
     const { category, keyWork } = useParams();
 
     const history = useHistory();
-
     const dispatch = useDispatch();
     const productsCategory = useSelector(categorySelector);
     const { products, isload, total, count, trademark } = productsCategory;
@@ -36,17 +36,19 @@ function Category(props) {
         keyword: keyWork,
         numPage: num ? num : 1,
     });
-    console.log(num);
+
+    useEffect(() => {
+        if (data) {
+            dispatch(handleSetLoadingCategory(isLoading));
+            dispatch(handleSetProducts(data));
+        }
+    }, [data, isLoading, dispatch]);
 
     useEffect(() => {
         if (error) {
             toast.error(`get category fail 😓`);
         }
     }, [error]);
-
-    useEffect(() => {
-        dispatch(handleSetLoadingCategory(true));
-    }, [dispatch]);
 
     return (
         <CategoryPage

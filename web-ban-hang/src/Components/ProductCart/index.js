@@ -22,6 +22,7 @@ function ProductCart(props) {
         sold,
     } = props;
 
+
     const imgRef = useRef();
     var name_url = name.replace(/[^\w\s]/gi, '');
 
@@ -56,7 +57,6 @@ function ProductCart(props) {
                 <Link to={`/product/${category}/${name_url}/${id}`}>
                     <div className="product-cart__image">
                         <img
-                            // src={image && image[0].image[0].data}
                             alt={name}
                             style={{ width: img_width }}
                             ref={imgRef}
@@ -66,7 +66,7 @@ function ProductCart(props) {
                     <div className="product-cart-evaluate">
                         <Rate
                             disabled
-                            defaultValue={star ? +star : 0}
+                            value={star ? +star : 0}
                             style={{ marginTop: '12px' }}
                         />
                         <p className="product-cart-sold">đã bán {sold}</p>

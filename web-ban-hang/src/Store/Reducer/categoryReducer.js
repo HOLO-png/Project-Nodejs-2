@@ -30,12 +30,13 @@ export const categoryApi = createApi({
                 body: { price, keyword, category },
             }),
         }),
-        getProductsToTrademark: builder.mutation({
-            query: ({ trademarkName, category }) => ({
-                url: `trademark`,
-                method: 'POST',
-                body: { trademarkName, category },
-            }),
+        getProductsToTrademark: builder.query({
+            query: ({ trademarkName, category, numPage }) => {
+                let limit = 8;
+                return `trademark?trademarkName=${trademarkName}&category=${category}&limit=${limit}&page=${
+                    numPage ? numPage : 1
+                }`;
+            },
         }),
     }),
 });
@@ -44,7 +45,7 @@ export const {
     useGetAllCategoryQuery,
     useGetProductsToStarMutation,
     useGetProductsToPriceMutation,
-    useGetProductsToTrademarkMutation,
+    useGetProductsToTrademarkQuery,
 } = categoryApi;
 
 const categorySlice = createSlice({
@@ -59,6 +60,18 @@ const categorySlice = createSlice({
     reducers: {
         handleSetLoadingCategory(state, action) {
             state.isload = action.payload;
+        },
+        handleSetProducts(state, action) {
+            if (action.payload) {
+                const { products, total, count, trademark } = action.payload;
+                state.products = products;
+                state.total = total;
+                state.count = count;
+                if (trademark) {
+                    state.trademark = trademark;
+                }
+                state.isload = false;
+            }
         },
     },
     extraReducers: (builder) => {
@@ -105,5 +118,6 @@ const categorySlice = createSlice({
 const categoryReducer = categorySlice.reducer;
 
 export const categorySelector = (state) => state.categoryReducer;
-export const { handleSetLoadingCategory } = categorySlice.actions;
+export const { handleSetLoadingCategory, handleSetProducts } =
+    categorySlice.actions;
 export default categoryReducer;

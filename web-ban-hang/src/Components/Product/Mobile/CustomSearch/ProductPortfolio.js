@@ -19,12 +19,15 @@ import {
     onChangePriceProduct,
 } from '../../../../Store/Reducer/searchProductCategory';
 import {
+    categoryApi,
     handleSetLoadingCategory,
+    handleSetProducts,
     useGetProductsToPriceMutation,
     useGetProductsToStarMutation,
-    useGetProductsToTrademarkMutation,
+    useGetProductsToTrademarkQuery,
 } from '../../../../Store/Reducer/categoryReducer';
 import { toast } from 'react-toastify';
+import { useHistory } from 'react-router';
 
 function ProductPortfolio(props) {
     const dispatch = useDispatch();
@@ -42,7 +45,6 @@ function ProductPortfolio(props) {
         data3,
         data4,
         data5,
-        data7,
         data10,
         changeProductSmartPhone,
         changeProductCommonPhone,
@@ -53,12 +55,29 @@ function ProductPortfolio(props) {
         category,
     } = props;
 
+    const [trademarkData, setTrademarkData] = useState({
+        trademarkName: '',
+        category: '',
+        numPage: 1,
+    });
     const [getProductsToStar, { error }] = useGetProductsToStarMutation();
-
+    const history = useHistory();
     const [getProductsToPrice, { error2 }] = useGetProductsToPriceMutation();
 
-    const [getProductsToTrademark, { error3 }] =
-        useGetProductsToTrademarkMutation();
+    const { error3, isLoading, data } = useGetProductsToTrademarkQuery(
+        trademarkData,
+        {
+            skip:
+                trademarkData.trademarkName === '' &&
+                trademarkData.category === '',
+        },
+    );
+
+    useEffect(() => {
+        if (data) {
+            dispatch(handleSetProducts(data));
+        }
+    }, [data, dispatch]);
 
     useEffect(() => {
         if (error || error2 || error3) {
@@ -67,9 +86,11 @@ function ProductPortfolio(props) {
     }, [error, error2, error3]);
 
     function onChangeCheckBox(e, item, index) {
+        history.push(`?page=${1}`);
+        const numPage = history.location.search.slice(6) || 1;
         dispatch(handleSetLoadingCategory(true));
         setactiveSearch(index);
-        getProductsToTrademark({ trademarkName: item, category });
+        setTrademarkData({ trademarkName: item, category, numPage });
     }
 
     function onChange(e) {}

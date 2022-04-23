@@ -17,12 +17,6 @@ const AllMobile = styled.div`
     }
 `;
 function AllProductMobile({ isload, products }) {
-    const [productAll, setproductAll] = useState([]);
-
-    useEffect(() => {
-        setproductAll(products);
-    }, [products]);
-
     return (
         <AllMobile>
             <DividerComponent
@@ -39,7 +33,7 @@ function AllProductMobile({ isload, products }) {
                 ) : (
                     <>
                         <Grid col={4} mdCol={2} smCol={1} gap={20}>
-                            {productAll.map((item, index) => (
+                            {products.map((item, index) => (
                                 <ProductCart
                                     key={index}
                                     id={item._id}
@@ -56,10 +50,10 @@ function AllProductMobile({ isload, products }) {
                                     priceOld={item.priceOld}
                                     height="300"
                                     img_width="100%"
-                                ></ProductCart>
+                                />
                             ))}
                         </Grid>
-                        {productAll.length ? '' : <Empty />}
+                        {products.length ? '' : <Empty />}
                     </>
                 )}
             </SectionBody>

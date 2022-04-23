@@ -119,6 +119,11 @@ const categoryProductCtrl = {
                             _id: '$description.trademark',
                         },
                     },
+                    {
+                        $sort: {
+                            _id: 1,
+                        },
+                    },
                 ]);
 
                 let count = 0;
@@ -133,8 +138,6 @@ const categoryProductCtrl = {
                 } else {
                     total = Math.floor(count / limit) + 1;
                 }
-
-                console.log({ total, count });
 
                 return res.status(200).json({
                     products,
@@ -443,8 +446,11 @@ const categoryProductCtrl = {
         }
     },
     filterTrademarkProduct: async (req, res) => {
+        const { limit, skip } = Pagination(req);
+        console.log(req.query);
+
         try {
-            const { trademarkName, category } = req.body;
+            const { trademarkName, category } = req.query;
             if (trademarkName === 'Tất cả') {
                 let products = await Product.aggregate([
                     {
@@ -452,8 +458,42 @@ const categoryProductCtrl = {
                             category: category,
                         },
                     },
+                    { $skip: skip },
+                    { $limit: limit },
                 ]);
-                return res.status(200).json({ products });
+                let countProducts = await Product.aggregate([
+                    {
+                        $match: {
+                            category: category,
+                        },
+                    },
+                    {
+                        $count: 'count_product',
+                    },
+                ]);
+
+                let count = 0;
+                if (countProducts[0]) {
+                    count = countProducts[0].count_product;
+                }
+                // Pagination
+                let total = 0;
+
+                if (count % limit === 0) {
+                    total = count / limit;
+                } else {
+                    total = Math.floor(count / limit) + 1;
+                }
+                console.log({
+                    products: products.length,
+                    total,
+                    count,
+                });
+                return res.status(200).json({
+                    products,
+                    total,
+                    count,
+                });
             } else {
                 let products = await Product.aggregate([
                     {
@@ -466,8 +506,48 @@ const categoryProductCtrl = {
                             'description.trademark': trademarkName,
                         },
                     },
+                    { $skip: skip },
+                    { $limit: limit },
                 ]);
-                return res.status(200).json({ products });
+                let countProducts = await Product.aggregate([
+                    {
+                        $match: {
+                            category: category,
+                        },
+                    },
+                    {
+                        $match: {
+                            'description.trademark': trademarkName,
+                        },
+                    },
+                    {
+                        $count: 'count_product',
+                    },
+                ]);
+                let count = 0;
+                if (countProducts[0]) {
+                    count = countProducts[0].count_product;
+                }
+                // Pagination
+                let total = 0;
+
+                if (count % limit === 0) {
+                    total = count / limit;
+                } else {
+                    total = Math.floor(count / limit) + 1;
+                }
+
+                console.log({
+                    products: products.length,
+                    total,
+                    count,
+                });
+
+                return res.status(200).json({
+                    products,
+                    total,
+                    count,
+                });
             }
         } catch (err) {
             console.log(err);
