@@ -1,0 +1,324 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+// font-family: 'Roboto Condensed', sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap');
+// font-family: 'M PLUS Rounded 1c', sans-serif;
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital@0;1&display=swap');
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 13px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+ul {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none !important;
+    color: unset;
+}
+
+a:hover {
+    color: $main-color;
+}
+
+.ant-drawer-body {
+    padding: 10px 0;
+}
+
+strong {
+    margin: 5px;
+    &:hover {
+        color: $main-color;
+    }
+}
+
+@each $color, $val in $colors {
+    .color-#{$color} {
+        color: $val;
+    }
+    .bg-#{$color} {
+        background-color: $val;
+    }
+}
+
+@each $val in $number {
+    .grid-col-#{$val} {
+        grid-template-columns: repeat($val, 1fr);
+    }
+}
+
+@each $val in $number {
+    .grid-col-md-#{$val} {
+        @include tablet {
+            grid-template-columns: repeat($val, 1fr);
+        }
+    }
+}
+
+@each $val in $number {
+    .grid-col-sm-#{$val} {
+        @include mobile {
+            grid-template-columns: repeat($val, 1fr);
+        }
+    }
+}
+
+@for $i from 1 through 12 {
+    #_#{$i} {
+        @include setColor($i);
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 1620px;
+    padding: 0 150px;
+    margin: auto;
+    background: #f8f8f8;
+    @include tablet {
+        padding: 0 20px;
+    }
+
+    @include mobile {
+        padding: 0 10px;
+    }
+}
+.ant-modal-title {
+    font-size: 22px;
+    text-align: center;
+}
+.ant-card-body {
+    height: 155px;
+}
+.ant-card-head-title {
+    color: #fff;
+    font-size: 15px;
+    text-align: center;
+}
+.main {
+    margin-top: $header-height;
+    margin-bottom: 7rem;
+    min-height: auto;
+
+    @include tablet {
+        margin-top: calc(#{$header-tablet-height} + 20px);
+    }
+
+    @include mobile {
+        margin-top: calc(#{$header-mobile-height} + 10px);
+    }
+}
+
+.grid {
+    display: grid;
+}
+
+.popup-product-cart {
+    .ant-modal-title {
+        color: rgb(21, 21, 193);
+    }
+    .ant-modal-body {
+        font-size: 20px;
+        color: #7d7d7d;
+    }
+}
+
+.category-select-card.active {
+    border: 1px solid #3673fa;
+    border-radius: 4px;
+}
+
+button.ant-btn.ant-btn-primary.btn-loading-product {
+    margin: 0 46.5%;
+    margin-bottom: 5%;
+    &.hidden {
+        display: none;
+    }
+}
+
+.ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+    width: 100%;
+    height: 40px;
+    padding: 4px 12px;
+}
+.info-user {
+    display: flex;
+    align-items: baseline;
+    font-size: 18px;
+    font-weight: 600;
+    p {
+        margin-left: 10px;
+    }
+}
+.info-address {
+    display: flex;
+    align-items: baseline;
+    font-size: 18px;
+    font-weight: 600;
+    p {
+        margin-left: 10px;
+    }
+}
+
+.rs_marker {
+    height: 35px;
+    width: 23px;
+    z-index: 99;
+    color: orangered;
+    /*background: url('./images/img_marker.png');*/
+}
+
+label.ant-radio-wrapper {
+    margin-right: 40px;
+}
+
+.search-address {
+    width: 100%;
+    max-width: 400px;
+    z-index: 10;
+    margin-bottom: 5px;
+}
+
+.search-address input {
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    width: 118%;
+}
+.loading__container {
+    position: fixed;
+    top: 0;
+    left: 0%;
+    width: 100%;
+    min-height: 100vh;
+    background: #c5ccf45f;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+.popup-product-cart {
+    p {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        font-size: 15px;
+    }
+    .ant-modal-body {
+        min-height: auto;
+        max-height: 210px;
+        overflow-y: auto;
+    }
+}
+
+ul.slick-dots.slick-dots-bottom {
+    visibility: hidden;
+}
+
+.ant-drawer-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: visible;
+}
+.ant-btn > .anticon + span,
+.ant-btn > span + .anticon {
+    margin-left: 8px;
+    display: inline;
+    margin-right: 75%;
+}
+.ant-drawer-content {
+    overflow: visible;
+}
+
+span.user__phone-number-content {
+    font-size: 18px;
+    margin-left: 46px;
+    color: #787878;
+}
+.user-order__product-all {
+    width: 100%;
+    height: auto;
+    transform: translateY(-14px);
+    overflow-y: auto;
+    max-height: 350px;
+}
+.input-product-checkbox.nohover:hover {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.order__user-status {
+    font-size: 12px;
+    margin-left: 14px;
+    font-weight: 600;
+    font-family: sans-serif;
+    & .Đang.chờ.xử.lý {
+        color: #e2c801;
+    }
+    & .Đã.hủy.đơn.hàng {
+        color: #d00000;
+    }
+    & .Đang.giao.hàng {
+        color: #119803;
+    }
+    span.title-status {
+        margin-right: 5px;
+    }
+}
+
+.invalid-feedback {
+    color: red;
+    font-family: system-ui;
+}
+.product-description-setting {
+    .ant-modal-body {
+        padding: 24px;
+        font-size: 14px;
+        line-height: 1.5715;
+        word-wrap: break-word;
+        height: auto;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+}
+
+a.button-redirect {
+    padding: 5px 10px;
+    background: #3998fe;
+    border-radius: 3px;
+    color: #fff;
+}
+
+.login-ship {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.loading-spin {
+    display: flex;
+    justify-content: center;
+    height: 200px;
+    align-items: center;
+}

@@ -1,0 +1,45 @@
+button.ant-btn.ant-btn-text.btn-sidebar {
+    width: 100%;
+    height: 45px;
+    transition: all 0s cubic-bezier(0.645, 0.045, 0.355, 1);
+    & a {
+        margin-left: 8px;
+        display: inline;
+        margin-right: 75%;
+    }
+    &.active {
+        background: #1a94ffee;
+        color: #fff;
+        transition: 0.4s ease-in-out;
+        a {
+            color: #fff;
+        }
+        &:last-child::after {
+            border: none;
+        }
+        &::after {
+            content: '';
+            border-left: 21px solid transparent;
+            border-right: 21px solid transparent;
+            border-bottom: 18px solid #1a94ffee;
+            position: absolute;
+            top: 12px;
+            right: -31px;
+            transform: rotate(90deg);
+            z-index: 100;
+        
+        }
+    }
+    span.anticon {
+        margin-right: 10px;
+    }
+    
+}
+.ant-btn > .anticon + span, .ant-btn > span + .anticon {
+    margin-left: 8px;
+    display: inline;
+    margin-right: 75%;
+}
+.ant-drawer-content {
+    overflow: visible;
+}
