@@ -10,31 +10,69 @@ const ProductSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        thumbnail: {
+        logo: {
             type: String,
             default: '',
         },
-        creator: {
-            type: String,
-        },
-        addressCreator: {
+        category: {
             type: String,
             required: true,
         },
-        addressProduct: {
+        description: {
+            type: Object,
+        },
+        detail: {
             type: String,
             required: true,
         },
-        status: {
+        image: [{ image: [{ data: { type: String } }] }],
+        varation: [
+            {
+                count: {
+                    type: Number,
+                    required: true,
+                },
+                image: {
+                    type: String,
+                    required: true,
+                },
+                title: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
+        shop: {
+            type: Object,
+        },
+        star: {
             type: Number,
-            required: true,
+            maximum: 5,
+            minimum: 0,
+            default: 0,
         },
-        indexProduct: {
-            type: Number,
-            required: true,
+        priceOld: {
+            type: String,
+            default: '0',
         },
+        sold: {
+            type: String,
+            default: '0',
+        },
+        amount: {
+            type: String,
+            default: '1',
+        },
+        likes: [],
+        comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
     },
     { timestamps: true },
 );
+
+ProductSchema.index({
+    'description.trademark': 'text',
+    name: 'text',
+    category: 'text',
+}); 
 
 module.exports = mongoose.model('Product', ProductSchema);

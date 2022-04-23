@@ -58,6 +58,8 @@ const authCtrl = {
 
             res.status(200).json({ msg: 'Register success!!' });
         } catch (error) {
+            console.log(error);
+            
             return res.status(500).json({ msg: error.message });
         }
     },
@@ -113,6 +115,7 @@ const authCtrl = {
 
             res.status(200).json({ user, refresh_token });
         } catch (err) {
+            console.log(err);
             return res.status(500).json({ msg: err.message });
         }
     },

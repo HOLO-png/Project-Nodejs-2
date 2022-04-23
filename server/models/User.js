@@ -50,6 +50,44 @@ const UserSchema = new mongoose.Schema(
             max: 50,
             default: '',
         },
+        address: [
+            {
+                receiver: {
+                    type: String,
+                    max: 80,
+                    min: 10,
+                    required: true,
+                },
+                phoneNumber: {
+                    type: String,
+                    max: 20,
+                    min: 8,
+                    required: true,
+                },
+                location: {
+                    type: String,
+                    max: 100,
+                    min: 10,
+                    required: true,
+                },
+                locationDetail: {
+                    type: String,
+                    max: 200,
+                    min: 10,
+                    required: true,
+                },
+                statusLocation: {
+                    type: String,
+                    required: true,
+                    default: '',
+                },
+                isActive: {
+                    type: Boolean,
+                    required: true,
+                    default: false,
+                },
+            },
+        ],
         Date: {
             type: Date,
         },
@@ -59,6 +97,9 @@ const UserSchema = new mongoose.Schema(
         },
     },
     { timestamps: true },
+    {
+        collection: 'User',
+    },
 );
 
 module.exports = mongoose.model('User', UserSchema);

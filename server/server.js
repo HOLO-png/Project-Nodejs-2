@@ -10,6 +10,10 @@ const productsRoute = require('./routes/products.js');
 const inputFieldRoute = require('./routes/inputFieldConfigProduct.js');
 const imgLogoFieldRoute = require('./routes/imageLogoField.js');
 const selectFieldRoute = require('./routes/selectField.js');
+const cartRoute = require('./routes/cart.js');
+const commentRoute = require('./routes/comment.js');
+const searchRoute = require('./routes/search.js');
+const categoryRoute = require('./routes/category.js');
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -19,9 +23,12 @@ dotenv.config();
 
 mongoose.connect(
     process.env.MONGO_URL,
-    { useNewUrlParser: true, useUnifiedTopology: true },
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    },
     () => {
-        console.log('Connected to MongoDB');
+        console.log('Connected to mongoDb Atlas.');
     },
 );
 
@@ -40,6 +47,11 @@ app.use('/api/select-field', selectFieldRoute);
 app.use('/api/logo-field', imgLogoFieldRoute);
 app.use('/api/users', userRoute);
 app.use('/api/products', productsRoute);
+app.use('/api/cart', cartRoute);
+app.use('/api/comment', commentRoute);
+app.use('/api/search', searchRoute);
+app.use('/api/category', categoryRoute);
+
 
 const PORT = process.env.PORT;
 

@@ -1,15 +1,16 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth.js');
 const productsCtrl = require('../controllers/productsCtrl.js');
+const categorySidebarCtrl = require('../controllers/categorySidebaarCtrl.js');
 
 // get product admin
-router.post('/', productsCtrl.createProduct);
-router.get('/', productsCtrl.getProducts);
-router.patch('/:id', productsCtrl.updateStatusProduct);
-router.put('/:id', auth, productsCtrl.updateProduct);
-router.delete('/:id', productsCtrl.deleteProduct);
-router.get('/:wallet', productsCtrl.getUsersAllProducts);
-router.get('/item/:addressItem', productsCtrl.getProduct);
 
+router.get('/', productsCtrl.getProducts);
+router.get('/search', productsCtrl.searchProduct);
+router.get('/star', productsCtrl.filterStarProducts);
+router.get('/price', productsCtrl.filterPriceProduct);
+router.get('/:productId', productsCtrl.getProduct);
+router.post('/', productsCtrl.createProduct);
+router.put('/:productId', auth, productsCtrl.updateProductLike);
 
 module.exports = router;
