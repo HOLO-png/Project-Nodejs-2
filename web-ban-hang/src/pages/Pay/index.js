@@ -20,12 +20,18 @@ import PayMethod from '../../Components/Pay/PayMethod';
 import Paypal from '../../Components/Pay/Paypal';
 import { openNotification } from '../../utils/messageAlear';
 import moment from 'moment';
-// import { AuthContext } from '../../Context/AuthProvider';
-// import { addDocument } from '../../Firebase/Services';
 import { isEmptyObject } from '../../utils/checkEmptyObj';
 import { isEmptyObjectAll } from '../../utils/checkEmptyObjAll';
 import { cartSelector } from '../../Store/Reducer/cartReducer';
 import { authSelector } from '../../Store/Reducer/authReducer';
+import {
+    getUserAddress,
+    insertUserAddress,
+    updateStatusUserAddress,
+    updateUserAddress,
+    userAddressSelector,
+} from '../../Store/Reducer/userAddressReducer';
+import { toast } from 'react-toastify';
 
 const PayComponent = styled.div``;
 const override = css`
@@ -58,17 +64,22 @@ const messageToCart = (status, text) => {
 function Pay(props) {
     const dispatch = useDispatch();
     const history = useHistory();
-    // const data = React.useContext(AuthContext);
-    const auth = useSelector(authSelector);
-    const address_api = useSelector(addressApiSelector);
-    const cartProducts = useSelector(cartSelector);
     const { linkText } = useParams();
+    // data auth.user && auth.token
+    const auth = useSelector(authSelector);
+    // data address api
+    const address_api = useSelector(addressApiSelector);
+    // data cart products
+    const cartProducts = useSelector(cartSelector);
+    // data user address
+    const userAddress = useSelector(userAddressSelector);
+
     const [sumProduct, setSumProduct] = useState('');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [visible, setVisible] = React.useState(false);
-    const [confirmLoading, setConfirmLoading] = React.useState(false);
-    const [modalText, setModalText] = React.useState('Content of the modal');
+    const [visible, setVisible] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [modalText, setModalText] = useState('Content of the modal');
     const [valueAddress, setvalueAddress] = useState({
         tinh: '',
         quan: '',
@@ -88,35 +99,34 @@ function Pay(props) {
     const [isShowTablePay, setIsShowTablePay] = useState(false);
     const [showPayPal, setShowPayPal] = useState(false);
     const [message, setMessage] = useState('');
+    const [userAddressDefault, setUserAddressDefault] = useState(null);
     const [address_user_api, setAddress_user_api] = useState(null);
-    // const { id } = data.user;
 
     useEffect(() => {
         dispatch(getAddressApi());
-        // dispatch(getCartProduct());
-    }, [dispatch]);
+        if (auth) {
+            dispatch(getUserAddress({ token: auth.tokenAuth }));
+        }
+    }, [auth, dispatch]);
+
+    console.log(userAddress);
 
     useEffect(() => {
-        if (auth) {
-            if (!auth.user.address.length) {
-                setVisible(true);
-            } else {
-                console.log('ok');
-
-                auth.user.address.forEach((item) => {
-                    if (item.status) {
-                        setObjAddress(item);
-                        setvalueAddress(item);
-                        setAddress_user_api(item);
-                        item && setInputName(item.receiver || '');
-                        item && setInputNumber(item.phoneNumber || '');
-                    }
-                });
-            }
+        if (!userAddress) {
+            setVisible(true);
+        } else {
+            userAddress.items.forEach((item) => {
+                if (item.status) {
+                    setObjAddress(item.address);
+                    setvalueAddress(item.address);
+                    setAddress_user_api(item);
+                    item && setInputName(item.username || '');
+                    item && setInputNumber(item.phoneNumber || '');
+                }
+            });
+            setVisible(false);
         }
-    }, [auth]);
-
-    console.log(visible);
+    }, [userAddress]);
 
     // useEffect(() => {
     //     setLoading(true);
@@ -198,23 +208,21 @@ function Pay(props) {
         setModalText('The modal will be closed after two seconds');
         setConfirmLoading(true);
         setTimeout(() => {
-            setVisible(false);
             setConfirmLoading(false);
 
             let o = Object.fromEntries(
                 Object.entries({
-                    id: address_user_api.id,
-                    id_user: address_user_api.id_user,
                     tinh: objAddress.tinh || valueAddress.tinh,
                     quan: objAddress.quan || valueAddress.quan,
                     xa: objAddress.xa || valueAddress.xa,
                     mota: objAddress.mota || valueAddress.mota,
                     name_user: inputName,
                     number_phone: inputNumber,
-                }).filter(([_, v]) => v !== ''),
+                    status: changeCheckbox,
+                }),
             );
 
-            const isEmpty = Object.values(o).every(
+            const isEmpty = Object.values(o).some(
                 (x) => x === null || x === '',
             );
 
@@ -222,14 +230,57 @@ function Pay(props) {
                 messageToCart(false, 'Lỗi Khi Tải Dữ Liệu Lên!');
             } else {
                 if (changeCheckbox) {
-                    // ImportApiAddressNew(o);
                     messageToCart(true, 'Đã Tải Thành Công Địa Chỉ Mặc Định');
                 } else {
                     setvalueAddress({ ...objAddress, ...o });
                     messageToCart(true, 'Đã Tải Thành Công Địa Chỉ Tạm Thời');
                 }
+                const address = {
+                    tinh: o.tinh,
+                    quan: o.quan,
+                    xa: o.xa,
+                    mota: o.mota,
+                };
+                const data = {
+                    username: inputName,
+                    phoneNumber: inputNumber,
+                    address,
+                    status: changeCheckbox,
+                    tokenAuth: auth.tokenAuth,
+                };
+                console.log({ o, address_user_api });
+
+                if (
+                    (address_user_api._id &&
+                        o.tinh !== address_user_api.address.tinh &&
+                        o.quan !== address_user_api.address.quan &&
+                        o.xa !== address_user_api.address.xa) ||
+                    inputName !== address_user_api.username ||
+                    inputNumber !== address_user_api.phoneNumber
+                ) {
+                    dispatch(
+                        updateUserAddress({
+                            data,
+                            userAddressId: address_user_api._id,
+                        }),
+                    );
+                } else if (userAddressDefault) {
+                    if (userAddressDefault !== address_user_api._id) {
+                        dispatch(
+                            updateStatusUserAddress({
+                                tokenAuth: auth.tokenAuth,
+                                userAddressId: userAddressDefault,
+                            }),
+                        );
+                    } else {
+                        toast.warning('Bi trung dia chi!');
+                    }
+                } else {
+                    dispatch(insertUserAddress(data));
+                }
             }
             setChangeCheckbox(false);
+            setVisible(false);
         }, 1000);
     };
 
@@ -238,9 +289,11 @@ function Pay(props) {
     };
 
     const handleCancel = () => {
+        if (address_user_api) {
+            setInputName(address_user_api.username || '');
+            setInputNumber(address_user_api.phoneNumber || '');
+        }
         setVisible(false);
-        setInputName(address_user_api.receiver || '');
-        setInputNumber(address_user_api.phoneNumber || '');
         setChangeCheckbox(false);
     };
 
@@ -347,6 +400,10 @@ function Pay(props) {
                     handleChangeInputName={handleChangeInputName}
                     handleChangeInputNumber={handleChangeInputNumber}
                     onChangeCheckbox={onChangeCheckbox}
+                    userAddress={userAddress}
+                    address_user_api={address_user_api}
+                    setUserAddressDefault={setUserAddressDefault}
+                    userAddressDefault={userAddressDefault}
                 />
                 <ProductsPay
                     products_api={products}

@@ -23,8 +23,8 @@ import authReducer from './Reducer/authReducer';
 import loadingReducer from './Reducer/loadingReducer';
 import productsReducer, { productsApi } from './Reducer/productsReducer';
 import cartReducer from './Reducer/cartReducer';
-import cartProductReducer from './Reducer/cartProductsReducer';
 import searchProductCategoryReducer from './Reducer/searchProductCategory';
+import userAddressReducer from './Reducer/userAddressReducer';
 import { menuSidebarApi } from './Reducer/menuReducer';
 import menuSidebarReducer from './Reducer/menuReducer';
 import { categoryApi } from './Reducer/categoryReducer';
@@ -51,10 +51,10 @@ export const store = configureStore({
         loadingReducer,
         productsReducer,
         cartReducer,
-        cartProductReducer,
         searchProductCategoryReducer,
         menuSidebarReducer,
         categoryReducer,
+        userAddressReducer,
         [productsApi.reducerPath]: productsApi.reducer,
         [menuSidebarApi.reducerPath]: menuSidebarApi.reducer,
         [categoryApi.reducerPath]: categoryApi.reducer,

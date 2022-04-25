@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Button, Col, message, Row, Skeleton } from 'antd';
 import DeliveryAddressTitle from './DeliveryAddressTitle';
 import ModalAddress from './ModalAddress';
 import { isEmptyObjectAll } from '../../../utils/checkEmptyObjAll';
+import UserAddressItems from '../UserAddressItems';
 
 const DeliveryStyle = styled.div`
     height: 120px;
@@ -94,9 +95,23 @@ function DeliveryAddress(props) {
         inputName,
         inputNumber,
         handleChangeInputName,
-        objAddress,
+        address_user_api,
         handleChangeInputNumber,
+        userAddress,
+        setUserAddressDefault,
+        userAddressDefault,
     } = props;
+    const [userAddressValue, setUserAddressValue] = useState(null);
+
+    useEffect(() => {
+        if (userAddress) {
+            userAddress.items.forEach((item) => {
+                if (item.status) {
+                    setUserAddressValue(item);
+                }
+            });
+        }
+    }, [userAddress]);
 
     return (
         <DeliveryStyle>
@@ -157,13 +172,14 @@ function DeliveryAddress(props) {
                                 </p>
                             </Col>
                         </Row>
-                        {valueAddress ? (
+                        {userAddress ? (
                             <Row
                                 gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}
                                 className="delivery-address__row"
                             >
+                                {/* <UserAddressItems userAddress={userAddress} /> */}
                                 <DeliveryAddressTitle
-                                    valueAddress={valueAddress}
+                                    userAddressValue={userAddressValue}
                                 />
                                 <Col
                                     className="gutter-row delivery-address__col--des"
@@ -199,6 +215,10 @@ function DeliveryAddress(props) {
                             handleChangeInputName={handleChangeInputName}
                             handleChangeInputNumber={handleChangeInputNumber}
                             onChangeCheckbox={onChangeCheckbox}
+                            address_user_api={address_user_api}
+                            userAddress={userAddress}
+                            setUserAddressDefault={setUserAddressDefault}
+                            userAddressDefault={userAddressDefault}
                         />
                     </div>
                 </>

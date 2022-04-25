@@ -23,14 +23,16 @@ function ModalAddress(props) {
         handleChangeInputName,
         handleChangeInputNumber,
         onChangeCheckbox,
+        address_user_api,
+        userAddress,
+        setUserAddressDefault,
+        userAddressDefault,
     } = props;
     const [value, setValue] = useState(1);
 
     const onChangeRadio = (e) => {
         setValue(e.target.value);
     };
-
-    console.log(visible);
 
     return (
         <ModalStyle>
@@ -82,11 +84,23 @@ function ModalAddress(props) {
                     />
                 )}
                 <InfoAddress active={value} />
-                <SaveAddress active={value} />
+                <SaveAddress
+                    active={value}
+                    userAddress={userAddress}
+                    setUserAddressDefault={setUserAddressDefault}
+                    userAddressDefault={userAddressDefault}
+                />
 
-                <Checkbox onChange={onChangeCheckbox} style={{ marginTop: 20 }}>
-                    Đặt làm địa chỉ mặc định
-                </Checkbox>
+                {address_user_api && !address_user_api._id ? (
+                    <Checkbox
+                        onChange={onChangeCheckbox}
+                        style={{ marginTop: 20 }}
+                    >
+                        Đặt làm địa chỉ mặc định
+                    </Checkbox>
+                ) : (
+                    ''
+                )}
             </Modal>
         </ModalStyle>
     );

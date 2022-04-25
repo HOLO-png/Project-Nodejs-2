@@ -14,6 +14,7 @@ const cartRoute = require('./routes/cart.js');
 const commentRoute = require('./routes/comment.js');
 const searchRoute = require('./routes/search.js');
 const categoryRoute = require('./routes/category.js');
+const userAddressRoute = require('./routes/userAddress.js');
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -51,7 +52,7 @@ app.use('/api/cart', cartRoute);
 app.use('/api/comment', commentRoute);
 app.use('/api/search', searchRoute);
 app.use('/api/category', categoryRoute);
-
+app.use('/api/user-address', userAddressRoute);
 
 const PORT = process.env.PORT;
 
