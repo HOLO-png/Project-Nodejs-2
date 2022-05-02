@@ -264,7 +264,7 @@ export default function Home() {
                                                 img_width="95%"
                                                 right="11px"
                                                 sold={item.sold}
-                                            ></ProductCart>
+                                            />
                                         </div>
                                     ))}
                                 </Grid>
@@ -291,7 +291,7 @@ export default function Home() {
                                     if (productsSelect.length === index + 1) {
                                         return (
                                             <div
-                                                // data-aos="fade-up"
+                                                data-aos="fade-up"
                                                 key={index}
                                                 ref={lastProductCart}
                                             >

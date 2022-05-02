@@ -52,6 +52,8 @@ function Payment(props) {
         handleChangeMethodPayProduct,
         handleMethodPayProduct,
         handleShowPayTable,
+        payMethodActive,
+        setPayMethodActive,
     } = props;
 
     return (
@@ -60,6 +62,8 @@ function Payment(props) {
                 <MethodPay
                     handleChangeMethodPayProduct={handleChangeMethodPayProduct}
                     handleShowPayTable={handleShowPayTable}
+                    payMethodActive={payMethodActive}
+                    setPayMethodActive={setPayMethodActive}
                 />
                 <Row
                     gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}

@@ -7,11 +7,14 @@ import { Empty } from 'antd';
 import { useSelector } from 'react-redux';
 import { authSelector } from '../../../Store/Reducer/authReducer';
 import { toast } from 'react-toastify';
+import { handleResetCartUser } from '../../../Store/Reducer/cartReducer';
+import { useDispatch } from 'react-redux';
 
 function Cart(props) {
     const { cart } = props;
     const cartDrawerRef = useRef(null);
     const user = useSelector(authSelector);
+    const dispatch = useDispatch();
     const history = useHistory();
 
     const someHandler = () => {
@@ -25,6 +28,13 @@ function Cart(props) {
             cartDrawerRef.current.classList.add('active');
         }
     };
+
+    useEffect(() => {
+        if (!user.tokenAuth && !user.user) {
+            dispatch(handleResetCartUser());
+        }
+    }, [user, dispatch]);
+
     useEffect(() => {
         window.addEventListener('mousemove', (e) => {
             if (
@@ -65,7 +75,7 @@ function Cart(props) {
                     <i className="fab fa-opencart"></i>
                 </span>
 
-                {cart && cart.cart.items.length ? (
+                {cart && cart.cart && cart.cart.items.length ? (
                     <p>
                         {cart.cart.items.reduce((sum, { qty }) => sum + qty, 0)}
                     </p>
@@ -80,7 +90,7 @@ function Cart(props) {
                         Add new product
                     </span>
                     <div className="header__menu__item__cart-drawer__products">
-                        {cart && cart.cart.items.length ? (
+                        {cart && cart.cart && cart.cart.items.length ? (
                             cart.cart.items.map((item, index) => (
                                 <CartProducts key={index} product={item} />
                             ))

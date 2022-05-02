@@ -4,7 +4,6 @@ import { Link, useParams } from 'react-router-dom';
 import numberWithCommas from '../../utils/numberWithCommas';
 import { Badge, Rate, Tag } from 'antd';
 import { handleChangeProductPrice } from '../../utils/handlePrice';
-import { entries } from 'lodash';
 
 function ProductCart(props) {
     const {

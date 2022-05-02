@@ -40,8 +40,6 @@ const menuSidebarSlice = createSlice({
 const menuSidebarReducer = menuSidebarSlice.reducer;
 
 export const menuSidebarSelector = (state) => {
-    console.log(state);
-
     return state.menuSidebarReducer;
 };
 export const { handleSetLoadingMenu } = menuSidebarSlice.actions;

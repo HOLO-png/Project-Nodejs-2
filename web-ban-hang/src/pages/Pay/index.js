@@ -17,11 +17,7 @@ import Helmet from '../../Components/Helmet';
 import { message } from 'antd';
 
 import PayMethod from '../../Components/Pay/PayMethod';
-import Paypal from '../../Components/Pay/Paypal';
-import { openNotification } from '../../utils/messageAlear';
-import moment from 'moment';
 import { isEmptyObject } from '../../utils/checkEmptyObj';
-import { isEmptyObjectAll } from '../../utils/checkEmptyObjAll';
 import { cartSelector } from '../../Store/Reducer/cartReducer';
 import { authSelector } from '../../Store/Reducer/authReducer';
 import {
@@ -32,7 +28,15 @@ import {
     userAddressSelector,
 } from '../../Store/Reducer/userAddressReducer';
 import { toast } from 'react-toastify';
-
+import {
+    loadingSelector,
+    setLoadingAction,
+} from '../../Store/Reducer/loadingReducer';
+import {
+    createPayment,
+    handleResetUrl,
+    paymentSelector,
+} from '../../Store/Reducer/paymentReducer';
 const PayComponent = styled.div``;
 const override = css`
     display: block;
@@ -73,10 +77,11 @@ function Pay(props) {
     const cartProducts = useSelector(cartSelector);
     // data user address
     const userAddress = useSelector(userAddressSelector);
+    const loading = useSelector(loadingSelector);
+    const payment = useSelector(paymentSelector);
 
     const [sumProduct, setSumProduct] = useState('');
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [modalText, setModalText] = useState('Content of the modal');
@@ -101,15 +106,37 @@ function Pay(props) {
     const [message, setMessage] = useState('');
     const [userAddressDefault, setUserAddressDefault] = useState(null);
     const [address_user_api, setAddress_user_api] = useState(null);
+    const [payMethodActive, setPayMethodActive] = useState(null);
+
+    const { paymentUrl } = payment;
+    console.log(payment);
 
     useEffect(() => {
         dispatch(getAddressApi());
-        if (auth) {
+        if (auth.tokenAuth && auth.user) {
             dispatch(getUserAddress({ token: auth.tokenAuth }));
+        } else {
+            history.push('/buyer/signin');
         }
-    }, [auth, dispatch]);
+    }, [auth, history, dispatch]);
 
-    console.log(userAddress);
+    useEffect(() => {
+        return () => {
+            dispatch(handleResetUrl());
+        };
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (paymentUrl) {
+            const newWindow = window.open(
+                paymentUrl,
+                '_self',
+                'noopener,noreferrer',
+            );
+            if (newWindow) newWindow.opener = null;
+            dispatch(setLoadingAction(false));
+        }
+    }, [dispatch, paymentUrl]);
 
     useEffect(() => {
         if (!userAddress) {
@@ -126,31 +153,19 @@ function Pay(props) {
             });
             setVisible(false);
         }
-    }, [userAddress]);
-
-    // useEffect(() => {
-    //     setLoading(true);
-    //     const timeLoading = setTimeout(() => {
-    //         if (cartProduct.length && data.user.address) {
-    //             setLoading(false);
-    //         }
-    //     }, 500);
-    //     document.body.style.overflow = '';
-    //     return () => {
-    //         clearTimeout(timeLoading);
-    //     };
-    // }, [cartProduct, data.user.address]);
+    }, [dispatch, userAddress]);
 
     useEffect(() => {
-        const sumValues = products.reduce(
-            (total, product) => total + product.price * product.amount,
-            0,
-        );
-        setSumProduct(sumValues);
+        if (products) {
+            const sumValues = products.reduce((accumulator, item) => {
+                return accumulator + Number(item.price) * item.qty;
+            }, 0);
+            setSumProduct(sumValues);
+        }
     }, [products]);
 
     useEffect(() => {
-        if (cartProducts) {
+        if (cartProducts.cart) {
             const { items } = cartProducts.cart;
             let arrText = linkText.split('+');
             const payProducts = [];
@@ -165,32 +180,6 @@ function Pay(props) {
             setProducts(payProducts);
         }
     }, [cartProducts, linkText]);
-
-    console.log(products);
-
-    // // DeliveryAddress
-    // const ImportApiAddressNew = (obj) => {
-    //     if (user === null) {
-    //         return;
-    //     }
-
-    //     db.collection('users')
-    //         .doc(id)
-    //         .update({
-    //             ...data.user,
-    //             address: changeAddressToObjActive(data.user.address, obj),
-    //         })
-    //         .then(() => {})
-    //         .catch((error) => {});
-    // };
-
-    const changeAddressToObjActive = (array, obj) => {
-        return array.map(function (item) {
-            return item.id === obj.id
-                ? { ...obj, status: true }
-                : { ...item, status: false };
-        });
-    };
 
     const showModal = () => {
         setVisible(true);
@@ -248,22 +237,23 @@ function Pay(props) {
                     status: changeCheckbox,
                     tokenAuth: auth.tokenAuth,
                 };
-                console.log({ o, address_user_api });
 
-                if (
-                    (address_user_api._id &&
-                        o.tinh !== address_user_api.address.tinh &&
-                        o.quan !== address_user_api.address.quan &&
-                        o.xa !== address_user_api.address.xa) ||
-                    inputName !== address_user_api.username ||
-                    inputNumber !== address_user_api.phoneNumber
-                ) {
-                    dispatch(
-                        updateUserAddress({
-                            data,
-                            userAddressId: address_user_api._id,
-                        }),
-                    );
+                if (address_user_api) {
+                    if (
+                        (address_user_api._id &&
+                            o.tinh !== address_user_api.address.tinh &&
+                            o.quan !== address_user_api.address.quan &&
+                            o.xa !== address_user_api.address.xa) ||
+                        inputName !== address_user_api.username ||
+                        inputNumber !== address_user_api.phoneNumber
+                    ) {
+                        dispatch(
+                            updateUserAddress({
+                                data,
+                                userAddressId: address_user_api._id,
+                            }),
+                        );
+                    }
                 } else if (userAddressDefault) {
                     if (userAddressDefault !== address_user_api._id) {
                         dispatch(
@@ -273,7 +263,7 @@ function Pay(props) {
                             }),
                         );
                     } else {
-                        toast.warning('Bi trung dia chi!');
+                        toast.warning('Bị trùng địa chỉ rồi bro!');
                     }
                 } else {
                     dispatch(insertUserAddress(data));
@@ -305,36 +295,29 @@ function Pay(props) {
         setPayMethod(method);
     };
 
+    console.log(products);
+
     const handleMethodPayProduct = () => {
-        if (payMethod) {
+        if (payMethodActive) {
             if (!isEmptyObject(valueAddress || {})) {
-                const obj = {
-                    ...valueAddress,
-                    products,
-                    status: {
-                        title: 'Đang chờ xử lý',
-                        icon: 'fa-badge-check',
-                    },
-                    message: message,
-                    dateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-                };
-                delete obj.id;
+                switch (payMethodActive.title) {
+                    case 'PayPal':
+                        dispatch(setLoadingAction(true));
+                        dispatch(
+                            createPayment({ products, email: auth.user.email }),
+                        );
+                        // dispatch(setLoadingAction(false));
 
-                // addDocument('orders', obj);
-
-                setTimeout(() => {
-                    openNotification(
-                        'Xin Chúc Mừng',
-                        `Bạn Đã Đặt ${products.length} sản phẩm thành Công`,
-                    );
-                    history.push('/user/all');
-                }, 500);
-
-                products.forEach((element) => {
-                    setTimeout(async () => {
-                        // await dispatch(deleteCartProductAllApi(element));
-                    }, 100);
-                });
+                        break;
+                    default:
+                }
+                // setTimeout(() => {
+                //     openNotification(
+                //         'Xin Chúc Mừng',
+                //         `Bạn Đã Đặt ${products.length} sản phẩm thành Công`,
+                //     );
+                //     history.push('/user/all');
+                // }, 500);
             } else {
                 messageToCart(
                     false,
@@ -350,7 +333,7 @@ function Pay(props) {
     };
 
     const handleShowPayTable = (method) => {
-        if (method === 'Thanh Toán Online') {
+        if (method === 'Thanh toán Online') {
             setIsShowTablePay(!isShowTablePay);
         } else {
             setIsShowTablePay(false);
@@ -358,10 +341,11 @@ function Pay(props) {
         }
     };
 
-    const handleIntegrate = (key) => {
-        if (key === 'PayPal') {
-            // setIsShowTablePay(false);
+    const handleIntegrate = (item) => {
+        if (item.title) {
             setShowPayPal(true);
+            setPayMethodActive(item);
+            setIsShowTablePay(false);
         }
     };
 
@@ -417,6 +401,8 @@ function Pay(props) {
                     handleMethodPayProduct={handleMethodPayProduct}
                     handleChangeMethodPayProduct={handleChangeMethodPayProduct}
                     handleShowPayTable={handleShowPayTable}
+                    payMethodActive={payMethodActive}
+                    setPayMethodActive={setPayMethodActive}
                 />
                 <PayMethod
                     isShowTablePay={isShowTablePay}

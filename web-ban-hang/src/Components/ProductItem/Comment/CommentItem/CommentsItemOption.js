@@ -65,8 +65,6 @@ function CommentsItemOption({
     const [onEdit, setOnEdit] = useState(false);
     const [loadLike, setLoadLike] = useState(false);
 
-    console.log(product);
-
     const handleLikeAndUnLike = () => {
         if (loadLike) return;
         if (isLike) {
@@ -154,14 +152,18 @@ function CommentsItemOption({
                 >
                     <Actions
                         comment={comment}
-                        handleStatus={() => handleStatus(comment, comment._id)}
+                        handleStatus={() => {
+                            if (comment) {
+                                return handleStatus(comment, comment._id);
+                            }
+                        }}
                         handleLikeAndUnLike={handleLikeAndUnLike}
                         handleUnLike={handleUnLike}
                         user={user}
                         setIsLike={setIsLike}
                         isLike={isLike}
                     />
-                    {user && comment.user._id === user._id ? (
+                    {user && comment.user && comment.user._id === user._id ? (
                         <Dropdown.Button
                             onClick={handleButtonClick}
                             overlay={menu}

@@ -40,6 +40,8 @@ import DashboardNews from '../Components/DashBoard/DashboardNews';
 // import ProductDescriptionList from '../Components/DashBoard/DashboardWidgets/ProductDescriptionList';
 import VerifyEmail from '../pages/VerifyEmail';
 import ActivationEmail from '../pages/ActivationEmail';
+import OrderSuccess from '../pages/OrderSuccess';
+import OrderCancel from '../pages/OrderCancel';
 // const Home = React.lazy(() => import('../pages/Home'));
 
 export const MAIN_ROUTES = [
@@ -102,6 +104,18 @@ export const MAIN_ROUTES = [
         path: '/search/:keyword',
         exact: true,
         component: Search,
+    },
+    {
+        name: 'OrderSuccess',
+        path: '/order/success/:paymentId',
+        exact: true,
+        component: OrderSuccess,
+    },
+    {
+        name: 'Order Cancel',
+        path: '/order/cancel',
+        exact: true,
+        component: OrderCancel,
     },
     {
         name: 'NotFound',

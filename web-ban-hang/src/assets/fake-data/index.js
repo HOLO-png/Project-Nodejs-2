@@ -354,7 +354,7 @@ export const search_item = [
 export const content_pay_btn = [
     'Ví Iphone Pay',
     'Thẻ Tín Dụng Ghi Nợ',
-    'Thanh Toán Online',
+    'Thanh toán Online',
     'Thanh Toán Khi Nhận Hàng',
 ];
 export const slide_genuine = [
@@ -410,11 +410,13 @@ export const evaluate_content = [
 export const pay_method_img = [
     {
         title: 'PayPal',
-        image: 'https://www.payvnn.com/wp-content/uploads/2010/12/Hoi-dap-Paypal.jpg',
+        key: 'Thanh toán Online',
+        image: 'https://sedberkdesign.com/wp-content/uploads/2020/06/kisspng-paypal-logo-brand-font-payment-paypal-logo-icon-paypal-icon-logo-png-and-vecto-5b7f273e45e8a9.9067728615350597742864.png',
     },
     {
         title: 'MoMo',
-        image: 'https://upload.wikimedia.org/wikipedia/vi/archive/f/fe/20201011055543%21MoMo_Logo.png',
+        key: 'Thanh toán Online',
+        image: 'https://vmit.com.vn/wp-content/uploads/2021/02/logo-momo.png',
     },
 ];
 export const order_status = [

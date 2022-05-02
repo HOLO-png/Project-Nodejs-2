@@ -220,17 +220,23 @@ const cartCtrl = {
     removeProductsToCart: async (req, res) => {
         try {
             const { productsId, cartId } = req.body;
+            console.log(productsId, cartId);
 
-            const cartUser = await Cart.findOne({ _id: cartId });
+            if (cartId) {
+                const cartUser = await Cart.findOne({ _id: cartId });
+                cartUser.cart.items = cartUser.cart.items.filter((item) => {
+                    console.log(!productsId.includes(item._id.toString()));
+                    return !productsId.includes(item._id.toString());
+                });
 
-            cartUser.cart.items = cartUser.cart.items.filter((item) => {
-                return productsId.some(
-                    (productId) => productId === item._id.toString(),
-                );
-            });
+                console.log(cartUser.cart.items);
 
-            await cartUser.save();
-            return res.status(200).json(cartUser);
+                await cartUser.save();
+                return res.status(200).json(cartUser);
+            } else {
+                return res.status(400).json({ msg: 'remove product failed' });
+            }
+            
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err.message });

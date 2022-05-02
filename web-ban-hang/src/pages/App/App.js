@@ -162,6 +162,7 @@ function App() {
                     />
                 </div>
             )}
+
             <BrowserRouter
                 getUserConfirmation={(message, callback) => {
                     return UserLeaveConfirmation(

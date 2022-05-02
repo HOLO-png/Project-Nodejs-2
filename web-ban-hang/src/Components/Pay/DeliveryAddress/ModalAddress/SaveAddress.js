@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Radio } from 'antd';
+import { Button, Radio, Empty } from 'antd';
 import { Link } from 'react-router-dom';
 
 function SaveAddress({
@@ -11,7 +11,6 @@ function SaveAddress({
 }) {
     const onChangeCheckbox = (e) => {
         console.log(e.target.value);
-
         setUserAddressDefault(e.target.value);
     };
 
@@ -28,8 +27,6 @@ function SaveAddress({
     useEffect(() => {
         return () => {
             if (userAddress) {
-                console.log('ok');
-
                 userAddress.items.forEach((item) => {
                     if (item.status) {
                         setUserAddressDefault(item._id.toString());
@@ -45,10 +42,10 @@ function SaveAddress({
             style={{ display: active !== 3 ? 'none' : 'block' }}
         >
             <div className="save-address__items">
-                {userAddress &&
-                    userAddress.items.map((item) => {
+                {userAddress && userAddress.items.length ? (
+                    userAddress.items.map((item, key) => {
                         return (
-                            <div className="save-address__item">
+                            <div className="save-address__item" key={key}>
                                 <div className="save-address__content">
                                     <Radio.Group
                                         onChange={onChangeCheckbox}
@@ -67,7 +64,10 @@ function SaveAddress({
                                 </div>
                             </div>
                         );
-                    })}
+                    })
+                ) : (
+                    <Empty />
+                )}
             </div>
             <Link to="/user/address">
                 <Button type="dashed" size="large">

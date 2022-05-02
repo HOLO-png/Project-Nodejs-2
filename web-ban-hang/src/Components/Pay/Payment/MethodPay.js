@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Col, Row, Tooltip } from 'antd';
-import { CheckOutlined } from '@ant-design/icons';
 import { content_pay_btn } from '../../../assets/fake-data';
 
 const handleTextInfoBtn = (i) => {
@@ -24,7 +23,12 @@ const handleTextInfoBtn = (i) => {
     }
 };
 function MethodPay(props) {
-    const { handleChangeMethodPayProduct, handleShowPayTable } = props;
+    const {
+        handleChangeMethodPayProduct,
+        handleShowPayTable,
+        payMethodActive,
+        setPayMethodActive,
+    } = props;
 
     const [activeBtn, setActiveBtn] = useState(null);
 
@@ -52,7 +56,15 @@ function MethodPay(props) {
                     disabled={index === 1 || index === 0 ? true : false}
                     onClick={() => handleBtnCheckPay(index, item)}
                 >
-                    {item}
+                    {payMethodActive && payMethodActive.key === item ? (
+                        <img
+                            alt=""
+                            src={payMethodActive.image}
+                            className="method-payment"
+                        />
+                    ) : (
+                        item
+                    )}
                 </Button>
             </Tooltip>
         </Col>

@@ -168,7 +168,6 @@ const authSlice = createSlice({
                 const user = action.payload.newUser || action.payload.user;
                 const token = action.payload.refresh_token;
 
-                console.log(user, token);
                 state.auth.user = user;
                 state.auth.tokenAuth = token;
                 localStorage.setItem('user', JSON.stringify(user));

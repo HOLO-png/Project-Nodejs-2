@@ -146,7 +146,7 @@ export const handleResetCart = createAsyncThunk(
 const cartSlice = createSlice({
     name: 'cart',
     initialState: {
-        cart: null,
+        cart: JSON.parse(localStorage.getItem('cart')) || null,
     },
     reducers: {
         handleResetCartUser(state, action) {
@@ -160,6 +160,7 @@ const cartSlice = createSlice({
         [getOrCreateCartToUserApi.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [getOrCreateCartToUserApi.rejected]: (state, action) => {},
@@ -169,6 +170,7 @@ const cartSlice = createSlice({
         [handleAddProductToCart.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.cart.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [handleAddProductToCart.rejected]: (state, action) => {},
@@ -177,6 +179,7 @@ const cartSlice = createSlice({
         [handleRemoveProductToCart.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [handleRemoveProductToCart.rejected]: (state, action) => {},
@@ -185,6 +188,7 @@ const cartSlice = createSlice({
         [handleUpdateAmountProductToCart.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [handleUpdateAmountProductToCart.rejected]: (state, action) => {},
@@ -193,6 +197,7 @@ const cartSlice = createSlice({
         [handleResetCart.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [handleResetCart.rejected]: (state, action) => {},
@@ -202,6 +207,7 @@ const cartSlice = createSlice({
         [deleteProductsInCart.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [deleteProductsInCart.rejected]: (state, action) => {},

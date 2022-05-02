@@ -5,8 +5,6 @@ import numberWithCommas from '../../../utils/numberWithCommas';
 function Product(props) {
     const { product } = props;
 
-    console.log(product);
-
     return (
         <Row
             gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}

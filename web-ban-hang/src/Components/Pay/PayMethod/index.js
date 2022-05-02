@@ -48,27 +48,26 @@ const PayMethodStyle = styled.div`
 `;
 function PayMethod(props) {
     const { isShowTablePay, handleIntegrate, showPayPal } = props;
-    console.log(showPayPal);
 
     return isShowTablePay ? (
         <PayMethodStyle>
             <div className="pay-method">
                 <div
-                    className={`row ${showPayPal ? 'hidden' : ''}`}
+                    className={`row}`}
                     style={{ display: 'flex', alignItems: 'center' }}
                 >
                     {pay_method_img.map((item, index) => (
                         <div className="col-6" key={index}>
                             <div
                                 className="pay-method__img"
-                                onClick={() => handleIntegrate(item.title)}
+                                onClick={() => handleIntegrate(item)}
                             >
                                 <img src={item.image} alt={item.title} />
                             </div>
                         </div>
                     ))}
                 </div>
-                {showPayPal ? <Paypal showPayPal={showPayPal} /> : ''}
+                {/* {showPayPal ? <Paypal showPayPal={showPayPal} /> : ''} */}
             </div>
         </PayMethodStyle>
     ) : (

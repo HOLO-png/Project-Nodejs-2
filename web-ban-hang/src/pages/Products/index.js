@@ -25,9 +25,6 @@ import {
     insertCmt,
 } from '../../Store/Reducer/comments_user';
 import { handleProductStatus } from '../../Store/Reducer/current_product';
-import { getMobilesApi } from '../../Store/Reducer/mobile_api';
-import { getLaptopsApi } from '../../Store/Reducer/laptop_api';
-import { getTabletsApi } from '../../Store/Reducer/tablet_api';
 import { authSelector } from '../../Store/Reducer/authReducer';
 import {
     loadingSelector,
