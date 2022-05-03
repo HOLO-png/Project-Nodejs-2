@@ -7,10 +7,14 @@ const OrderSchema = new mongoose.Schema(
         email: { type: String, default: '' },
         phoneNumber: {
             type: String,
-            default: '',
+            required: true,
         },
-        city: { type: String, default: '' },
-        products: [{}],
+        city: { type: Object, required: true },
+        products: [{ type: String, required: true }],
+        userID: {
+            type: String,
+            required: true,
+        },
     },
     { timestamps: true },
 );

@@ -82,7 +82,7 @@ export const updateStatusUserAddress = createAsyncThunk(
 const userAddressSlice = createSlice({
     name: 'userAddress',
     initialState: {
-        userAddress: null,
+        userAddress: JSON.parse(localStorage.getItem('userAddress')) || null,
     },
     reducers: {},
     extraReducers: {
@@ -91,6 +91,10 @@ const userAddressSlice = createSlice({
         [getUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
+                localStorage.setItem(
+                    'userAddress',
+                    JSON.stringify(action.payload.userAddress),
+                );
             }
         },
         [getUserAddress.rejected]: (state, action) => {},
@@ -100,6 +104,10 @@ const userAddressSlice = createSlice({
         [insertUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.savedUserAddress;
+                localStorage.setItem(
+                    'userAddress',
+                    JSON.stringify(action.payload.savedUserAddress),
+                );
             }
         },
         [insertUserAddress.rejected]: (state, action) => {},
@@ -108,6 +116,10 @@ const userAddressSlice = createSlice({
         [updateUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
+                localStorage.setItem(
+                    'userAddress',
+                    JSON.stringify(action.payload.userAddress),
+                );
             }
         },
         [updateUserAddress.rejected]: (state, action) => {},
@@ -117,6 +129,10 @@ const userAddressSlice = createSlice({
         [updateStatusUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
+                localStorage.setItem(
+                    'userAddress',
+                    JSON.stringify(action.payload.userAddress),
+                );
             }
         },
         [updateStatusUserAddress.rejected]: (state, action) => {},

@@ -109,7 +109,6 @@ function Pay(props) {
     const [payMethodActive, setPayMethodActive] = useState(null);
 
     const { paymentUrl } = payment;
-    console.log(payment);
 
     useEffect(() => {
         dispatch(getAddressApi());

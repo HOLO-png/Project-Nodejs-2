@@ -17,6 +17,7 @@ const searchRoute = require('./routes/search.js');
 const categoryRoute = require('./routes/category.js');
 const userAddressRoute = require('./routes/userAddress.js');
 const paymentRoute = require('./routes/payment.js');
+const orderRoute = require('./routes/order.js');
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -77,6 +78,7 @@ app.use('/api/search', searchRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/user-address', userAddressRoute);
 app.use('/api/payment', paymentRoute);
+app.use('/api/order', orderRoute);
 
 const PORT = process.env.PORT;
 

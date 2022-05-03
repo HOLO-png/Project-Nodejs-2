@@ -181,6 +181,7 @@ const sendEMailPurchase = (to, username, products) => {
                         <table class="table table-responsive-xl">
                             <thead>
                                 <tr>
+                                    <th>image</th>
                                     <th>name</th>
                                     <th>price</th>
                                     <th>quantity</th>
@@ -193,13 +194,11 @@ const sendEMailPurchase = (to, username, products) => {
                                     product,
                                     index,
                                 ) => `<tr class="alert" role="alert" key=${index}>
-                                    <td>
-                                    </td>
-                                    <td class="d-flex align-items-center border-bottom-0">
-                                        <div class="img"
-                                            style="background-image:url(images/xperson_1.jpg.pagespeed.ic.a2MnMHMs44.webp)">
-                                        </div>
-                                    </td>
+                                    <td class="border-bottom-0"><img src=${
+                                        product.description
+                                    } alt=${
+                                    product.name
+                                } style="width: 35%, height: 35%"/></td>
                                     <td class="border-bottom-0">${
                                         product.name
                                     }</td>

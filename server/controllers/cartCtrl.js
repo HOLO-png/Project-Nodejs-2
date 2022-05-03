@@ -220,16 +220,12 @@ const cartCtrl = {
     removeProductsToCart: async (req, res) => {
         try {
             const { productsId, cartId } = req.body;
-            console.log(productsId, cartId);
 
             if (cartId) {
                 const cartUser = await Cart.findOne({ _id: cartId });
                 cartUser.cart.items = cartUser.cart.items.filter((item) => {
-                    console.log(!productsId.includes(item._id.toString()));
                     return !productsId.includes(item._id.toString());
                 });
-
-                console.log(cartUser.cart.items);
 
                 await cartUser.save();
                 return res.status(200).json(cartUser);

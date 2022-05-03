@@ -5,16 +5,30 @@ import Section from '../../Components/Section';
 import { useParams } from 'react-router-dom';
 import SuccessModalCheckout from '../../Components/SuccessModalCheckout';
 import useQuery from '../../Hooks/useQuery.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteProductsInCart } from '../../Store/Reducer/cartReducer';
+import {
+    handleAddOrder,
+    orderSelector,
+} from '../../Store/Reducer/orderReducer';
+import { authSelector } from '../../Store/Reducer/authReducer';
+import {
+    getUserAddress,
+    userAddressSelector,
+} from '../../Store/Reducer/userAddressReducer';
 
 function OrderSuccess(props) {
     const { paymentId } = useParams();
     const dispatch = useDispatch();
     const query = useQuery();
+    const auth = useSelector(authSelector);
     const cartProducts = JSON.parse(localStorage.getItem('cart'));
+    const userAddress = JSON.parse(localStorage.getItem('userAddress'));
     const [productsId, setProductsId] = useState(null);
+    // const userAddress = useSelector(userAddressSelector);
+    const order = useSelector(orderSelector);
     const [isActiveModalSuccess, setIsActiveModalSuccess] = useState(false);
+    const [isCheckProductsToCart, setIsCheckProductsToCart] = useState(false);
 
     useEffect(() => {
         if (query.get('productsId')) {
@@ -25,21 +39,78 @@ function OrderSuccess(props) {
     }, [query]);
 
     useEffect(() => {
-        if (paymentId) {
-            setIsActiveModalSuccess(true);
-            if (productsId && cartProducts._id) {
-                dispatch(
-                    deleteProductsInCart({
-                        productsId,
-                        cartId: cartProducts._id,
-                    }),
+        if (productsId && productsId.length) {
+            if (cartProducts.cart) {
+                const cartProductsChange = cartProducts.cart.items.some(
+                    function (item) {
+                        if (productsId.includes(item._id.toString()))
+                            return true;
+                        else return false;
+                    },
                 );
+                setIsCheckProductsToCart(cartProductsChange);
             }
         }
-        setTimeout(() => {
-            setIsActiveModalSuccess(false);
-        }, 3000);
-    }, [cartProducts._id, dispatch, paymentId, productsId]);
+    }, [cartProducts, productsId]);
+
+    // console.log(order);
+
+    useEffect(() => {
+        if (order) {
+            if (isCheckProductsToCart) {
+                if (paymentId) {
+                    setIsActiveModalSuccess(true);
+                    if (productsId && cartProducts._id) {
+                        dispatch(
+                            deleteProductsInCart({
+                                productsId,
+                                cartId: cartProducts._id,
+                            }),
+                        );
+                    }
+                }
+                setTimeout(() => {
+                    setIsActiveModalSuccess(false);
+                }, 3000);
+            }
+        }
+    }, [
+        cartProducts._id,
+        dispatch,
+        isCheckProductsToCart,
+        order,
+        paymentId,
+        productsId,
+    ]);
+
+    useEffect(() => {
+        if (auth) {
+            dispatch(getUserAddress({ token: auth.tokenAuth }));
+        }
+    }, [dispatch, auth]);
+
+    useEffect(() => {
+        if (auth.tokenAuth) {
+            if (productsId && productsId.length) {
+                if (userAddress.items.length) {
+                    userAddress.items.forEach((item) => {
+                        if (item.status) {
+                            dispatch(
+                                handleAddOrder({
+                                    tokenAuth: auth.tokenAuth,
+                                    username: item.username,
+                                    phoneNumber: item.phoneNumber,
+                                    city: item.address,
+                                    productsID: productsId,
+                                }),
+                            );
+                            console.log(item.status);
+                        }
+                    });
+                }
+            }
+        }
+    }, [auth, dispatch]);
 
     return (
         <Helmet title="Order Success">

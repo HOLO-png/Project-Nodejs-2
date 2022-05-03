@@ -122,11 +122,13 @@ const paypalProductCtrl = {
 
                         const { first_name, last_name } =
                             payment.payer.payer_info;
+
                         sendEMailPurchase(
                             email,
                             `${last_name} ${first_name}`,
                             payment.transactions[0].item_list.items,
                         );
+
                         return res.redirect(
                             url.format({
                                 pathname: `http://localhost:1901/order/success/${paymentId}`,
