@@ -15,7 +15,6 @@ function ProductBuy(props) {
     } = props;
     const [productCart, setproductCart] = useState({});
 
-    console.log(product.description);
 
     useEffect(() => {
         const productItem =

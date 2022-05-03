@@ -6,11 +6,18 @@ const url = 'http://localhost:8800/api';
 
 export const handleAddOrder = createAsyncThunk(
     'handleAddOrder/handleAddOrderFetch',
-    async ({ username, phoneNumber, city, productsID, tokenAuth }) => {
+    async ({
+        username,
+        phoneNumber,
+        city,
+        productsID,
+        tokenAuth,
+        isPayment,
+    }) => {
         try {
             const res = await axios.post(
                 `${url}/order`,
-                { username, phoneNumber, city, productsID },
+                { username, phoneNumber, city, productsID, isPayment },
                 {
                     headers: { Authorization: tokenAuth },
                 },

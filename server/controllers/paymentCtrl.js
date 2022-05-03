@@ -135,6 +135,7 @@ const paypalProductCtrl = {
                                 query: {
                                     username: `${last_name} ${first_name}`,
                                     productsId: stringItemId,
+                                    isPayment: 'true',
                                 },
                             }),
                         );

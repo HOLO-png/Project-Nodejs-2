@@ -15,6 +15,10 @@ const OrderSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        isPayment: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true },
 );

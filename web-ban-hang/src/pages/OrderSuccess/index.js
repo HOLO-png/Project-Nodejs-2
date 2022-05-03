@@ -25,7 +25,6 @@ function OrderSuccess(props) {
     const cartProducts = JSON.parse(localStorage.getItem('cart'));
     const userAddress = JSON.parse(localStorage.getItem('userAddress'));
     const [productsId, setProductsId] = useState(null);
-    // const userAddress = useSelector(userAddressSelector);
     const order = useSelector(orderSelector);
     const [isActiveModalSuccess, setIsActiveModalSuccess] = useState(false);
     const [isCheckProductsToCart, setIsCheckProductsToCart] = useState(false);
@@ -52,8 +51,6 @@ function OrderSuccess(props) {
             }
         }
     }, [cartProducts, productsId]);
-
-    // console.log(order);
 
     useEffect(() => {
         if (order) {
@@ -102,6 +99,9 @@ function OrderSuccess(props) {
                                     phoneNumber: item.phoneNumber,
                                     city: item.address,
                                     productsID: productsId,
+                                    isPayment: JSON.parse(
+                                        query.get('isPayment'),
+                                    ),
                                 }),
                             );
                             console.log(item.status);

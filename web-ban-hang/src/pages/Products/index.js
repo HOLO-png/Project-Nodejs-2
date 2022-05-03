@@ -459,6 +459,8 @@ export default function Products() {
     };
 
     const handleProductToCart = (obj) => {
+        console.log(obj);
+
         if (user.user && user.tokenAuth) {
             dispatch(handleAddProductToCart({ cart, obj, amout, user }));
         } else {
@@ -488,6 +490,20 @@ export default function Products() {
     };
 
     const handleProductToBuy = (obj) => {
+        if (user.user && user.tokenAuth) {
+            dispatch(
+                handleAddProductToCart({
+                    cart,
+                    obj,
+                    amout,
+                    user,
+                    isChecked: true,
+                }),
+            );
+        } else {
+            toast.warning('Bạn cần phải đăng nhập để sử dụng dịch vụ này');
+            history.push('/buyer/signin');
+        }
         messageToCart(true);
     };
 

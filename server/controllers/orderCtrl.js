@@ -4,8 +4,10 @@ const Order = require('../models/Order.js');
 
 const orderCtrl = {
     createOrder: async (req, res) => {
-        const { username, phoneNumber, city, productsID } = req.body;
+        const { username, phoneNumber, city, productsID, isPayment } = req.body;
         const { id } = req.user;
+
+        console.log({ isPayment });
 
         try {
             if (id) {
@@ -27,6 +29,7 @@ const orderCtrl = {
                         city,
                         products,
                         userID: id,
+                        isPayment,
                     });
 
                     const newOrder = await order.save();

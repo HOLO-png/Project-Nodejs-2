@@ -25,8 +25,6 @@ function ProductsTop(props) {
 
     const name_url = (name) => name.replace(/ /g, '-');
 
-    console.log(products_api);
-
     const renderProductsTop = () =>
         products_api
             ? getProducts(

@@ -64,6 +64,7 @@ export const deleteProductsInCart = createAsyncThunk(
 export const handleAddProductToCart = createAsyncThunk(
     'handleAddProductToCart/handleAddProductToCartFetch',
     async (data) => {
+        const { isChecked } = data;
         try {
             const res = await axios.post(
                 `${url}/cart/${data.cart._id}`,
@@ -83,7 +84,13 @@ export const handleAddProductToCart = createAsyncThunk(
                 },
             );
             messageToCart(true);
-            return res.data;
+            return {
+                itemsChecked: {
+                    isChecked,
+                    image: data.obj.image[0].data,
+                },
+                data: res.data,
+            };
         } catch (err) {
             toast.warning(`Thêm sản phẩm thất bại`);
             console.log(err);
@@ -168,9 +175,29 @@ const cartSlice = createSlice({
         //fetch activation email
         [handleAddProductToCart.pending]: (state, action) => {},
         [handleAddProductToCart.fulfilled]: (state, action) => {
-            if (action.payload) {
-                state.cart.cart = action.payload;
-                localStorage.setItem('cart', JSON.stringify(action.payload));
+            if (action.payload.data) {
+                if (action.payload.itemsChecked.isChecked) {
+                    state.cart.cart.items = action.payload.data.items.map(
+                        (item) => {
+                            if (
+                                item.image === action.payload.itemsChecked.image
+                            ) {
+                                return { ...item, isChecked: true };
+                            } else {
+                                return item;
+                            }
+                        },
+                    );
+                    console.log(state.cart);
+
+                    localStorage.setItem('cart', JSON.stringify(state.cart));
+                } else {
+                    state.cart.cart = action.payload.data;
+                    localStorage.setItem(
+                        'cart',
+                        JSON.stringify(action.payload),
+                    );
+                }
             }
         },
         [handleAddProductToCart.rejected]: (state, action) => {},
