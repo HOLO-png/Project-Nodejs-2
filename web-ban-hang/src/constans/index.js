@@ -77,7 +77,7 @@ export const MAIN_ROUTES = [
     },
     {
         name: 'PurchaseOrder',
-        path: '/user',
+        path: '/user/:location',
         exact: true,
         component: PurchaseOrder,
     },
@@ -188,7 +188,7 @@ export const FILE_USER = [
 export const ORDER_WHEEL = [
     {
         name: 'AllProduct',
-        path: '/user/all',
+        path: '/user/order',
         exact: true,
         component: OrderUser,
     },

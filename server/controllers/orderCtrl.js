@@ -4,10 +4,9 @@ const Order = require('../models/Order.js');
 
 const orderCtrl = {
     createOrder: async (req, res) => {
-        const { username, phoneNumber, city, productsID, isPayment } = req.body;
+        const { username, phoneNumber, city, productsID, isPayment, message } =
+            req.body;
         const { id } = req.user;
-
-        console.log({ isPayment });
 
         try {
             if (id) {
@@ -30,11 +29,26 @@ const orderCtrl = {
                         products,
                         userID: id,
                         isPayment,
+                        message,
                     });
 
                     const newOrder = await order.save();
                     res.status(200).json({ newOrder });
                 }
+            } else {
+                throw { status: 500, message: 'You are not logged in' };
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(500).json(err);
+        }
+    },
+    getOrderUser: async (req, res) => {
+        const { id } = req.user;
+        try {
+            if (id) {
+                const orders = await Order.find({ userID: id });
+                res.status(200).json({ orders });
             } else {
                 throw { status: 500, message: 'You are not logged in' };
             }

@@ -4,6 +4,21 @@ import { toast } from 'react-toastify';
 
 const url = 'http://localhost:8800/api';
 
+// handle feature for User Page
+export const updateProfileUser = createAsyncThunk(
+    'updateProfileUser/updateProfileUserFetch',
+    async ({tokenAuth, data}) => {
+        try {
+               await axios.put(`${url}/users`, data, { headers: { Authorization: tokenAuth, data },});
+                return data;
+        } catch (err) {
+            console.log(err);
+            toast.error(`${err.message} 😓`);
+        }
+    },
+);
+
+// handle feature for Login Page
 export const fetchSignupAction = createAsyncThunk(
     'signup/signupFetch',
     async (data) => {
@@ -154,6 +169,17 @@ const authSlice = createSlice({
         },
     },
     extraReducers: {
+        //update user profile
+        [updateProfileUser.pending]: (state, action) => {},
+        [updateProfileUser.fulfilled]: (state, action) => {
+            const data = action.payload;
+            if(data) {
+                state.auth.user = {...state.auth.user, ...data}
+                localStorage.setItem('user', JSON.stringify(state.auth.user));
+            }
+        },
+        [updateProfileUser.rejected]: (state, action) => {},
+
         //fetch activation email
         [fetchSignupAction.pending]: (state, action) => {},
         [fetchSignupAction.fulfilled]: (state, action) => {

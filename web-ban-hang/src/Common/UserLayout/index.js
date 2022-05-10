@@ -2,12 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route } from 'react-router-dom';
 
-export default function Userlayout(props) {
-    const { name, component: YourComponent, path, exact } = props;
+export default function Userlayout({
+    name,
+    component: YourComponent,
+    path,
+    exact,
+    location,
+}) {
     return (
         <Route
             name={name}
-            path={path}
+            path={location.pathname}
             exact={exact}
             render={(props) => <YourComponent {...props} />}
         />

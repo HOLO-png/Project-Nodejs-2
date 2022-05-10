@@ -33,6 +33,7 @@ import {
 import {
     cartSelector,
     handleAddProductToCart,
+    handleAddProductToCartBuyAction,
 } from '../../Store/Reducer/cartReducer';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -459,8 +460,6 @@ export default function Products() {
     };
 
     const handleProductToCart = (obj) => {
-        console.log(obj);
-
         if (user.user && user.tokenAuth) {
             dispatch(handleAddProductToCart({ cart, obj, amout, user }));
         } else {
@@ -469,30 +468,10 @@ export default function Products() {
         }
     };
 
-    const messageToCart = (status) => {
-        if (status) {
-            message.success({
-                content: 'Sản phẩm đã được thêm vào giỏ hàng !',
-                className: 'custom-class',
-                style: {
-                    marginTop: '0vh',
-                },
-            });
-        } else {
-            message.warning({
-                content: 'Sản Phẩm đã có trong giỏ hàng!',
-                className: 'custom-class',
-                style: {
-                    marginTop: '0vh',
-                },
-            });
-        }
-    };
-
     const handleProductToBuy = (obj) => {
         if (user.user && user.tokenAuth) {
             dispatch(
-                handleAddProductToCart({
+                handleAddProductToCartBuyAction({
                     cart,
                     obj,
                     amout,
@@ -504,7 +483,6 @@ export default function Products() {
             toast.warning('Bạn cần phải đăng nhập để sử dụng dịch vụ này');
             history.push('/buyer/signin');
         }
-        messageToCart(true);
     };
 
     return (

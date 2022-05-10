@@ -10,7 +10,6 @@ function SaveAddress({
     userAddressDefault,
 }) {
     const onChangeCheckbox = (e) => {
-        console.log(e.target.value);
         setUserAddressDefault(e.target.value);
     };
 

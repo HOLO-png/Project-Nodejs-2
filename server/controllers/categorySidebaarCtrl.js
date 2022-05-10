@@ -484,11 +484,7 @@ const categoryProductCtrl = {
                 } else {
                     total = Math.floor(count / limit) + 1;
                 }
-                console.log({
-                    products: products.length,
-                    total,
-                    count,
-                });
+
                 return res.status(200).json({
                     products,
                     total,

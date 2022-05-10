@@ -6,29 +6,46 @@ const url = 'http://localhost:8800/api';
 
 export const handleAddOrder = createAsyncThunk(
     'handleAddOrder/handleAddOrderFetch',
-    async ({
-        username,
-        phoneNumber,
-        city,
-        productsID,
-        tokenAuth,
-        isPayment,
-    }) => {
+    async (
+        {
+            username,
+            phoneNumber,
+            city,
+            productsID,
+            tokenAuth,
+            isPayment,
+            message,
+        },
+        { rejectWithValue },
+    ) => {
         try {
             const res = await axios.post(
                 `${url}/order`,
-                { username, phoneNumber, city, productsID, isPayment },
+                { username, phoneNumber, city, productsID, isPayment, message },
                 {
                     headers: { Authorization: tokenAuth },
                 },
             );
-            console.log(res.data);
-
             return res.data;
         } catch (err) {
             toast.warning(`Tạo đơn hàng thất bại!`);
             console.log(err);
-            toast.error(`${err.message} 😓`);
+            return rejectWithValue(err.response.data);
+        }
+    },
+);
+
+export const handleGetOrder = createAsyncThunk(
+    'handleGetOrder/handleGetOrderFetch',
+    async ({ tokenAuth }) => {
+        try {
+            const res = await axios.get(`${url}/order`, {
+                headers: { Authorization: tokenAuth },
+            });
+            return res.data;
+        } catch (err) {
+            toast.warning(`Get orders failed!`);
+            console.log(err);
         }
     },
 );
@@ -37,6 +54,8 @@ const orderSlice = createSlice({
     name: 'order',
     initialState: {
         order: null,
+        isError: false,
+        orders: null,
     },
     reducers: {},
     extraReducers: {
@@ -47,13 +66,25 @@ const orderSlice = createSlice({
                 state.order = action.payload.newOrder;
             }
         },
-        [handleAddOrder.rejected]: (state, action) => {},
+        [handleAddOrder.rejected]: (state, action) => {
+            console.log(action.payload);
+            state.isError = true;
+        },
+
+        //fetch activation email
+        [handleGetOrder.pending]: (state, action) => {},
+        [handleGetOrder.fulfilled]: (state, action) => {
+            if (action.payload) {
+                state.orders = action.payload.orders;
+            }
+        },
+        [handleGetOrder.rejected]: (state, action) => {},
     },
 });
 
 const orderReducer = orderSlice.reducer;
 
-export const orderSelector = (state) => state.orderReducer.order;
+export const orderSelector = (state) => state.orderReducer;
 export const { handleResetOrderUser } = orderSlice.actions;
 
 export default orderReducer;

@@ -10,7 +10,7 @@ const { NganLuong } = require('vn-payments');
 
 const paypalProductCtrl = {
     createPaypalPayment: async (req, res) => {
-        const { products, email } = req.body;
+        const { products, email,message } = req.body;
 
         const formatter = new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -59,7 +59,7 @@ const paypalProductCtrl = {
                                 .replace('$', '')
                                 .replace(',', ''),
                         },
-                        description: 'payment success',
+                        description: message,
                     },
                 ],
             };
@@ -136,6 +136,7 @@ const paypalProductCtrl = {
                                     username: `${last_name} ${first_name}`,
                                     productsId: stringItemId,
                                     isPayment: 'true',
+                                    message: payment.transactions[0].description
                                 },
                             }),
                         );

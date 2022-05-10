@@ -10,5 +10,7 @@ router.patch(
     auth,
     userAddressCtrl.setIsActiveUserAddressItem,
 );
+router.delete('/:userAddressId', auth, userAddressCtrl.deleteUserAddressItem);
+
 
 module.exports = router;

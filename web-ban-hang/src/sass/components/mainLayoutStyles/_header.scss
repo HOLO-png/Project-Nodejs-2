@@ -506,7 +506,9 @@
         }
     }
 }
-
+.ant-avatar-sm {
+    width: 18%;
+}
 span.header-cart-icon {
     cursor: pointer;
 }
@@ -518,4 +520,5 @@ span.display-name-user {
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
+    width: 82%;
 }

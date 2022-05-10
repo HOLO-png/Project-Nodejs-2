@@ -37,6 +37,10 @@ import {
     handleResetUrl,
     paymentSelector,
 } from '../../Store/Reducer/paymentReducer';
+import {
+    handleAddOrder,
+    orderSelector,
+} from '../../Store/Reducer/orderReducer';
 const PayComponent = styled.div``;
 const override = css`
     display: block;
@@ -79,6 +83,7 @@ function Pay(props) {
     const userAddress = useSelector(userAddressSelector);
     const loading = useSelector(loadingSelector);
     const payment = useSelector(paymentSelector);
+    const orderSlt = useSelector(orderSelector);
 
     const [sumProduct, setSumProduct] = useState('');
     const [products, setProducts] = useState([]);
@@ -107,6 +112,10 @@ function Pay(props) {
     const [userAddressDefault, setUserAddressDefault] = useState(null);
     const [address_user_api, setAddress_user_api] = useState(null);
     const [payMethodActive, setPayMethodActive] = useState(null);
+    const [isRedirectToSuccessPage, setIsRedirectToSuccessPage] =
+        useState(false);
+
+    const { order, isError } = orderSlt;
 
     const { paymentUrl } = payment;
 
@@ -138,7 +147,7 @@ function Pay(props) {
     }, [dispatch, paymentUrl]);
 
     useEffect(() => {
-        if (!userAddress) {
+        if (!userAddress.items.length) {
             setVisible(true);
         } else {
             userAddress.items.forEach((item) => {
@@ -164,7 +173,7 @@ function Pay(props) {
     }, [products]);
 
     useEffect(() => {
-        if (cartProducts.cart) {
+        if (cartProducts) {
             const { items } = cartProducts.cart;
             let arrText = linkText.split('+');
             const payProducts = [];
@@ -179,6 +188,40 @@ function Pay(props) {
             setProducts(payProducts);
         }
     }, [cartProducts, linkText]);
+
+    console.log(isError);
+
+    useEffect(() => {
+        if (isRedirectToSuccessPage) {
+            if (payMethod === 'Thanh Toán Khi Nhận Hàng') {
+                if (products) {
+                    if (order) {
+                        if (!isError) {
+                            const stringItemId = products.reduce(
+                                (string, product) => {
+                                    return string + '-' + product._id;
+                                },
+                                '',
+                            );
+                            history.push(
+                                `/order/success/${order._id}?username=${inputName}&productsId=${stringItemId}&isPayment=false`,
+                            );
+                        } else {
+                            history.push(`/order/cancel`);
+                        }
+                    }
+                }
+            }
+        }
+    }, [
+        history,
+        inputName,
+        isError,
+        isRedirectToSuccessPage,
+        order,
+        payMethod,
+        products,
+    ]);
 
     const showModal = () => {
         setVisible(true);
@@ -197,7 +240,6 @@ function Pay(props) {
         setConfirmLoading(true);
         setTimeout(() => {
             setConfirmLoading(false);
-
             let o = Object.fromEntries(
                 Object.entries({
                     tinh: objAddress.tinh || valueAddress.tinh,
@@ -233,7 +275,7 @@ function Pay(props) {
                     username: inputName,
                     phoneNumber: inputNumber,
                     address,
-                    status: changeCheckbox,
+                    status: true,
                     tokenAuth: auth.tokenAuth,
                 };
 
@@ -243,6 +285,7 @@ function Pay(props) {
                             o.tinh !== address_user_api.address.tinh &&
                             o.quan !== address_user_api.address.quan &&
                             o.xa !== address_user_api.address.xa) ||
+                        o.mota !== address_user_api.address.mota ||
                         inputName !== address_user_api.username ||
                         inputNumber !== address_user_api.phoneNumber
                     ) {
@@ -252,23 +295,26 @@ function Pay(props) {
                                 userAddressId: address_user_api._id,
                             }),
                         );
-                    }
-                } else if (userAddressDefault) {
-                    if (userAddressDefault !== address_user_api._id) {
-                        dispatch(
-                            updateStatusUserAddress({
-                                tokenAuth: auth.tokenAuth,
-                                userAddressId: userAddressDefault,
-                            }),
-                        );
                     } else {
-                        toast.warning('Bị trùng địa chỉ rồi bro!');
+                        if (userAddressDefault) {
+                            if (userAddressDefault !== address_user_api._id) {
+                                dispatch(
+                                    updateStatusUserAddress({
+                                        tokenAuth: auth.tokenAuth,
+                                        userAddressId: userAddressDefault,
+                                    }),
+                                );
+                            } else {
+                                toast.warning('Bị trùng địa chỉ rồi bro!');
+                            }
+                        }
                     }
                 } else {
                     dispatch(insertUserAddress(data));
                 }
             }
             setChangeCheckbox(false);
+            setUserAddressDefault(null);
             setVisible(false);
         }, 1000);
     };
@@ -294,39 +340,64 @@ function Pay(props) {
         setPayMethod(method);
     };
 
-    console.log(products);
-
     const handleMethodPayProduct = () => {
-        if (payMethodActive) {
-            if (!isEmptyObject(valueAddress || {})) {
-                switch (payMethodActive.title) {
-                    case 'PayPal':
-                        dispatch(setLoadingAction(true));
-                        dispatch(
-                            createPayment({ products, email: auth.user.email }),
-                        );
-                        // dispatch(setLoadingAction(false));
-
-                        break;
-                    default:
+        if (!isEmptyObject(valueAddress || {})) {
+            if (payMethod === 'Thanh toán Online') {
+                if (payMethodActive) {
+                    switch (payMethodActive.title) {
+                        case 'PayPal':
+                            dispatch(setLoadingAction(true));
+                            dispatch(
+                                createPayment({
+                                    products,
+                                    email: auth.user.email,
+                                    message,
+                                }),
+                            );
+                            break;
+                        default:
+                    }
                 }
-                // setTimeout(() => {
-                //     openNotification(
-                //         'Xin Chúc Mừng',
-                //         `Bạn Đã Đặt ${products.length} sản phẩm thành Công`,
-                //     );
-                //     history.push('/user/all');
-                // }, 500);
+            } else if (payMethod === 'Thanh Toán Khi Nhận Hàng') {
+                if (auth.tokenAuth) {
+                    if (products.length) {
+                        const productsId = [];
+                        products.forEach((product) => {
+                            productsId.push(product._id);
+                        });
+                        if (productsId.length) {
+                            if (userAddress.items.length) {
+                                userAddress.items.forEach((item) => {
+                                    if (item.status) {
+                                        dispatch(setLoadingAction(true));
+                                        dispatch(
+                                            handleAddOrder({
+                                                tokenAuth: auth.tokenAuth,
+                                                username: item.username,
+                                                phoneNumber: item.phoneNumber,
+                                                city: item.address,
+                                                productsID: productsId,
+                                                isPayment: false,
+                                                message,
+                                            }),
+                                        );
+                                        setIsRedirectToSuccessPage(true);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
             } else {
                 messageToCart(
                     false,
-                    'Xin Lỗi, Bạn Chưa Có Địa Chỉ Mặc Định, Vui Lòng Nhập Lại!',
+                    'Xin Lỗi, Vui Lòng Chọn Phương Thức Thanh Toán Trước Khi Đặt Hàng!',
                 );
             }
         } else {
             messageToCart(
                 false,
-                'Xin Lỗi, Vui Lòng Chọn Phương Thức Thanh Toán Trước Khi Đặt Hàng!',
+                'Xin Lỗi, Bạn Chưa Có Địa Chỉ Mặc Định, Vui Lòng Nhập Lại!',
             );
         }
     };
@@ -354,7 +425,7 @@ function Pay(props) {
 
     // End
     return (
-        <Helmet title="Cart">
+        <Helmet title="Payment">
             {loading && (
                 <div className="loading__container">
                     <ScaleLoader

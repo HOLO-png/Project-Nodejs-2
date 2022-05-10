@@ -47,13 +47,13 @@
               /*  set transition for mouse enter & exit */
             }
           
-            button:hover #creditcard {
+            a:hover #creditcard {
               transform: translateY(0px);
               transition: transform 0.2s ease-in-out;
               /*  overide transition for mouse enter */
             }
           
-            button:hover #money {
+            a:hover #money {
               transform: translateY(0px);
               transition: transform 0.3s ease-in-out;
               /*  overide transition for mouse enter */

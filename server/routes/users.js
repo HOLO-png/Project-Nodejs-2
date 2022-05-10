@@ -4,5 +4,7 @@ const usersCtrl = require('../controllers/usersCtrl.js');
 
 // get user admin
 router.get('/', auth, usersCtrl.getUserInfo);
+router.put('/', auth, usersCtrl.updateUserProfile);
+
 
 module.exports = router;

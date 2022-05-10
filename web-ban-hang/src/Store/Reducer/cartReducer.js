@@ -64,7 +64,39 @@ export const deleteProductsInCart = createAsyncThunk(
 export const handleAddProductToCart = createAsyncThunk(
     'handleAddProductToCart/handleAddProductToCartFetch',
     async (data) => {
+        try {
+            const res = await axios.post(
+                `${url}/cart/${data.cart._id}`,
+                {
+                    productId: data.obj._id,
+                    qty: data.amout,
+                    indexProduct: data.obj.count,
+                    name: data.obj.name,
+                    price: data.obj.price,
+                    priceOld: data.obj.priceOld,
+                    category: data.obj.category,
+                    image: data.obj.image[0].data,
+                    capacity: data.obj.capacity,
+                },
+                {
+                    headers: { Authorization: data.user.tokenAuth },
+                },
+            );
+            messageToCart(true);
+            return res.data;
+        } catch (err) {
+            toast.warning(`Thêm sản phẩm thất bại`);
+            console.log(err);
+            toast.error(`${err.message} 😓`);
+        }
+    },
+);
+
+export const handleAddProductToCartBuyAction = createAsyncThunk(
+    'handleAddProductToCartBuyAction/handleAddProductToCartBuyActionFetch',
+    async (data) => {
         const { isChecked } = data;
+
         try {
             const res = await axios.post(
                 `${url}/cart/${data.cart._id}`,
@@ -158,6 +190,7 @@ const cartSlice = createSlice({
     reducers: {
         handleResetCartUser(state, action) {
             console.log('reset cart');
+            localStorage.removeItem('cart');
             state.cart = null;
         },
     },
@@ -173,31 +206,32 @@ const cartSlice = createSlice({
         [getOrCreateCartToUserApi.rejected]: (state, action) => {},
 
         //fetch activation email
+        [handleAddProductToCartBuyAction.pending]: (state, action) => {},
+        [handleAddProductToCartBuyAction.fulfilled]: (state, action) => {
+            if (action.payload) {
+                state.cart.cart.items = action.payload.data.cart.items.map(
+                    (item) => {
+                        if (item.image === action.payload.itemsChecked.image) {
+                            return { ...item, isChecked: true };
+                        } else {
+                            return item;
+                        }
+                    },
+                );
+
+                localStorage.setItem(
+                    'cart',
+                    JSON.stringify(action.payload.data),
+                );
+            }
+        },
+        [handleAddProductToCartBuyAction.rejected]: (state, action) => {},
+        //fetch activation email
         [handleAddProductToCart.pending]: (state, action) => {},
         [handleAddProductToCart.fulfilled]: (state, action) => {
-            if (action.payload.data) {
-                if (action.payload.itemsChecked.isChecked) {
-                    state.cart.cart.items = action.payload.data.items.map(
-                        (item) => {
-                            if (
-                                item.image === action.payload.itemsChecked.image
-                            ) {
-                                return { ...item, isChecked: true };
-                            } else {
-                                return item;
-                            }
-                        },
-                    );
-                    console.log(state.cart);
-
-                    localStorage.setItem('cart', JSON.stringify(state.cart));
-                } else {
-                    state.cart.cart = action.payload.data;
-                    localStorage.setItem(
-                        'cart',
-                        JSON.stringify(action.payload),
-                    );
-                }
+            if (action.payload) {
+                state.cart = action.payload;
+                localStorage.setItem('cart', JSON.stringify(action.payload));
             }
         },
         [handleAddProductToCart.rejected]: (state, action) => {},

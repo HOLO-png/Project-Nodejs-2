@@ -1,7 +1,12 @@
 import './App.css';
 import { BrowserRouter, Switch, useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { DASHBOARD_MAIN, LOGIN_ROUTES, MAIN_ROUTES } from '../../constans';
+import {
+    DASHBOARD_MAIN,
+    FILE_USER,
+    LOGIN_ROUTES,
+    MAIN_ROUTES,
+} from '../../constans';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../../Common/Layout';

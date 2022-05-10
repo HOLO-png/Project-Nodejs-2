@@ -12,6 +12,34 @@ const user = {
             return res.status(500).json({ msg: error.message });
         }
     },
+    updateUserProfile: async (req, res) => {
+        const { id } = req.user;
+        const { username, gender, dateOfBirth, profilePicture, phoneNumber } =
+            req.body;
+
+        try {
+            if (id) {
+                const user = await User.update(
+                    { _id: id },
+                    {
+                        $set: {
+                            username,
+                            gender,
+                            dateOfBirth,
+                            profilePicture,
+                            phoneNumber,
+                        },
+                    },
+                );
+                res.status(200).json(user);
+            } else {
+                throw { status: 500, message: 'You are not logged in' };
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ msg: error.message });
+        }
+    },
 };
 
 module.exports = user;

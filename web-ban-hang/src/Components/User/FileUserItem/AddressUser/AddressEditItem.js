@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import SelecteValue from '../../../Pay/DeliveryAddress/ModalAddress/SelecteValue';
 import { Form, Input, Button, Modal } from 'antd';
 import { isEmptyObject } from '../../../../utils/checkEmptyObj';
 
 function AddressEditItem(props) {
-    const { address_api, id_user, item, importAddressUserItem } = props;
+    const { address_api, item, importAddressUserItem } = props;
     const [modal, setModal] = useState(false);
     const [nameUser, setNameUser] = useState('');
     const [numberPhone, setNumberPhone] = useState('');
@@ -17,10 +17,10 @@ function AddressEditItem(props) {
     useEffect(() => {
         if (Object.values(item).length !== 0) {
             const result = {
-                tinh: item.tinh,
-                quan: item.quan,
-                xa: item.xa,
-                mota: item.mota,
+                tinh: item.address.tinh,
+                quan: item.address.quan,
+                xa: item.address.xa,
+                mota: item.address.mota,
             };
             setAddressInfoSelect(result);
         }
@@ -28,23 +28,29 @@ function AddressEditItem(props) {
 
     useEffect(() => {
         const addressUserObj = {
-            ...objAddress,
-            name_user: nameUser,
-            number_phone: numberPhone,
+            username: nameUser,
+            phoneNumber: numberPhone,
+            address: item.address,
         };
         setDataAddress(addressUserObj);
-    }, [id_user, item.id, nameUser, numberPhone, objAddress]);
+    }, [item.address, nameUser, numberPhone]);
 
     const handleImportAddressUser = () => {
         setTimeout(() => {
-            const addressUserObj = {
-                ...objAddress,
-                id: item.id,
-                id_user: id_user,
-                name_user: nameUser,
-                number_phone: numberPhone,
+            const isNullish = Object.values(objAddress).some((value) => {
+                if (!value) {
+                    return true;
+                }
+                return false;
+            });
+
+            const newUserAddress = {
+                username: nameUser || item.username,
+                phoneNumber: numberPhone || item.phoneNumber,
+                address: isNullish ? item.address : objAddress,
+                status: item.status,
             };
-            importAddressUserItem(addressUserObj);
+            importAddressUserItem({ newUserAddress, userAddressId: item._id });
         }, 500);
         setNameUser('');
         setNumberPhone('');
@@ -53,10 +59,19 @@ function AddressEditItem(props) {
 
     const setModal1Visible = (modal1Visible) => {
         setModal(modal1Visible);
-        setNameUser('');
+        setNameUser(item.username);
         setNumberPhone('');
-        setObjAddress({ tinh: '', quan: '', xa: '', mota: '' });
+        setObjAddress({
+            tinh: item.address.tinh,
+            quan: item.address.quan,
+            xa: item.address.xa,
+            mota: item.address.mota,
+        });
     };
+    useEffect(() => {
+        setNameUser(item.username);
+        setNumberPhone(item.phoneNumber);
+    }, [item.phoneNumber, item.username]);
 
     const onChangeName = (e) => {
         setNameUser(e.target.value);
@@ -104,14 +119,14 @@ function AddressEditItem(props) {
                         <Input
                             placeholder="Họ và tên"
                             onChange={onChangeName}
-                            defaultValue={item.name_user}
+                            value={nameUser}
                         />
                     </Form.Item>
                     <Form.Item label="Số điện thoại" style={{ margin: 0 }}>
                         <Input
                             placeholder="Số điện thoại"
                             onChange={onChangeNumberPhone}
-                            defaultValue={item.number_phone}
+                            defaultValue={item.phoneNumber}
                         />
                     </Form.Item>
                     <Form.Item label="Địa Chỉ" style={{ margin: 0 }}>
@@ -133,4 +148,4 @@ function AddressEditItem(props) {
 
 AddressEditItem.propTypes = {};
 
-export default AddressEditItem;
+export default memo(AddressEditItem);

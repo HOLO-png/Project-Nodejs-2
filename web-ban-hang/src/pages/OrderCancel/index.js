@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Helmet from '../../Components/Helmet';
 import Section, { SectionBody, SectionTitle } from '../../Components/Section';
+import { useDispatch } from 'react-redux';
+import { setLoadingAction } from '../../Store/Reducer/loadingReducer';
 
 function OrderCancel(props) {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setLoadingAction(false));
+    }, [dispatch]);
     return (
         <Helmet title="Order Cancel">
             <div className="order-success">

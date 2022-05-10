@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Button, Col, Divider, Empty, Input, Row } from 'antd';
 import { Link } from 'react-router-dom';
 import OrderPayProducts from './OrderPayProducts';
+import { SearchOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
 const AllProductItem = styled.div`
@@ -37,15 +38,12 @@ const AllProductItem = styled.div`
     }
 `;
 function AllProduct(props) {
-    const {
-        orders,
-        loading,
-        handleOrderActive,
-        photoURL,
-        handleChangeDataValue,
-    } = props;
+    const { orders, handleOrderActive, photoURL, handleSetValueSearchOrder } =
+        props;
 
-    const onSearch = (value) => console.log(value);
+    const onSearch = (e) => {
+        handleSetValueSearchOrder(e.target.value);
+    };
 
     return (
         <AllProductItem>
@@ -65,10 +63,10 @@ function AllProduct(props) {
                     }}
                 >
                     <div className="all-product__search">
-                        <Search
+                        <Input
                             placeholder="tìm kiếm đơn hàng..."
-                            onSearch={onSearch}
-                            enterButton
+                            prefix={<SearchOutlined />}
+                            onChange={onSearch}
                         />
                     </div>
                     <Divider
@@ -83,7 +81,6 @@ function AllProduct(props) {
                                 orders={orders}
                                 handleOrderActive={handleOrderActive}
                                 photoURL={photoURL}
-                                handleChangeDataValue={handleChangeDataValue}
                             />
                         ) : (
                             <>

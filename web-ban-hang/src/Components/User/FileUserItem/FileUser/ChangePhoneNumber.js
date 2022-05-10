@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Form, Input, Tag } from 'antd';
+import { Button, Modal, Form, Input, Tag, Tooltip } from 'antd';
 
 function ChangePhoneNumber(props) {
     const { phoneNumber, onChangePhoneNumber } = props;
     const [visible, setVisible] = useState(false);
+    const [phone, setPhone] = useState('');
+
+    useEffect(() => {
+        phoneNumber ? setPhone(phoneNumber) : setPhone('');
+    }, [phoneNumber]);
 
     const showModal = () => {
         setVisible(true);
@@ -26,18 +31,32 @@ function ChangePhoneNumber(props) {
                 onCancel={hideModal}
             >
                 <Form.Item label="Nhập Số Điện Thoại">
-                    <Input onChange={onChangePhoneNumber} type="number" />
+                    <Tooltip
+                        title={
+                            !phone
+                                ? 'Nhập số điện thoại mặc định ở đây'
+                                : 'Thay đổi số điện thoại của bạn ở đây'
+                        }
+                        color="#f50"
+                        key={
+                            !phone
+                                ? 'Nhập số điện thoại mặc định ở đây'
+                                : 'Thay đổi số điện thoại của bạn ở đây'
+                        }
+                    >
+                        <Input onChange={onChangePhoneNumber} type="number" />
+                    </Tooltip>
                 </Form.Item>
 
                 <Form.Item label="Số Hiện Tại">
                     <span className="user__phone-number-content">
-                        {phoneNumber
-                            ? '(84+ )' + phoneNumber
-                            : 'Bạn chưa có số nào cả!'}
+                        {phone ? '(84+) ' + phone : 'Bạn chưa có số nào cả!'}
                     </span>
-                    <Tag color="green" style={{ marginLeft: 10 }}>
-                        Gốc
-                    </Tag>
+                    {phone && (
+                        <Tag color="green" style={{ marginLeft: 10 }}>
+                            Gốc
+                        </Tag>
+                    )}
                 </Form.Item>
             </Modal>
         </Form.Item>

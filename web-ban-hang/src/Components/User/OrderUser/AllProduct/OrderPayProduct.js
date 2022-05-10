@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Avatar, Badge, Button } from 'antd';
@@ -104,17 +104,22 @@ function OrderPayProduct(props) {
     const { order, handleOrderActive, photoURL, index, handleChangeDataValue } =
         props;
 
+    const [orderCreated, setOrderCreated] = useState('');
+
     useEffect(() => {
-        const time = setTimeout(() => {
-            handleChangeDataValue(order);
-        }, 10000);
-        return () => {
-            clearTimeout(time);
-        };
+        if (order) {
+            const d = new Date(order.createdAt);
+            const orderCreated =
+                d.getHours() + ':' + d.getMinutes() + ', ' + d.toDateString();
+            setOrderCreated(orderCreated);
+        }
     }, [order]);
 
     return (
-        <OrderPayProductStyles>
+        <OrderPayProductStyles
+            id={order._id}
+            // style={{ background: '#74beff82' }}
+        >
             <div
                 className="user-order__pay-product-item"
                 onDoubleClick={() => handleOrderActive(order)}
@@ -126,17 +131,17 @@ function OrderPayProduct(props) {
                     <Badge
                         count={order.products.length}
                         style={{ zIndex: 1 }}
-                    ></Badge>
+                    />
                     {renderPhotoAccout(photoURL, 50, 'avatar')}
                 </div>
                 <div className="user-order__pay-product-item__content">
                     <div className="user-order__pay-product-item__title">
                         <div className="user-order__pay-product-item__name">
                             <span className="title-product">
-                                Đơn hàng của {order.name_user}
+                                Đơn hàng của {order.username}
                             </span>
                             <div className="user-order__pay-product-item__date">
-                                <span>{order.dateTime}</span>
+                                <span>{orderCreated}</span>
                             </div>
                         </div>
                         <div className="user-order__pay-product-item__description">
@@ -146,8 +151,9 @@ function OrderPayProduct(props) {
                         </div>
                         <div className="user-order__pay-product-item__address-info">
                             <span>
-                                Địa chỉ giao hàng: {order.tinh}, {order.quan},{' '}
-                                {order.xa}, {order.mota}
+                                Địa chỉ giao hàng: {order.city.tinh} -{' '}
+                                {order.city.quan} - {order.city.xa} -{' '}
+                                {order.city.mota}
                             </span>
                         </div>
                     </div>
@@ -156,7 +162,7 @@ function OrderPayProduct(props) {
                     <span>
                         {numberWithCommas(
                             order.products.reduce((accumulator, item) => {
-                                return accumulator + item.price * item.amount;
+                                return accumulator + item.price * item.qty;
                             }, 0),
                         )}
                         <sup
@@ -169,11 +175,8 @@ function OrderPayProduct(props) {
                     </span>
                 </div>
                 <div className="user-order__pay-product-item__status">
-                    <div className={order.status.title}>
-                        <span className="title-status">
-                            {order.status.title}
-                        </span>
-                        <i className={`fad ${order.status.icon}`}></i>
+                    <div className={order.complete}>
+                        <span className="title-status">{order.complete}</span>
                     </div>
                 </div>
             </div>

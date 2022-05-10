@@ -15,7 +15,7 @@ function OrderProductItem(props) {
                 <Image
                     preview={{ visibleImage: false }}
                     width={60}
-                    src={item.image.image[0].data}
+                    src={item.image}
                     onClick={() => setVisibleImage(true)}
                 />
                 <div style={{ display: 'none' }}>
@@ -25,9 +25,7 @@ function OrderProductItem(props) {
                             onVisibleChange: (vis) => setVisibleImage(vis),
                         }}
                     >
-                        {item.image.image.map((item, index) => (
-                            <Image src={item} key={index} />
-                        ))}
+                        <Image src={item.image} />
                     </Image.PreviewGroup>
                 </div>
             </div>
@@ -36,11 +34,11 @@ function OrderProductItem(props) {
                     <span>{item.name}</span>
                 </div>
                 <div className="order__product-item-content-capacity">
-                    <span>{item.capacity}</span>
+                    <span>{item.capacity.Capacity}</span>
                 </div>
             </div>
             <div className="order__product-item-content-amount">
-                <span>X {item.amount}</span>
+                <span>X {item.qty}</span>
             </div>
             <div className="order__product-item-content-price">
                 <span>

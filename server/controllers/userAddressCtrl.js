@@ -5,46 +5,66 @@ const userAddressCtrl = {
         try {
             if (req.user.id) {
                 const { address, username, phoneNumber, status } = req.body;
+                console.log(address, username, phoneNumber, status);
 
                 const userAddress = await UserAddress.findOne({
                     userId: req.user.id,
                 });
 
                 if (userAddress) {
-                    const isCheck = userAddress.items.some((item) => {
-                        return (
-                            item.address.tinh === address.tinh &&
-                            item.address.quan === address.quan &&
-                            item.address.xa === address.xa
-                        );
-                    });
-                    console.log(isCheck);
+                    if (userAddress.items.length) {
+                        const isCheck = userAddress.items.some((item) => {
+                            return (
+                                item.address.tinh === address.tinh &&
+                                item.address.quan === address.quan &&
+                                item.address.xa === address.xa
+                            );
+                        });
+                        console.log(isCheck);
 
-                    if (isCheck) {
-                        return res
-                            .status(400)
-                            .json({ msg: 'Bạn đã có địa chỉ này!' });
+                        if (isCheck) {
+                            return res
+                                .status(400)
+                                .json({ msg: 'Bạn đã có địa chỉ này!' });
+                        } else {
+                            const item = {
+                                username,
+                                phoneNumber,
+                                address,
+                                status,
+                            };
+                            if (status) {
+                                userAddress.items.forEach((item) => {
+                                    item.status = false;
+                                });
+                                const items = [...userAddress.items, item];
+                                userAddress.items = items;
+                                const savedUserAddress =
+                                    await userAddress.save();
+                                return res
+                                    .status(200)
+                                    .json({ savedUserAddress });
+                            } else {
+                                const items = [...userAddress.items, item];
+                                userAddress.items = items;
+                                const savedUserAddress =
+                                    await userAddress.save();
+                                return res
+                                    .status(200)
+                                    .json({ savedUserAddress });
+                            }
+                        }
                     } else {
                         const item = {
                             username,
                             phoneNumber,
                             address,
-                            status,
+                            status: true,
                         };
-                        if (status) {
-                            userAddress.items.forEach((item) => {
-                                item.status = false;
-                            });
-                            const items = [...userAddress.items, item];
-                            userAddress.items = items;
-                            const savedUserAddress = await userAddress.save();
-                            return res.status(200).json({ savedUserAddress });
-                        } else {
-                            const items = [...userAddress.items, item];
-                            userAddress.items = items;
-                            const savedUserAddress = await userAddress.save();
-                            return res.status(200).json({ savedUserAddress });
-                        }
+                        const items = [item];
+                        userAddress.items = items;
+                        const savedUserAddress = await userAddress.save();
+                        return res.status(200).json({ savedUserAddress });
                     }
                 } else {
                     const item = {
@@ -88,7 +108,9 @@ const userAddressCtrl = {
     updateUserAddressItem: async (req, res) => {
         try {
             const { userAddressId } = req.params;
-            const { address, username, phoneNumber } = req.body;
+            const { address, username, phoneNumber, status } = req.body;
+
+            console.log({ address, username, phoneNumber, status });
 
             if (req.user.id) {
                 const userAddress = await UserAddress.findOne({
@@ -99,12 +121,12 @@ const userAddressCtrl = {
                     return (
                         item.address.tinh === address.tinh &&
                         item.address.quan === address.quan &&
+                        item.address.mota === address.mota &&
                         item.address.xa === address.xa &&
                         item.username === username &&
                         item.phoneNumber === phoneNumber
                     );
                 });
-
                 if (!isCheck) {
                     const newAddress = userAddress.items.map((item) => {
                         if (item._id.toString() === userAddressId) {
@@ -112,7 +134,7 @@ const userAddressCtrl = {
                                 username,
                                 phoneNumber,
                                 address,
-                                status: true,
+                                status: status,
                                 _id: item._id,
                             };
                             return newItem;
@@ -138,6 +160,7 @@ const userAddressCtrl = {
     setIsActiveUserAddressItem: async (req, res) => {
         try {
             const { userAddressId } = req.params;
+            console.log({ userAddressId });
 
             if (req.user.id) {
                 const userAddress = await UserAddress.findOne({
@@ -151,10 +174,50 @@ const userAddressCtrl = {
                         item.status = false;
                     }
                 });
+
                 await userAddress.save();
                 return res.status(200).json({ userAddress });
             } else {
                 throw { status: 500, message: 'You are not logged in' };
+            }
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    deleteUserAddressItem: async (req, res) => {
+        const { userAddressId } = req.params;
+        const { id } = req.user;
+
+        try {
+            if (userAddressId) {
+                if (id) {
+                    const userAddress = await UserAddress.findOne({
+                        userId: id,
+                    });
+
+                    userAddress.items = userAddress.items.filter(
+                        (item) => item._id.toString() !== userAddressId,
+                    );
+
+                    const isCheck = userAddress.items.every((item) => {
+                        if (!item.status) {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    if (isCheck) {
+                        if (userAddress.items.length === 1) {
+                            userAddress.items[0].status = true;
+                        } else {
+                            userAddress.items[0].status = true;
+                        }
+                    }
+
+                    await userAddress.save();
+                    return res.status(200).json({ userAddress });
+                }
             }
         } catch (err) {
             console.log(err);

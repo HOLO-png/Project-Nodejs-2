@@ -1,20 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Avatar } from 'antd';
 
 function OrderUserProfile(props) {
     const { photoURL, dataOrder } = props;
+    const [orderCreated, setOrderCreated] = useState('');
+
+    useEffect(() => {
+        if (dataOrder) {
+            const d = new Date(dataOrder.createdAt);
+            const orderCreated =
+                d.getHours() + ':' + d.getMinutes() + ', ' + d.toDateString();
+            setOrderCreated(orderCreated);
+        }
+    }, [dataOrder]);
+
     return (
         <div className="row">
             <div className="col-lg-12">
                 <div className="order__user-profile">
                     <span>Thông tin người mua hàng</span>
                     <div className="order__user-status">
-                        <div className={dataOrder.status.title}>
+                        <div className={dataOrder.complete}>
                             <span className="title-status">
-                                {dataOrder.status.title}
+                                {dataOrder.complete}
                             </span>
-                            <i className={`fad ${dataOrder.status.icon}`}></i>
+                            {/* <i className={`fad ${dataOrder.complete}`}></i> */}
                         </div>
                     </div>
                 </div>
@@ -24,7 +35,7 @@ function OrderUserProfile(props) {
                             <Avatar alt="" src={photoURL} size="large" />
                         </div>
                         <div className="order__user-name">
-                            <span>{dataOrder.name_user}</span>
+                            <span>{dataOrder.username}</span>
                         </div>
                     </div>
                     <div className="order__user-phone">
@@ -32,7 +43,7 @@ function OrderUserProfile(props) {
                             Số Điện Thoại:
                         </span>
                         <span className="order__user-phone-text">
-                            {dataOrder.number_phone}
+                            {dataOrder.phoneNumber}
                         </span>
                     </div>
                     <div className="order__user-address">
@@ -40,8 +51,8 @@ function OrderUserProfile(props) {
                             Địa Chỉ:
                         </span>
                         <span className="order__user-address-text">
-                            {dataOrder.mota}, {dataOrder.quan}, {dataOrder.xa},{' '}
-                            {dataOrder.tinh}
+                            {dataOrder.city.mota}, {dataOrder.city.quan},{' '}
+                            {dataOrder.city.xa}, {dataOrder.city.tinh}
                         </span>
                     </div>
                     <div className="order__user-date-time">
@@ -49,7 +60,7 @@ function OrderUserProfile(props) {
                             Thời gian:
                         </span>
                         <span className="order__user-date-time-text">
-                            {dataOrder.dateTime}
+                            {orderCreated}
                         </span>
                     </div>
                     <div className="order__user-message">

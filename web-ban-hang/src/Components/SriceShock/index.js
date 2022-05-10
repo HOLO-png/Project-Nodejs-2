@@ -132,12 +132,12 @@ function SriceShock(props) {
         ],
     };
 
-    const handleProductCheck = () => {
-        openNotification(
-            'Ahihi Ko Bấm Đc Đâu 🧨',
-            'Hiện tại thì tui chưa thêm sản phẩm này nên tạm thời lướt chỗ khác đi nha 😁',
-        );
-    };
+    // const handleProductCheck = () => {
+    //     openNotification(
+    //         'Ahihi Ko Bấm Đc Đâu 🧨',
+    //         'Hiện tại thì tui chưa thêm sản phẩm này nên tạm thời lướt chỗ khác đi nha 😁',
+    //     );
+    // };
 
     const handleRenderProductUI = (products) => {
         if (products) {
@@ -238,9 +238,9 @@ function SriceShock(props) {
                                                               }
                                                           />
                                                       }
-                                                      onClick={
-                                                          handleProductCheck
-                                                      }
+                                                      //   onClick={
+                                                      //       handleProductCheck
+                                                      //   }
                                                   >
                                                       <Meta
                                                           title={

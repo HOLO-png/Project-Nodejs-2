@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Helmet from '../../Components/Helmet';
 import Section from '../../Components/Section';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import SuccessModalCheckout from '../../Components/SuccessModalCheckout';
 import useQuery from '../../Hooks/useQuery.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +16,7 @@ import {
     getUserAddress,
     userAddressSelector,
 } from '../../Store/Reducer/userAddressReducer';
+import { setLoadingAction } from '../../Store/Reducer/loadingReducer';
 
 function OrderSuccess(props) {
     const { paymentId } = useParams();
@@ -25,29 +26,46 @@ function OrderSuccess(props) {
     const cartProducts = JSON.parse(localStorage.getItem('cart'));
     const userAddress = JSON.parse(localStorage.getItem('userAddress'));
     const [productsId, setProductsId] = useState(null);
-    const order = useSelector(orderSelector);
+    const orderSlt = useSelector(orderSelector);
     const [isActiveModalSuccess, setIsActiveModalSuccess] = useState(false);
     const [isCheckProductsToCart, setIsCheckProductsToCart] = useState(false);
 
+    const { order } = orderSlt;
+    const messageOrder = query.get('message');
+
     useEffect(() => {
+        dispatch(setLoadingAction(false));
         if (query.get('productsId')) {
             if (query.get('productsId').split('-').length) {
                 setProductsId(query.get('productsId').split('-'));
             }
         }
-    }, [query]);
+    }, [query, dispatch]);
 
     useEffect(() => {
         if (productsId && productsId.length) {
-            if (cartProducts.cart) {
-                const cartProductsChange = cartProducts.cart.items.some(
-                    function (item) {
-                        if (productsId.includes(item._id.toString()))
-                            return true;
-                        else return false;
-                    },
-                );
-                setIsCheckProductsToCart(cartProductsChange);
+            if (cartProducts.itemsChecked) {
+                if (cartProducts.data.items) {
+                    const cartProductsChange = cartProducts.data.items.some(
+                        function (item) {
+                            if (productsId.includes(item._id.toString()))
+                                return true;
+                            else return false;
+                        },
+                    );
+                    setIsCheckProductsToCart(cartProductsChange);
+                }
+            } else {
+                if (cartProducts.cart) {
+                    const cartProductsChange = cartProducts.cart.items.some(
+                        function (item) {
+                            if (productsId.includes(item._id.toString()))
+                                return true;
+                            else return false;
+                        },
+                    );
+                    setIsCheckProductsToCart(cartProductsChange);
+                }
             }
         }
     }, [cartProducts, productsId]);
@@ -102,9 +120,9 @@ function OrderSuccess(props) {
                                     isPayment: JSON.parse(
                                         query.get('isPayment'),
                                     ),
+                                    message: messageOrder,
                                 }),
                             );
-                            console.log(item.status);
                         }
                     });
                 }
@@ -126,10 +144,11 @@ function OrderSuccess(props) {
                         </div>
                         <div className="order-success__payment-info__title">
                             <p>
-                                THANK{' '}
+                                THANK{'  '}
                                 {query.get('username')
                                     ? query.get('username').toUpperCase()
-                                    : 'YOU'}{' '}
+                                    : 'YOU'}
+                                {'  '}
                                 FOR YOUR PURCHASE
                             </p>
                         </div>
@@ -137,12 +156,12 @@ function OrderSuccess(props) {
                             <p>Your order number is: {paymentId}</p>
                         </div>
                         <div className="order-success__payment-info__btn-continue">
-                            <button className="button">
+                            <Link className="button" to="/user/all">
                                 <span className="button__text">
-                                    <span>Continue</span>
+                                    <span>Xem</span>
                                 </span>
                                 <span> </span>
-                                <span>Shopping</span>
+                                <span>đơn hàng</span>
 
                                 <svg
                                     className="button__svg"
@@ -226,7 +245,7 @@ function OrderSuccess(props) {
                                         />
                                     </g>
                                 </svg>
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </Section>

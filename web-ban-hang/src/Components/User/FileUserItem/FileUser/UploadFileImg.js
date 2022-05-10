@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Avatar } from 'antd';
+import { Avatar, Spin } from 'antd';
 import { humanImg } from '../../../../assets/fake-data/human';
+import { imageUpload } from '../../../../utils/imageUpload';
 
 const FileUserEdit = styled.div`
     display: flex;
@@ -39,25 +40,33 @@ const FileUserEdit = styled.div`
 function UploadFileImg(props) {
     const { photoURL, importImg } = props;
     const [imgUser, setImgUser] = useState('');
+    const [isLoadingImage, setIsLoadingImage] = useState(false);
 
-    function chooseFileImg(e) {
+    const chooseFileImg = async (e) => {
+        setIsLoadingImage(true);
         const fileInput = e.target;
         if (fileInput.files && fileInput.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                setImgUser(e.target.result);
-                importImg(e.target.result);
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+            const imageURL = await imageUpload(fileInput.files[0]);
+            console.log(imageURL);
+            setImgUser(imageURL);
+            importImg(imageURL);
         }
-    }
+        setIsLoadingImage(false);
+    };
 
     return (
         <FileUserEdit className="file-user-edit">
-            <Avatar
-                size={150}
-                src={imgUser ? imgUser : photoURL ? photoURL : humanImg}
-            />
+            {isLoadingImage ? (
+                <div className="example-image-loading">
+                    <Spin />
+                </div>
+            ) : (
+                <Avatar
+                    size={150}
+                    src={imgUser ? imgUser : photoURL ? photoURL : humanImg}
+                />
+            )}
+
             <input
                 type="file"
                 onChange={(e) => chooseFileImg(e)}

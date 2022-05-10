@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Row, Col, Button, Menu } from 'antd';
 import { Link, Switch } from 'react-router-dom';
+
+import { Redirect, useParams } from 'react-router';
 import styled from 'styled-components';
 import Helmet from '../../Components/Helmet';
 import {
@@ -13,8 +15,9 @@ import {
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { FILE_USER, NOTIFICATION_USER, ORDER_WHEEL } from '../../constans';
 import Userlayout from '../../Common/UserLayout';
-// import { AuthContext } from '../../Context/AuthProvider';
 import { renderPhotoAccout } from '../../utils/avartarChange';
+import { useSelector } from 'react-redux';
+import { authSelector } from '../../Store/Reducer/authReducer';
 
 const UserSetting = styled.div`
     display: flex;
@@ -54,61 +57,39 @@ const UserChoice = styled.div`
         margin-top: 10px;
     }
 `;
-const renderUserFileItem = () => {
-    let xhtml = null;
-    xhtml = FILE_USER.map((route, index) => {
-        return (
-            <Userlayout
-                name={route.name}
-                key={index}
-                component={route.component}
-                exact={route.exact}
-                path={route.path}
-            />
-        );
-    });
-    return xhtml;
-};
 
-const renderOrderWheetUser = () => {
-    let xhtml = null;
-    xhtml = ORDER_WHEEL.map((route, index) => {
-        return (
-            <Userlayout
-                name={route.name}
-                key={index}
-                component={route.component}
-                exact={route.exact}
-                path={route.path}
-            />
-        );
-    });
-    return xhtml;
-};
-const renderNotificationUser = () => {
-    let xhtml = null;
-    xhtml = NOTIFICATION_USER.map((route, index) => {
-        return (
-            <Userlayout
-                name={route.name}
-                key={index}
-                component={route.component}
-                exact={route.exact}
-                path={route.path}
-            />
-        );
-    });
-    return xhtml;
-};
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub3', 'sub4'];
 function PurchaseOrder(props) {
-    const [openKeys, setOpenKeys] = React.useState(['sub2']);
-    // const data = React.useContext(AuthContext);
-    // const { email, photoURL, uid, displayName } = data.user;
+    const auth = useSelector(authSelector);
+    const { location } = useParams();
+    const [openKeys, setOpenKeys] = useState([location]);
+    const { user } = auth;
 
     const handleClick = (e) => {
         console.log('click ', e);
     };
+
+    if (!auth.user && !auth.tokenAuth) {
+        return <Redirect to="/buyer/signin" />;
+    }
+
+    const renderUserFileItem = (route) => {
+        let xhtml = null;
+        xhtml = route.map((route, index) => {
+            return (
+                <Userlayout
+                    name={route.name}
+                    key={index}
+                    component={route.component}
+                    exact={route.exact}
+                    path={route.path}
+                    location={location}
+                />
+            );
+        });
+        return xhtml;
+    };
+
     const onOpenChange = (keys) => {
         const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
         if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
@@ -117,6 +98,7 @@ function PurchaseOrder(props) {
             setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
         }
     };
+
     return (
         <Helmet title="User">
             <Row
@@ -128,15 +110,22 @@ function PurchaseOrder(props) {
                     span={6}
                     style={{ background: '#fff', padding: '20px' }}
                 >
-                    {/* <UserSetting>
-                        {renderPhotoAccout(photoURL, 50, displayName)}
+                    <UserSetting>
+                        {user &&
+                            renderPhotoAccout(
+                                user.profilePicture,
+                                50,
+                                user.username,
+                            )}
                         <div className="user-settings">
-                            <p className="user-title">{displayName}</p>
+                            <p className="user-title">
+                                {user && user.username}
+                            </p>
                             <Button type="text" icon={<EditOutlined />}>
                                 <Link to="/user/profile">Sửa Hồ Sơ</Link>
                             </Button>
                         </div>
-                    </UserSetting> */}
+                    </UserSetting>
                     <UserChoice>
                         <Menu
                             onClick={handleClick}
@@ -145,65 +134,65 @@ function PurchaseOrder(props) {
                                 marginTop: '10px',
                                 fontSize: '17px',
                             }}
-                            defaultSelectedKeys={['sub2']}
-                            defaultOpenKeys={['sub2']}
+                            defaultSelectedKeys={[location]}
+                            defaultOpenKeys={[location]}
                             mode="inline"
                             openKeys={openKeys}
                             onOpenChange={onOpenChange}
                         >
                             <SubMenu
-                                key="sub1"
+                                key="profile"
                                 icon={<UserOutlined />}
                                 title="Tài khoản của tôi"
                             >
-                                <Menu.Item key="1">
+                                <Menu.Item key="profile">
                                     <Link to="/user/profile">Hồ sơ</Link>
                                 </Menu.Item>
 
-                                <Menu.Item key="2">
+                                <Menu.Item key="payment">
                                     <Link to="/user/payment">Ngân hàng</Link>
                                 </Menu.Item>
-                                <Menu.Item key="3">
+                                <Menu.Item key="address">
                                     <Link to="/user/address">Địa chỉ</Link>
                                 </Menu.Item>
-                                <Menu.Item key="4">
+                                <Menu.Item key="password">
                                     <Link to="/user/password">
                                         Đổi mật khẩu
                                     </Link>
                                 </Menu.Item>
                             </SubMenu>
-                            <Menu.Item key="sub2" icon={<SnippetsOutlined />}>
-                                <Link to="/user/all">Đơn Mua</Link>
+                            <Menu.Item key="order" icon={<SnippetsOutlined />}>
+                                <Link to="/user/order">Đơn Mua</Link>
                             </Menu.Item>
                             <SubMenu
-                                key="sub3"
+                                key="order-update"
                                 icon={<BellOutlined />}
                                 title="Thông báo"
                             >
-                                <Menu.Item key="5">
+                                <Menu.Item key="order-update">
                                     <Link to="/user/order-update">
                                         Cập nhật đơn hàng
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="6">
+                                <Menu.Item key="promotion">
                                     <Link to="/user/promotion">Khuyến mãi</Link>
                                 </Menu.Item>
-                                <Menu.Item key="7">
+                                <Menu.Item key="wallet-update">
                                     <Link to="/user/wallet-update">
                                         Cập nhật ví
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="8">
+                                <Menu.Item key="work">
                                     <Link to="/user/work">Hoạt động</Link>
                                 </Menu.Item>
-                                <Menu.Item key="9">
+                                <Menu.Item key="updated-review">
                                     <Link to="/user/updated-review">
                                         Đánh giá cập nhật
                                     </Link>
                                 </Menu.Item>
                             </SubMenu>
                             <Menu.Item
-                                key="sub4"
+                                key="wheel"
                                 icon={<DollarCircleOutlined />}
                             >
                                 <Link to="/user/wheel">Vòng quay may mắn</Link>
@@ -223,9 +212,9 @@ function PurchaseOrder(props) {
                     }}
                 >
                     <Switch>
-                        {renderUserFileItem()}
-                        {renderOrderWheetUser()}
-                        {renderNotificationUser()}
+                        {renderUserFileItem(FILE_USER)}
+                        {renderUserFileItem(NOTIFICATION_USER)}
+                        {renderUserFileItem(ORDER_WHEEL)}
                     </Switch>
                 </Col>
             </Row>

@@ -85,7 +85,7 @@ const cartCtrl = {
                         }
                         cartUser.cart.totalPrice += product.price * qty;
                         const data = await cartUser.save();
-                        return res.status(200).json(data.cart);
+                        return res.status(200).json(data);
                     }
                 }
             } else {

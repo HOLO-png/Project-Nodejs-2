@@ -249,7 +249,6 @@ const authCtrl = {
 
             const { email, name, picture } = data;
 
-            console.log({ data });
 
             const password = email + process.env.FACEBOOK_SECRET;
             const passwordHash = await bcrypt.hash(password, 12);

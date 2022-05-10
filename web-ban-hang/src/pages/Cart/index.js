@@ -29,6 +29,8 @@ import {
 } from '../../Store/Reducer/cartReducer';
 import { loadingSelector } from '../../Store/Reducer/loadingReducer';
 import { productsSelector } from '../../Store/Reducer/productsReducer';
+import { Redirect } from 'react-router';
+import { authSelector } from '../../Store/Reducer/authReducer';
 
 const CartPage = styled.div`
     display: flex;
@@ -131,6 +133,8 @@ function Cart(props) {
     const cartProducts = useSelector(cartSelector);
     const totalProducts = useSelector(totalProductsSelector);
     const searchSimilarProducts = useSelector(searchSimilarSelector);
+    const auth = useSelector(authSelector);
+
     const [modal, setModal] = useState(false);
     const [currentProduct, setCurrentProduct] = useState([]);
     const [cartProduct, setCartProduct] = useState([]);
@@ -152,6 +156,10 @@ function Cart(props) {
             dispatch(resetProductCoints());
         };
     }, [dispatch]);
+
+    if (!auth.user && !auth.tokenAuth) {
+        return <Redirect to="/buyer/signin" />;
+    }
 
     const handleAmount = (obj) => {
         const { productId, indexProduct, amount } = obj;

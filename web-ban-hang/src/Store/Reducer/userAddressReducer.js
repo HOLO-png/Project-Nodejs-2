@@ -61,10 +61,31 @@ export const updateUserAddress = createAsyncThunk(
 export const updateStatusUserAddress = createAsyncThunk(
     'updateStatusUserAddress/updateStatusUserAddressFetch',
     async ({ tokenAuth, userAddressId }) => {
+        console.log({ tokenAuth, userAddressId });
         try {
             const res = await axios.patch(
                 `${url}/user-address/status/${userAddressId}`,
                 null,
+                {
+                    headers: { Authorization: tokenAuth },
+                },
+            );
+            console.log(res.data);
+
+            return res.data;
+        } catch (err) {
+            console.log(err);
+            toast.error('error');
+        }
+    },
+);
+
+export const deleteUserAddress = createAsyncThunk(
+    'deleteUserAddress/deleteUserAddressFetch',
+    async ({ tokenAuth, userAddressId }) => {
+        try {
+            const res = await axios.delete(
+                `${url}/user-address/${userAddressId}`,
                 {
                     headers: { Authorization: tokenAuth },
                 },
@@ -98,6 +119,19 @@ const userAddressSlice = createSlice({
             }
         },
         [getUserAddress.rejected]: (state, action) => {},
+
+        // get cart product
+        [deleteUserAddress.pending]: (state, action) => {},
+        [deleteUserAddress.fulfilled]: (state, action) => {
+            if (action.payload) {
+                state.userAddress = action.payload.userAddress;
+                localStorage.setItem(
+                    'userAddress',
+                    JSON.stringify(action.payload.userAddress),
+                );
+            }
+        },
+        [deleteUserAddress.rejected]: (state, action) => {},
 
         // insert cart product
         [insertUserAddress.pending]: (state, action) => {},

@@ -10,7 +10,7 @@ const OrderSchema = new mongoose.Schema(
             required: true,
         },
         city: { type: Object, required: true },
-        products: [{ type: String, required: true }],
+        products: [{ type: Object, required: true }],
         userID: {
             type: String,
             required: true,
@@ -18,6 +18,10 @@ const OrderSchema = new mongoose.Schema(
         isPayment: {
             type: Boolean,
             default: false,
+        },
+        message: {
+            type: String,
+            default: '',
         },
     },
     { timestamps: true },

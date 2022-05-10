@@ -19,8 +19,6 @@ function DrawerOrderPay(props) {
     const {
         visible,
         placement,
-        showDrawer,
-        onChange,
         onClose,
         dataOrder,
         photoURL,
@@ -44,13 +42,13 @@ function DrawerOrderPay(props) {
 
     const handleRenderUI = () => {
         if (dataOrder) {
-            if (dataOrder.status.title === 'Đang chờ xử lý') {
+            if (dataOrder.complete === 'pending') {
                 return (
                     <Button type="dashed" danger onClick={showModal}>
                         Hủy Đơn Hàng
                     </Button>
                 );
-            } else if (dataOrder.status.title === 'Đã hủy đơn hàng') {
+            } else if (dataOrder.complete === 'cancel') {
                 return (
                     <Button
                         type="primary"
@@ -92,7 +90,7 @@ function DrawerOrderPay(props) {
                     {numberWithCommas(
                         dataOrder &&
                             dataOrder.products.reduce((accumulator, item) => {
-                                return accumulator + item.price * item.amount;
+                                return accumulator + item.price * item.qty;
                             }, 0),
                     )}
                     <sup

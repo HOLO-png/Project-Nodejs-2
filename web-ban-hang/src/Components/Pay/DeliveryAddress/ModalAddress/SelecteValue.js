@@ -11,6 +11,7 @@ function SelecteValue(props) {
         widthInput,
         objAddress,
     } = props;
+    
     const [stateAddress, setStateAddress] = useState([]);
     const [cities, setCities] = useState('');
 
@@ -54,8 +55,6 @@ function SelecteValue(props) {
     const handleChangeInput = (e) => {
         setInput(e.target.value);
     };
-
-    console.log(objAddress);
 
     return (
         <div
@@ -140,7 +139,7 @@ function SelecteValue(props) {
                         placeholder="Số Nhà, Đường,..."
                         style={{ height: 40 }}
                         onChange={handleChangeInput}
-                        value={input !== '' ? input : objAddress.mota}
+                        value={input ? input : objAddress.mota}
                     />
                 </Col>
             </Row>

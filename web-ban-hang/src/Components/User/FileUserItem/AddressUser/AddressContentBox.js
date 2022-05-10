@@ -1,16 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Form,
-    Input,
-    Button,
-    Row,
-    Col,
-    Divider,
-    Tag,
-    Cascader,
-    Popconfirm,
-} from 'antd';
+import { Form, Button, Row, Tag, Popconfirm } from 'antd';
 import styled from 'styled-components';
 import AddressEditItem from './AddressEditItem';
 
@@ -106,9 +96,7 @@ function AddressContentBox(props) {
                                         display: 'flex',
                                     }}
                                 >
-                                    <p className="user-name">
-                                        {item.name_user}
-                                    </p>
+                                    <p className="user-name">{item.username}</p>
                                     {item.status ? (
                                         <Tag color="green">Mặc Định</Tag>
                                     ) : (
@@ -121,13 +109,14 @@ function AddressContentBox(props) {
                                     style={{ margin: 0 }}
                                 >
                                     <p className="user-name">
-                                        (+84) {item.number_phone}
+                                        (+84) {item.phoneNumber}
                                     </p>
                                 </Form.Item>
                                 <Form.Item label="Địa Chỉ">
                                     <p className="user-name">
-                                        {item.mota} ~ {item.xa} ~ {item.quan} ~{' '}
-                                        {item.tinh}
+                                        {item.address.mota} ~ {item.address.xa}{' '}
+                                        ~ {item.address.quan} ~{' '}
+                                        {item.address.tinh}
                                     </p>
                                 </Form.Item>
                             </Form>
