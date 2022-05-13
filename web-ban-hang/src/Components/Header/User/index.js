@@ -112,7 +112,7 @@ function User({ user }) {
                                 </span>
                             </div>
                         </Link>
-                        <Link to="/user/all">
+                        <Link to="/user/order">
                             <div className="header__menu__item__user-drawer-accout">
                                 <i className="fad fa-calendar-week"></i>
                                 <span>Đơn mua</span>

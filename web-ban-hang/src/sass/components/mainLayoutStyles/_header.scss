@@ -495,6 +495,7 @@
 }
 .header__menu__item__user-drawer-accout {
     display: flex;
+    width: 120px;
 }
 .avatar {
     background-color: #f0f0f0;
@@ -507,7 +508,7 @@
     }
 }
 .ant-avatar-sm {
-    width: 18%;
+    width: 32%;
 }
 span.header-cart-icon {
     cursor: pointer;
