@@ -42,10 +42,22 @@ const user = {
     },
     getUsersInStore: async (req, res) => {
         try {
-            const users = await User.find({isAdmin: false}).select("-password");
+            const users = await User.find({ isAdmin: false }).select(
+                '-password',
+            );
             console.log(users);
-            
-            return res.status(200).json({users});
+
+            return res.status(200).json({ users });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    getUseToDB: async (req, res) => {
+        try {
+            const { userId } = req.params;
+            const user = await User.findOne({ _id: userId });
+            return res.status(200).json({ user });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err.message });

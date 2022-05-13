@@ -10,11 +10,11 @@ const DescriptionItem = ({ title, content }) => (
     </div>
 );
 
-function NavigationCustomer(props) {
-    const { visible, handleSetVisible } = props;
+function NavigationCustomer({ visible, handleSetVisible }) {
     const onClose = () => {
         handleSetVisible(false);
     };
+
     return (
         <>
             <Drawer

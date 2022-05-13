@@ -109,6 +109,8 @@ function CommentsItemOption({
         console.log('click left button', e);
     }
 
+    console.log(comment);
+    
     return (
         <UploadStyle key={comment._id}>
             <Comment

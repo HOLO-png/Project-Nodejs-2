@@ -172,7 +172,7 @@ function DeliveryAddress(props) {
                                 </p>
                             </Col>
                         </Row>
-                        {userAddress.items.length ? (
+                        {userAddress && userAddress.items.length ? (
                             <Row
                                 gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}
                                 className="delivery-address__row"

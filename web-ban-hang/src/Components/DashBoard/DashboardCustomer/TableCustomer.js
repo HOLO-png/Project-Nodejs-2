@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { humanImg } from '../../../assets/fake-data/human';
 import { Button, Popconfirm } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-function TableCustomer(props) {
-    const { users, confirm } = props;
+import {
+    DeleteOutlined,
+    EditOutlined,
+    SearchOutlined,
+} from '@ant-design/icons';
+function TableCustomer({ users, confirm, handleShowNavigation }) {
     const [activeTd, setActiveTd] = useState(null);
-    const [user, setUser] = useState(null);
 
     const someHandler = (i, item) => {
         setActiveTd(i);
@@ -22,7 +24,6 @@ function TableCustomer(props) {
                     <th scope="col">Uy Tín</th>
                     <th scope="col">Email</th>
                     <th scope="col">Số Điện Thoại</th>
-                    <th scope="col">Địa Chỉ</th>
                     <th scope="col">Hành Động</th>
                 </tr>
             </thead>
@@ -36,27 +37,31 @@ function TableCustomer(props) {
                             <th scope="row">{index + 1}</th>
                             <td className="table-img">
                                 <img
-                                    alt={item.displayName}
-                                    src={item.photoURL || humanImg}
+                                    alt={item.username}
+                                    src={item.profilePicture || humanImg}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src =
+                                            'https://icon-library.com/images/image-error-icon/image-error-icon-21.jpg';
+                                    }}
                                 />
                             </td>
-                            <td>{item.displayName}</td>
+                            <td>{item.username}</td>
                             <td>100</td>
                             <td>{item.email}</td>
                             <td>{item.phoneNumber || 'chưa có SĐT'}</td>
-                            <td>
-                                {item.address[0]
-                                    ? item.address[0].mota +
-                                      ', ' +
-                                      item.address[0].quan +
-                                      ', ' +
-                                      item.address[0].xa +
-                                      ', ' +
-                                      item.address[0].tinh
-                                    : 'Chưa có dữ liệu!'}
-                            </td>
                             {activeTd === index ? (
                                 <td>
+                                    <Button
+                                        type="primary"
+                                        icon={<SearchOutlined />}
+                                        style={{ marginRight: 10 }}
+                                        onClick={() =>
+                                            handleShowNavigation(item._id)
+                                        }
+                                    >
+                                        Xem
+                                    </Button>
                                     <Button
                                         type="dashed"
                                         icon={<EditOutlined />}

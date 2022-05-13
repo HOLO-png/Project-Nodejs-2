@@ -26,9 +26,9 @@ function DashboardMain(props) {
     const dispatch = useDispatch();
     const orderSlt = useSelector(orderSelector);
     const comments = useSelector(commentsUserSelector);
-    const users = useSelector(usersSelector);
+    const usersDB = useSelector(usersSelector);
     const productsDB = useSelector(productsDBSelector);
-
+    const { users } = usersDB;
     const { orders } = orderSlt;
     const { count } = productsDB;
 

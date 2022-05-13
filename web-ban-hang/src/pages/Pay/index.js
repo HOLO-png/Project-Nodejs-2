@@ -147,19 +147,23 @@ function Pay(props) {
     }, [dispatch, paymentUrl]);
 
     useEffect(() => {
-        if (!userAddress.items.length) {
-            setVisible(true);
+        if (userAddress) {
+            if (!userAddress.items.length) {
+                setVisible(true);
+            } else {
+                userAddress.items.forEach((item) => {
+                    if (item.status) {
+                        setObjAddress(item.address);
+                        setvalueAddress(item.address);
+                        setAddress_user_api(item);
+                        item && setInputName(item.username || '');
+                        item && setInputNumber(item.phoneNumber || '');
+                    }
+                });
+                setVisible(false);
+            }
         } else {
-            userAddress.items.forEach((item) => {
-                if (item.status) {
-                    setObjAddress(item.address);
-                    setvalueAddress(item.address);
-                    setAddress_user_api(item);
-                    item && setInputName(item.username || '');
-                    item && setInputNumber(item.phoneNumber || '');
-                }
-            });
-            setVisible(false);
+            setVisible(true);
         }
     }, [dispatch, userAddress]);
 
