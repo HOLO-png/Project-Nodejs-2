@@ -21,14 +21,17 @@ function UserLeaveConfirmation(message, callback, confirmOpen, setConfirmOpen) {
 
     document.body.appendChild(container);
 
+    const { header, content } = JSON.parse(message);
+
     ReactDOM.render(
         <Modal
             title="Bạn Chưa Lưu Lại"
             visible={confirmOpen}
+            header={header}
             onOk={handleConfirm}
             onCancel={handleCancel}
         >
-            <p>{message}</p>
+            <p>{content}</p>
         </Modal>,
         container,
     );

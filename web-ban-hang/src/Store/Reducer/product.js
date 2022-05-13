@@ -6,12 +6,13 @@ const url = 'http://localhost:8800/api';
 
 export const getProductApi = createAsyncThunk(
     'product/productFetch',
-    async ({ id, search }) => {
+    async ({ limit, id, search, skip }) => {
         try {
-            let limit = 4;
-            let value = search ? search : `?page=${1}`;
+            let value1 = limit ? limit : 4;
+            let value2 = search ? search : `?page=${1}`;
+            let value3 = skip === 0 ? `skip=${skip}` : '';
             const res = await axios.get(
-                `${url}/products/${id}${value}&limit=${limit}`,
+                `${url}/products/${id}${value2}&limit=${value1}&${value3}`,
             );
             return res.data;
         } catch (err) {
@@ -57,18 +58,25 @@ const productItemSlice = createSlice({
         product: {},
         total: 0,
         totalCmt: 0,
+        isLoading: false,
     }, // gia tri ban dau cua state
     reducers: {
         handleUpdateProduct(state, action) {
             state.product = action.payload;
         },
+        handleUpdateIsLoading(state, action) {
+            state.isLoading = true;
+        },
     },
     extraReducers: {
         [getProductApi.pending]: (state, action) => {},
         [getProductApi.fulfilled]: (state, action) => {
-            state.product = action.payload.product;
-            state.total = action.payload.total;
-            state.totalCmt = action.payload.totalCmt;
+            if (action.payload) {
+                state.product = action.payload.product;
+                state.total = action.payload.total;
+                state.totalCmt = action.payload.totalCmt;
+                state.isLoading = false;
+            }
         },
         [getProductApi.rejected]: (state, action) => {},
 
@@ -98,6 +106,7 @@ const productItemSlice = createSlice({
 const productItemReducer = productItemSlice.reducer;
 
 export const productItemSelector = (state) => state.productItemReducer;
-export const { handleUpdateProduct } = productItemSlice.actions;
+export const { handleUpdateProduct, handleUpdateIsLoading } =
+    productItemSlice.actions;
 
 export default productItemReducer;

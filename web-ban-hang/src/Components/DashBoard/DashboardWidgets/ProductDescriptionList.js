@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TableProduct from './TableProduct';
 import CompleteSearch from './SearchProduct';
 import CategorySelect from './CategorySelect';
@@ -18,31 +18,35 @@ function callback(key) {}
 
 function ProductDescriptionList(props) {
     const {
+        total,
         products,
-        productsPerPage,
-        totalProduct,
-        paginate,
-        isShowCategoryOptions,
         handleRemoveProductItem,
         comments_users,
         handleEditProduct,
         setVisible,
         visible,
         product,
-        setProduct,
         active,
         setActive,
         handleOnNavigation,
         handleSearchInputToProduct,
-        search_products,
+        searchSimilar,
+        totalCmt,
     } = props;
     const [productsSearch, setProductsSearch] = useState([]);
+    const [inputSearch, setInputSearch] = useState('');
     const [isActive, setIsActive] = useState(false);
 
     const handleImportProductToTablet = (product) => {
         setProductsSearch([product]);
         setIsActive(false);
     };
+
+    useEffect(() => {
+        if (!inputSearch) {
+            setProductsSearch([]);
+        }
+    }, [inputSearch]);
 
     return (
         <div className="panel-body">
@@ -60,12 +64,15 @@ function ProductDescriptionList(props) {
                                     handleSearchInputToProduct={
                                         handleSearchInputToProduct
                                     }
-                                    search_products={search_products}
+                                    searchSimilar={searchSimilar}
                                     handleImportProductToTablet={
                                         handleImportProductToTablet
                                     }
                                     isActive={isActive}
                                     setIsActive={setIsActive}
+                                    setProductsSearch={setProductsSearch}
+                                    setInputSearch={setInputSearch}
+                                    inputSearch={inputSearch}
                                 />
                             </div>
                         </div>
@@ -78,22 +85,19 @@ function ProductDescriptionList(props) {
                 </div>
                 <div className="col-lg-12">
                     <TableProduct
+                        total={total}
                         products={products}
-                        productsPerPage={productsPerPage}
-                        totalProduct={totalProduct}
-                        paginate={paginate}
-                        isShowCategoryOptions={isShowCategoryOptions}
                         handleRemoveProductItem={handleRemoveProductItem}
                         comments_users={comments_users}
                         handleEditProduct={handleEditProduct}
                         setVisible={setVisible}
                         visible={visible}
                         product={product}
-                        setProduct={setProduct}
                         active={active}
                         setActive={setActive}
                         handleOnNavigation={handleOnNavigation}
                         productsSearch={productsSearch}
+                        totalCmt={totalCmt}
                     />
                 </div>
             </div>

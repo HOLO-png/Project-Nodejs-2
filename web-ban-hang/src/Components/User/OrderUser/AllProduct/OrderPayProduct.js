@@ -116,10 +116,7 @@ function OrderPayProduct(props) {
     }, [order]);
 
     return (
-        <OrderPayProductStyles
-            id={order._id}
-            // style={{ background: '#74beff82' }}
-        >
+        <OrderPayProductStyles id={order._id}>
             <div
                 className="user-order__pay-product-item"
                 onDoubleClick={() => handleOrderActive(order)}

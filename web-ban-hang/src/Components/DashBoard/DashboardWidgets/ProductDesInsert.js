@@ -8,7 +8,7 @@ import {
     Select,
     Tooltip,
 } from 'antd';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -16,11 +16,16 @@ import parse from 'html-react-parser';
 import UploadImageCategory from './UploadImageCategory';
 import Slider from 'react-slick';
 import { isEmptyObjectAll } from '../../../utils/checkEmptyObjAll';
-import uuid from 'lodash';
+import { ObjectID } from 'bson';
 import numberWithCommas from '../../../utils/numberWithCommas';
 import { Link, Prompt } from 'react-router-dom';
 import { setLoadingAction } from '../../../Store/Reducer/loadingReducer';
 import { imageUpload } from '../../../utils/imageUpload';
+import {
+    handleUpdateIsEdit,
+    handleUpdateLogoToProduct,
+    updateDetailToProduct,
+} from '../../../Store/Reducer/productConfig';
 
 const clone = (obj) => Object.assign({}, obj);
 
@@ -64,6 +69,11 @@ function ProductDesInsert(props) {
         handleSetImageField,
         handleSetValueInputFieldUpdate,
         handlePassingSelectProductConfig,
+        isEdit,
+        setIndexCategory,
+        indexCategory,
+        isCheckCreate,
+                        setIsCheckCreate,
     } = props;
 
     const dispatch = useDispatch();
@@ -72,8 +82,10 @@ function ProductDesInsert(props) {
     const [isShowInput, setIsShowInput] = useState(false);
     const [isShowSelect, setIsShowSelect] = useState(false);
     const [isShowImage, setIsShowImage] = useState(false);
-    const [indexCategory, setIndexCategory] = useState(null);
     const [categoryProduct, setCategoryProduct] = useState(null);
+    const [inputElement, setInputElement] = useState('');
+
+    const inputRef = useRef([]);
 
     const settings = {
         dots: true,
@@ -94,6 +106,12 @@ function ProductDesInsert(props) {
     }, []);
 
     useEffect(() => {
+        return () => {
+            dispatch(handleUpdateIsEdit());
+        };
+    }, [dispatch]);
+
+    useEffect(() => {
         setactiveImg(indexProduct);
     }, [indexProduct]);
 
@@ -108,11 +126,13 @@ function ProductDesInsert(props) {
             ...productVaratior,
             logo: image_field[index].value,
         });
+        dispatch(handleUpdateLogoToProduct(image_field[index].value));
     };
 
     const handleChangeDesProduct = (e, editor) => {
         const data = editor.getData();
         setVal(data);
+        dispatch(updateDetailToProduct(data));
     };
 
     const handleImportImg = async (e) => {
@@ -127,6 +147,26 @@ function ProductDesInsert(props) {
             alert('Upload file failed! ');
         }
     };
+
+    useEffect(() => {
+        const options = [...input_feild, ...select_field];
+        const optionsChecked = [...resultInputConfig, ...resultDescription];
+        const check = options.length === optionsChecked.length;
+        if (
+            product_config.image.length &&
+            check &&
+            product_config.logo &&
+            product_config.detail
+        ) {
+            setIsCheckCreate(true);
+        }
+    }, [
+        input_feild,
+        product_config,
+        resultDescription,
+        resultInputConfig,
+        select_field,
+    ]);
 
     const handleSetValueInputField = (e, key) => {
         const contact = renameKey(
@@ -169,12 +209,12 @@ function ProductDesInsert(props) {
 
     const importImg = (img, id) => {
         product_config.image.forEach((item) => {
-            if (item.id === id) {
+            if (item._id === id) {
                 handleImportImgPush({
-                    id: id,
+                    _id: id,
                     image: [
                         ...item.image,
-                        { id: uuid.uniqueId('image_'), data: img },
+                        { _id: new ObjectID().toString(), data: img },
                     ],
                 });
             }
@@ -183,10 +223,10 @@ function ProductDesInsert(props) {
 
     const handleRemoveImage = (item, idImg) => {
         const result = product_config.image[indexProduct].image.filter(
-            (ar) => ar.id !== item.id,
+            (ar) => ar._id !== item._id,
         );
         handleImportImgPush({
-            id: idImg,
+            _id: idImg,
             image: result,
         });
         item.image && URL.revokeObjectURL(item.image);
@@ -202,7 +242,7 @@ function ProductDesInsert(props) {
     const handleFilterPropertyValues = () => {
         const defaultTitle = [];
         const descTitle = [];
-        if (product_config) {
+        if (product_config.status === 'update') {
             var resultInputConfig = Object.keys(product_config).map((key) => [
                 key,
                 product_config[key],
@@ -210,11 +250,21 @@ function ProductDesInsert(props) {
 
             resultInputConfig.forEach((item) => {
                 if (
-                    item[0] !== 'id' &&
+                    item[0] !== '_id' &&
                     item[0] !== 'description' &&
                     item[0] !== 'detail' &&
                     item[0] !== 'varation' &&
                     item[0] !== 'shop' &&
+                    item[0] !== 'likes' &&
+                    item[0] !== 'dislikes' &&
+                    item[0] !== 'star' &&
+                    item[0] !== 'sold' &&
+                    item[0] !== 'createdAt' &&
+                    item[0] !== 'updatedAt' &&
+                    item[0] !== 'comments' &&
+                    item[0] !== 'status' &&
+                    item[0] !== 'logo' &&
+                    item[0] !== '__v' &&
                     item[0] !== 'image'
                 ) {
                     defaultTitle.push(item);
@@ -224,11 +274,16 @@ function ProductDesInsert(props) {
                     );
                 }
             });
+
             return { defaultTitle: defaultTitle, descTitle: descTitle };
         }
     };
 
     const value = handleFilterPropertyValues();
+
+    const handleFocusInputChange = (e, name) => {
+        setInputElement(name);
+    };
 
     const handleRenderUIInputConfig = () => {
         if (isShowInput) {
@@ -241,6 +296,10 @@ function ProductDesInsert(props) {
                                 onChange={(e) =>
                                     handleSetValueInputFieldUpdate(e, item[0])
                                 }
+                                onFocus={(e) =>
+                                    handleFocusInputChange(e, item[0])
+                                }
+                                id={item[0]}
                             />
                         </Form.Item>
                     ));
@@ -254,6 +313,10 @@ function ProductDesInsert(props) {
                             onChange={(e) =>
                                 handleSetValueInputField(e, item.value)
                             }
+                            onFocus={(e) =>
+                                handleFocusInputChange(e, item.value)
+                            }
+                            id={item.value}
                         />
                     </Form.Item>
                 ));
@@ -276,13 +339,98 @@ function ProductDesInsert(props) {
         }
     };
 
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.forEach((ele) => {
+                const inputId = ele.getAttribute('id');
+                if (inputId === inputElement) {
+                    ele.style.color = 'red';
+                    ele.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'center',
+                        inline: 'center',
+                    });
+                } else {
+                    ele.style.color = 'black';
+                }
+            });
+        }
+        window.addEventListener('mousemove', (e) => {
+            if (
+                !e.target.closest('#userId') &&
+                !e.target.closest('#userDrawerId')
+            ) {
+                setInputElement('');
+            }
+        });
+        return () => {
+            window.removeEventListener('mousemove', null);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            const arrayCheck = [];
+            if (product_config.status === 'update') {
+                const inputConfigSelectConfig = [
+                    ...value.defaultTitle,
+                    ...value.descTitle[0],
+                ];
+                arrayCheck.push(inputConfigSelectConfig);
+            } else {
+                arrayCheck.push([...resultInputConfig, ...resultDescription]);
+            }
+
+            if (arrayCheck[0].length) {
+                inputRef.current = inputRef.current.slice(
+                    0,
+                    arrayCheck[0].length,
+                );
+                inputRef.current.forEach((ele) => {
+                    if (ele) {
+                        const inputId = ele.getAttribute('id');
+                        if (inputId === inputElement) {
+                            ele.style.color = '#f63c3c';
+                            ele.style.border = '1px solid';
+                            ele.style.borderRadius = '3px';
+                            ele.style.padding = '3px';
+                            ele.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center',
+                                inline: 'center',
+                            });
+                            ele.style.transition = '0.25s';
+                        } else {
+                            ele.style.color = 'black';
+                            ele.style.border = 'none';
+                            ele.style.padding = '0px';
+                        }
+                    }
+                });
+            }
+        }
+    }, [
+        product_config.status,
+        resultDescription,
+        resultInputConfig,
+        value,
+        inputElement,
+    ]);
+
     const demoInputSelectUI = (data) => {
         return data.map((item, index) =>
             item[1] ? (
                 <div key={index} className="slider-product-config">
                     {item[0] === 'price' || item[0] === 'priceOld' ? (
                         <>
-                            <p className="key">{item[0]}:</p>
+                            <p
+                                className="key"
+                                id={item[0]}
+                                key={index}
+                                ref={(el) => (inputRef.current[index] = el)}
+                            >
+                                {item[0]}:
+                            </p>
                             <p className="value">
                                 {numberWithCommas(+item[1])}
                                 <sup
@@ -296,7 +444,14 @@ function ProductDesInsert(props) {
                         </>
                     ) : (
                         <>
-                            <p className="key">{item[0]}:</p>
+                            <p
+                                className="key"
+                                id={item[0]}
+                                key={index}
+                                ref={(el) => (inputRef.current[index] = el)}
+                            >
+                                {item[0]}:
+                            </p>
                             <p className="value">{item[1]}</p>
                         </>
                     )}
@@ -309,59 +464,124 @@ function ProductDesInsert(props) {
 
     const handleLinkUpdateProduct = () => {
         if (product_config.status === 'update') {
-            return '/dashboard/widgets/list-all/mobile';
+            return '/dashboard/widgets/list-all';
         } else {
             return '#';
         }
     };
 
     const handleRenderUiSelectConfig = () => {
-        if (isShowSelect) {
-            if (select_field.length) {
-                return select_field.map((item, index) => (
-                    <Form.Item label={item.name} key={index}>
-                        <Select
-                            placeholder={item.description}
-                            onChange={(value) =>
-                                handleChangeSelect(value, item.name)
-                            }
-                        >
-                            {item &&
-                                item.options.map((option, index) => (
-                                    <Select.Option key={index} value={option}>
-                                        {option}
-                                    </Select.Option>
-                                ))}
-                        </Select>
-                    </Form.Item>
-                ));
+        if (product_config.status === 'update') {
+            if (isShowSelect) {
+                if (select_field.length) {
+                    if (value.descTitle[0].length) {
+                        return value.descTitle[0].map((des) =>
+                            select_field.map((item, index) => {
+                                if (des[0] === item.name) {
+                                    return (
+                                        <Form.Item
+                                            label={item.name}
+                                            key={index}
+                                        >
+                                            <Select
+                                                placeholder={item.description}
+                                                onChange={(value) =>
+                                                    handleChangeSelect(
+                                                        value,
+                                                        item.name,
+                                                    )
+                                                }
+                                                defaultValue={des[1]}
+                                                id={des[0]}
+                                                ref={(el) =>
+                                                    (inputRef.current[index] =
+                                                        el)
+                                                }
+                                                onFocus={(e) =>
+                                                    handleFocusInputChange(
+                                                        e,
+                                                        des[0],
+                                                    )
+                                                }
+                                            >
+                                                {item &&
+                                                    item.options.map(
+                                                        (option, index) => (
+                                                            <Select.Option
+                                                                key={index}
+                                                                value={option}
+                                                            >
+                                                                {option}
+                                                            </Select.Option>
+                                                        ),
+                                                    )}
+                                            </Select>
+                                        </Form.Item>
+                                    );
+                                }
+                            }),
+                        );
+                    }
+                }
             }
-        }
-    };
-
-    const isHandleValidationForm = () => {
-        if (product_config.image[indexProduct]) {
-            return (
-                !product_config.logo &&
-                !product_config.category &&
-                product_config.image[indexProduct].image.length === 0
-            );
+        } else {
+            if (isShowSelect) {
+                if (select_field.length) {
+                    return select_field.map((item, index) => (
+                        <Form.Item label={item.name} key={index}>
+                            <Select
+                                placeholder={item.description}
+                                onChange={(value) =>
+                                    handleChangeSelect(value, item.name)
+                                }
+                                id={item.name}
+                                onFocus={(e) =>
+                                    handleFocusInputChange(e, item.name)
+                                }
+                                ref={(el) => (inputRef.current[index] = el)}
+                            >
+                                {item &&
+                                    item.options.map((option, index) => (
+                                        <Select.Option
+                                            key={index}
+                                            value={option}
+                                        >
+                                            {option}
+                                        </Select.Option>
+                                    ))}
+                            </Select>
+                        </Form.Item>
+                    ));
+                }
+            }
         }
     };
 
     return (
         <div className="product-description-insert">
             <Prompt
-                when={formHarlObject}
+                when={isEdit}
                 message={(location, action) => {
                     if (product_config.status === 'update') {
-                        return true;
+                        return location.pathname.startsWith(
+                            '/dashboard/widgets/update-product',
+                        )
+                            ? true
+                            : JSON.stringify({
+                                  header: 'Confirm',
+                                  content:
+                                      'Dữ liệu sẽ không được lưu lại, Bạn có chắc muốn rời trang này không?',
+                              });
                     } else {
                         return location.pathname.startsWith(
                             '/dashboard/widgets/create-product',
                         )
                             ? true
-                            : `Bạn chưa lưu lại sản phẩm, bạn có chắc muốn chuyển trang không ?`;
+                            : JSON.stringify({
+                                  header: 'Confirm',
+                                  content:
+                                      'Dữ liệu sẽ không được lưu lại, Bạn có chắc muốn rời trang này không?',
+                              });
                     }
                 }}
             />
@@ -611,7 +831,11 @@ function ProductDesInsert(props) {
                                                 key={index}
                                                 style={{
                                                     border:
-                                                        indexCategory === index
+                                                        product_config.logo ===
+                                                        item.value
+                                                            ? '5px solid #0a8bba'
+                                                            : indexCategory ===
+                                                              index
                                                             ? '5px solid #0a8bba'
                                                             : '',
                                                 }}
@@ -640,7 +864,10 @@ function ProductDesInsert(props) {
                                         <div className="box-description-product">
                                             <CKEditor
                                                 editor={ClassicEditor}
-                                                data={addData}
+                                                data={
+                                                    product_config.detail ||
+                                                    addData
+                                                }
                                                 onChange={
                                                     handleChangeDesProduct
                                                 }
@@ -666,6 +893,7 @@ function ProductDesInsert(props) {
                                             position: 'absolute',
                                             top: '3%',
                                             right: '10%',
+                                            zIndex: 1,
                                         }}
                                         onClick={() =>
                                             hanldeImportProductToDB({
@@ -673,7 +901,11 @@ function ProductDesInsert(props) {
                                                 status: product_config.status,
                                             })
                                         }
-                                        disabled={isHandleValidationForm()}
+                                        disabled={
+                                            product_config.status === 'update'
+                                                ? !isEdit
+                                                : !isCheckCreate
+                                        }
                                     >
                                         <Link to={handleLinkUpdateProduct()}>
                                             {product_config.status === 'update'
@@ -681,26 +913,45 @@ function ProductDesInsert(props) {
                                                 : 'Chốt sản phẩm'}
                                         </Link>
                                     </Button>
-                                    <Popconfirm
-                                        title="Bạn có đồng ý Reset lại sản phẩm này ?"
-                                        onConfirm={handleResetProductConfig}
-                                        onCancel={cancel}
-                                        okText="Yes"
-                                        cancelText="No"
-                                    >
+                                    {product_config.status === 'update' ? (
                                         <Button
                                             type="ghost"
-                                            danger
                                             style={{
                                                 position: 'absolute',
                                                 top: '3%',
                                                 right: '32%',
                                                 marginRight: 20,
+                                                zIndex: 1,
                                             }}
                                         >
-                                            Reset sản phẩm
+                                            <Link to="/dashboard/widgets/list-all">
+                                                Quay lại trang sản phẩm
+                                            </Link>
                                         </Button>
-                                    </Popconfirm>
+                                    ) : (
+                                        <Popconfirm
+                                            title="Bạn có đồng ý Reset lại sản phẩm này ?"
+                                            onConfirm={handleResetProductConfig}
+                                            onCancel={cancel}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button
+                                                type="ghost"
+                                                danger
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '3%',
+                                                    right: '32%',
+                                                    marginRight: 20,
+                                                    zIndex: 1,
+                                                }}
+                                            >
+                                                Reset sản phẩm
+                                            </Button>
+                                        </Popconfirm>
+                                    )}
+
                                     <div className="list-product-varation">
                                         {product_config.varation &&
                                             product_config.varation.map(
@@ -721,9 +972,7 @@ function ProductDesInsert(props) {
                                                         <img
                                                             alt={item.title}
                                                             src={item.image}
-                                                            style={{
-                                                                width: '100%',
-                                                            }}
+                                                            className="image-file-input-varation"
                                                             onError={(e) => {
                                                                 e.target.onerror =
                                                                     null;
@@ -774,7 +1023,9 @@ function ProductDesInsert(props) {
                                         Thông Tin Sản Phẩm Chi Tiết
                                     </p>
                                     <div className="product-detail">
-                                        {parse(addData)}
+                                        {parse(
+                                            product_config.detail || addData,
+                                        )}
                                     </div>
                                 </div>
                             </Affix>

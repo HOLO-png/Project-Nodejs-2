@@ -3,19 +3,14 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function SliderImgToProduct(props) {
     const { image_field, handleRemoveImage, handleSetImageField } = props;
-    const [character, setCharacter] = useState(image_field);
 
     const handleOnDragEnd = (result) => {
         if (!result.destination) return;
-        const item = Array.from(character.image);
+        const item = Array.from(image_field.image);
         const [reorderedItem] = item.splice(result.source.index, 1);
         item.splice(result.destination.index, 0, reorderedItem);
-        handleSetImageField({ id: character.id, image: item });
+        handleSetImageField({ _id: image_field._id, image: item });
     };
-
-    useEffect(() => {
-        image_field && setCharacter(image_field);
-    }, [image_field]);
 
     return (
         <>
@@ -28,11 +23,11 @@ function SliderImgToProduct(props) {
                             className="row"
                             style={{ width: '500px', display: 'inline-table' }}
                         >
-                            {character &&
-                                character.image.map((item, index) => (
+                            {image_field &&
+                                image_field.image.map((item, index) => (
                                     <Draggable
-                                        key={item.id}
-                                        draggableId={item.id}
+                                        key={item._id}
+                                        draggableId={item._id}
                                         index={index}
                                     >
                                         {(provided) => (
@@ -57,7 +52,7 @@ function SliderImgToProduct(props) {
                                                     onClick={() =>
                                                         handleRemoveImage(
                                                             item,
-                                                            image_field.id,
+                                                            image_field._id,
                                                         )
                                                     }
                                                 ></i>

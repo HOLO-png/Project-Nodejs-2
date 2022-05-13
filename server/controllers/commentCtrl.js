@@ -138,6 +138,15 @@ const commentCtrl = {
             res.status(500).json(err);
         }
     },
+    getCommentsInStore: async (req, res) => {
+        try {
+            const comments = await Comments.find();
+            return res.status(200).json({ comments });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    },
 };
 
 module.exports = commentCtrl;

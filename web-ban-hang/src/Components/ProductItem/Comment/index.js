@@ -68,7 +68,7 @@ function Comments(props) {
                 videoMedia = await imagesUpload(videoURL);
             }
 
-            setTimeout(async () => {
+            setTimeout(() => {
                 setSubmitting(false);
                 setValue('');
                 setStar(0);
@@ -107,7 +107,7 @@ function Comments(props) {
                 setimg(media);
             }
         });
-    });
+    }, []);
 
     const handlePagination = (num) => {
         const search = `?page=${num}`;

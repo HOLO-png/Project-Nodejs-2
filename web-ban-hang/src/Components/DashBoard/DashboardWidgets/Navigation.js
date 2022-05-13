@@ -1,37 +1,65 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { Button, Divider, Drawer, Empty, List, Typography } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+    Button,
+    Divider,
+    Drawer,
+    Empty,
+    List,
+    Spin,
+    Tooltip,
+    Typography,
+} from 'antd';
 import Slider from 'react-slick';
 import parse from 'html-react-parser';
 import UserComments from './UserComments';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    getProductApi,
+    productItemSelector,
+} from '../../../Store/Reducer/product';
 
-function Navigation(props) {
-    const {
-        visible,
-        handleSetVisible,
-        product,
-        handleSetActiveProductDetail,
-        comments_users,
-    } = props;
-    const [userCommentsArray, setUserCommentsArray] = useState([]);
+function Navigation({
+    visible,
+    handleSetVisible,
+    product,
+    handleSetActiveProductDetail,
+    totalCmt,
+}) {
+    const dispatch = useDispatch();
+    const productStore = useSelector(productItemSelector);
+
     const [display, setDisplay] = useState(false);
+    const [replyComment, setReplyComment] = useState([]);
     const [activeImage, setActiveImage] = useState(0);
-    const userComments = [];
 
+    const drawerRef = useRef();
+
+    const { isLoading } = productStore;
     const handleShowDescriptionProduct = () => {
         setDisplay(!display);
     };
 
+    const handleGetMoreComments = (item) => {
+        dispatch(
+            getProductApi({ limit: item.comments.length + 4, id: item._id }),
+        );
+    };
+
+    useEffect(() => {
+        if (drawerRef.current) {
+            drawerRef.current.scrollTo(0, 0);
+        }
+    }, [visible]);
+
     const handleFilterPropertyValues = () => {
         const defaultTitle = [];
         const descTitle = [];
-        if (product) {
+        if (Object.keys(product).length) {
             var resultInputConfig = Object.keys(product).map((key) => [
                 key,
                 product[key],
             ]);
-
             resultInputConfig.forEach((item) => {
                 if (
                     item[0] !== 'id' &&
@@ -47,10 +75,29 @@ function Navigation(props) {
                         Object.keys(item[1]).map((key) => [key, item[1][key]]),
                     );
                 }
+                if (item[0] === 'likes' || item[0] === 'comments') {
+                    item[1] = item[1].length;
+                }
+                if (item[0] === 'createdAt') {
+                    const d = new Date(item[1]);
+                    item[1] =
+                        d.getHours() +
+                        ':' +
+                        d.getMinutes() +
+                        ', ' +
+                        d.toDateString();
+                }
             });
             return { defaultTitle: defaultTitle, descTitle: descTitle };
         }
     };
+
+    useEffect(() => {
+        if (product.comments) {
+            const newRep = product.comments.filter((cmt) => !cmt.reply);
+            setReplyComment(newRep);
+        }
+    }, [product.comments]);
 
     const onClose = () => {
         handleSetVisible(false);
@@ -60,6 +107,7 @@ function Navigation(props) {
     const handleSetProduct = (index) => {
         setActiveImage(index);
     };
+
 
     const settings = {
         dots: true,
@@ -71,33 +119,33 @@ function Navigation(props) {
 
     const value = handleFilterPropertyValues();
 
-    useEffect(() => {
-        if (comments_users) {
-            if (product) {
-                comments_users.forEach((item) => {
-                    if (item.id_product === product.id) {
-                        userComments.push(item);
-                    }
-                });
-            }
-        }
-        setUserCommentsArray(userComments);
-    }, [comments_users, product]);
 
     return (
-        <>
-            <Drawer
-                width={640}
-                placement="right"
-                closable={false}
-                onClose={onClose}
-                visible={visible}
-                className="drawer-info-product"
-            >
+        <Drawer
+            width={640}
+            placement="right"
+            closable={false}
+            onClose={onClose}
+            visible={visible}
+            className="drawer-info-product"
+        >
+            {isLoading ? (
+                <div className="loading-drawer drawer-product-dashboard">
+                    <div
+                        className="row varation-image loading-change"
+                        style={{ paddingTop: 5, height: 'auto' }}
+                    >
+                        <Spin size="large" />
+                    </div>
+                </div>
+            ) : (
                 <div className="drawer-product-dashboard">
-                    <div className="row" style={{ paddingTop: 5 }}>
+                    <div
+                        className="row varation-image"
+                        style={{ paddingTop: 5, height: 'auto' }}
+                    >
                         <div className="product-switching">
-                            {product &&
+                            {Object.keys(product).length &&
                                 product.varation.map((item, index) => (
                                     <div
                                         className={`product-image-item ${
@@ -107,31 +155,42 @@ function Navigation(props) {
                                         }`}
                                         key={item.id}
                                         onClick={() => handleSetProduct(index)}
+                                        ref={drawerRef}
                                     >
-                                        <img
-                                            alt={item.title}
-                                            src={item.image}
-                                        />
+                                        <Tooltip
+                                            placement="top"
+                                            title={item.title}
+                                        >
+                                            <img
+                                                alt={item.title}
+                                                src={item.image}
+                                            />
+                                        </Tooltip>
                                     </div>
                                 ))}
                         </div>
                     </div>
-                    <div className="row">
+                    <div
+                        className="row"
+                        style={{ paddingTop: 5, height: 'auto' }}
+                    >
                         <div className="slider-img">
                             <Slider {...settings}>
-                                {product
+                                {Object.keys(product).length
                                     ? product.image[activeImage].image.map(
-                                          (item, index) => (
-                                              <div
-                                                  className="image-products"
-                                                  key={index}
-                                              >
-                                                  <img
-                                                      alt={item.id}
-                                                      src={item.data}
-                                                  />
-                                              </div>
-                                          ),
+                                          (item, index) => {
+                                              return (
+                                                  <div
+                                                      className="image-products"
+                                                      key={index}
+                                                  >
+                                                      <img
+                                                          alt={item._id}
+                                                          src={item.data}
+                                                      />
+                                                  </div>
+                                              );
+                                          },
                                       )
                                     : ''}
                             </Slider>
@@ -197,7 +256,9 @@ function Navigation(props) {
                                 }}
                             >
                                 <h1>MÔ TẢ SẢN PHẨM</h1>
-                                {product ? parse(product.detail) : ''}
+                                {Object.keys(product).length
+                                    ? parse(product.detail)
+                                    : ''}
                                 <div
                                     className="opacity"
                                     style={{
@@ -227,23 +288,35 @@ function Navigation(props) {
                                 Bình Luận Từ Người Mua
                             </Divider>
                             <div className="user-comments">
-                                {userCommentsArray &&
-                                userCommentsArray.length ? (
-                                    userCommentsArray.map((item) => (
+                                {replyComment && replyComment.length ? (
+                                    replyComment.map((item) => (
                                         <UserComments
                                             comment={item}
                                             key={item.key}
+                                            comments={product.comments}
                                         />
                                     ))
                                 ) : (
                                     <Empty />
                                 )}
+                                {totalCmt !== product.comments.length ? (
+                                    <Button
+                                        type="link"
+                                        onClick={() =>
+                                            handleGetMoreComments(product)
+                                        }
+                                    >
+                                        Xem thêm bình luận
+                                    </Button>
+                                ) : (
+                                    ''
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
-            </Drawer>
-        </>
+            )}
+        </Drawer>
     );
 }
 

@@ -8,13 +8,13 @@ function TotalCate(props) {
     const arrayData = [data1, data2, data3, data4];
 
     return (
-        <div className="col-xs-6">
-            {arrayData.map((item) => (
+        <div className="col-xs-12">
+            {arrayData.map((item, index) => (
                 <Link
                     key={item.icon}
                     to={`/dashboard/widgets/list-all/${item.title.toLowerCase()}`}
                 >
-                    <div className="col-xs-6 col-md-6 col-lg-6 no-padding">
+                    <div className="col-xs-3 col-md-3 col-lg-3 no-padding">
                         <div className="panel panel-teal panel-widget border-right">
                             <div className="row no-padding">
                                 <em

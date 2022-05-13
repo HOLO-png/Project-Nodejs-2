@@ -405,7 +405,6 @@ export default function Products() {
     useEffect(() => {
         dispatch(setLoadingAction(true));
         dispatch(getProductApi({ id }));
-        dispatch(getCommentsUserApi(id));
         setTimeout(() => {
             dispatch(setLoadingAction(false));
         }, 500);

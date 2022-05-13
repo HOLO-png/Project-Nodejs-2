@@ -19,6 +19,7 @@ function UploadImageCategory(props) {
     const dispatch = useDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [imageULR, setImageULR] = useState('');
+    console.log(image_field);
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -27,9 +28,10 @@ function UploadImageCategory(props) {
 
     const handleOk = () => {
         setIsModalVisible(false);
-        image_field && importImg(imageULR, image_field.id);
+        image_field && importImg(imageULR, image_field._id);
         setImageULR('');
     };
+
 
     const handleCancel = () => {
         setIsModalVisible(false);

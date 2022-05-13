@@ -1,42 +1,41 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import { Input, AutoComplete } from 'antd';
+import React from 'react';
+import { Input } from 'antd';
 import numberWithCommas from '../../../utils/numberWithCommas';
 
 export default function CompleteSearch(props) {
     const {
         handleSearchInputToProduct,
-        search_products,
+        searchSimilar,
         handleImportProductToTablet,
         setIsActive,
         isActive,
+        setInputSearch,
+        inputSearch,
     } = props;
-
-    const [inputSearch, setInputSearch] = useState('');
 
     const handleChangeInputSearch = (e) => {
         const value = e.target.value;
-        setInputSearch(value.trim());
+        setInputSearch(value);
         value.trim() ? setIsActive(true) : setIsActive(false);
-        handleSearchInputToProduct(value.trim());
+        handleSearchInputToProduct(value);
     };
 
     return (
         <div className="input-search-list-products" style={{ width: 400 }}>
-            <Input.Search
+            <Input
                 size="large"
                 placeholder="search product ..."
                 value={inputSearch}
                 enterButton
-                onChange={handleChangeInputSearch}
+                onChange={(e) => handleChangeInputSearch(e)}
             />
             <div
                 className={`input-search-list-products-table ${
                     isActive ? 'active' : ''
                 }`}
             >
-                {search_products.length
-                    ? search_products.map((item, index) => (
+                {searchSimilar.length
+                    ? searchSimilar.map((item, index) => (
                           <div
                               className="input-search-list-products-table-item"
                               key={index}

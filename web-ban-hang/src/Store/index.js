@@ -29,6 +29,9 @@ import paymentReducer from './Reducer/paymentReducer.js';
 import orderReducer from './Reducer/orderReducer.js';
 import { menuSidebarApi } from './Reducer/menuReducer';
 import menuSidebarReducer from './Reducer/menuReducer';
+import usersReducer from './Reducer/usersReducer';
+import productsDBReducer from './Reducer/productsDBReducer';
+
 import { categoryApi } from './Reducer/categoryReducer';
 
 export const store = configureStore({
@@ -59,6 +62,8 @@ export const store = configureStore({
         userAddressReducer,
         paymentReducer,
         orderReducer,
+        usersReducer,
+        productsDBReducer,
         [productsApi.reducerPath]: productsApi.reducer,
         [menuSidebarApi.reducerPath]: menuSidebarApi.reducer,
         [categoryApi.reducerPath]: categoryApi.reducer,

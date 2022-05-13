@@ -50,6 +50,19 @@ export const handleGetOrder = createAsyncThunk(
     },
 );
 
+export const handleGetOrdersInStore = createAsyncThunk(
+    'handleGetOrdersInStore/handleGetOrdersInStoreFetch',
+    async () => {
+        try {
+            const res = await axios.get(`${url}/order/all`);
+            return res.data;
+        } catch (err) {
+            toast.error(`Get orders failed!`);
+            console.log(err);
+        }
+    },
+);
+
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
@@ -59,6 +72,14 @@ const orderSlice = createSlice({
     },
     reducers: {},
     extraReducers: {
+        //fetch activation email
+        [handleGetOrdersInStore.pending]: (state, action) => {},
+        [handleGetOrdersInStore.fulfilled]: (state, action) => {
+            if (action.payload) {
+                state.orders = action.payload.orders;
+            }
+        },
+        [handleGetOrdersInStore.rejected]: (state, action) => {},
         //fetch activation email
         [handleAddOrder.pending]: (state, action) => {},
         [handleAddOrder.fulfilled]: (state, action) => {

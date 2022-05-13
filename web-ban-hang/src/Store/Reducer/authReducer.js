@@ -7,10 +7,12 @@ const url = 'http://localhost:8800/api';
 // handle feature for User Page
 export const updateProfileUser = createAsyncThunk(
     'updateProfileUser/updateProfileUserFetch',
-    async ({tokenAuth, data}) => {
+    async ({ tokenAuth, data }) => {
         try {
-               await axios.put(`${url}/users`, data, { headers: { Authorization: tokenAuth, data },});
-                return data;
+            await axios.put(`${url}/users`, data, {
+                headers: { Authorization: tokenAuth, data },
+            });
+            return data;
         } catch (err) {
             console.log(err);
             toast.error(`${err.message} 😓`);
@@ -173,8 +175,8 @@ const authSlice = createSlice({
         [updateProfileUser.pending]: (state, action) => {},
         [updateProfileUser.fulfilled]: (state, action) => {
             const data = action.payload;
-            if(data) {
-                state.auth.user = {...state.auth.user, ...data}
+            if (data) {
+                state.auth.user = { ...state.auth.user, ...data };
                 localStorage.setItem('user', JSON.stringify(state.auth.user));
             }
         },

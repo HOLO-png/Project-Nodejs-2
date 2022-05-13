@@ -132,7 +132,6 @@ function OrderUser(props) {
                         orderSearch.push(order);
                     }
                 });
-                console.log(orderSearch);
                 setOrderSearch(orderSearch);
             }
         } else {

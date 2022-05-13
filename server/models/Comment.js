@@ -13,6 +13,7 @@ const CommentsSchema = new mongoose.Schema(
             max: 500,
         },
         likes: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+        dislikes: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
         media: {
             image: [
                 {

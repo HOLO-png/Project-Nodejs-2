@@ -9,11 +9,8 @@ const ProductsDescription = forwardRef((props, ref) => {
     const {
         handleShowProductDesSetting,
         isShowProductDes,
+        total,
         products,
-        productsPerPage,
-        totalProduct,
-        paginate,
-        isShowCategoryOptions,
         passingInputArray,
         input_feild,
         handleRemoveTagInput,
@@ -58,12 +55,17 @@ const ProductsDescription = forwardRef((props, ref) => {
         setVisible,
         visible,
         product,
-        setProduct,
         active,
         setActive,
         handleOnNavigation,
         handleSearchInputToProduct,
-        search_products,
+        searchSimilar,
+        totalCmt,
+        isEdit,
+        setIndexCategory,
+        indexCategory,
+        isCheckCreate,
+        setIsCheckCreate,
     } = props;
 
     const handeRenderTitle = () => {
@@ -76,7 +78,7 @@ const ProductsDescription = forwardRef((props, ref) => {
         }
     };
     return (
-        <div className={`col-md-${isShowCategoryOptions ? '8' : '12'}`}>
+        <div className={`col-md-12}`}>
             <div className="panel panel-default">
                 <div className="panel-heading">
                     {handeRenderTitle()}
@@ -106,18 +108,15 @@ const ProductsDescription = forwardRef((props, ref) => {
                             }
                         >
                             <i className="fad fa-plus"></i>
-                        </span>{' '}
+                        </span>
                     </Link>
                 </div>
                 <Switch>
                     {
                         <Route path="/dashboard/widgets/list-all">
                             <ProductDescriptionList
+                                total={total}
                                 products={products}
-                                productsPerPage={productsPerPage}
-                                totalProduct={totalProduct}
-                                paginate={paginate}
-                                isShowCategoryOptions={isShowCategoryOptions}
                                 handleRemoveProductItem={
                                     handleRemoveProductItem
                                 }
@@ -126,14 +125,14 @@ const ProductsDescription = forwardRef((props, ref) => {
                                 setVisible={setVisible}
                                 visible={visible}
                                 product={product}
-                                setProduct={setProduct}
                                 active={active}
                                 setActive={setActive}
                                 handleOnNavigation={handleOnNavigation}
                                 handleSearchInputToProduct={
                                     handleSearchInputToProduct
                                 }
-                                search_products={search_products}
+                                searchSimilar={searchSimilar}
+                                totalCmt={totalCmt}
                             />
                         </Route>
                     }
@@ -187,6 +186,11 @@ const ProductsDescription = forwardRef((props, ref) => {
                                 handlePassingSelectProductConfig={
                                     handlePassingSelectProductConfig
                                 }
+                                isEdit={isEdit}
+                                setIndexCategory={setIndexCategory}
+                                indexCategory={indexCategory}
+                                isCheckCreate={isCheckCreate}
+                                setIsCheckCreate={setIsCheckCreate}
                             />
                         </Route>
                     }

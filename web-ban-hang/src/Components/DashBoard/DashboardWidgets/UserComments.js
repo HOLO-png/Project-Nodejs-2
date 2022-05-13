@@ -1,6 +1,5 @@
-import React, { createElement, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { Comment, Tooltip, Avatar, Rate, Button } from 'antd';
+import React, { createElement, useEffect, useState } from 'react';
+import { Comment, Tooltip, Avatar, Rate, Button, Image } from 'antd';
 import moment from 'moment';
 import {
     DislikeOutlined,
@@ -10,17 +9,32 @@ import {
     CaretUpOutlined,
     CaretDownOutlined,
 } from '@ant-design/icons';
+import { humanImg } from '../../../assets/fake-data/human';
+import ActionItem from '../../ProductItem/Comment/CommentItem/ActionItem';
 
 function UserComments(props) {
-    const { comment } = props;
+    const { comment, replyComment, comments } = props;
     const [action, setAction] = useState(null);
     const [statusHeight, setStatusHeight] = useState(false);
+    const [commentsReply, setCommentsReply] = useState([]);
+
+    useEffect(() => {
+        if (comments) {
+            const commentReply = [];
+            comments.forEach((commentItem) => {
+                if (commentItem.reply === comment._id) {
+                    commentReply.push(commentItem);
+                }
+            });
+            setCommentsReply(commentReply);
+        }
+    }, [comment, comments]);
 
     const actions = [
         <Tooltip key="comment-basic-like" title="Like">
             <span>
                 {createElement(action === 'liked' ? LikeFilled : LikeOutlined)}
-                <span className="comment-action">{comment.like}</span>
+                <span className="comment-action">{comment.likes.length}</span>
             </span>
         </Tooltip>,
         <Tooltip key="comment-basic-dislike" title="Dislike">
@@ -28,24 +42,34 @@ function UserComments(props) {
                 {React.createElement(
                     action === 'disliked' ? DislikeFilled : DislikeOutlined,
                 )}
-                <span className="comment-action">{comment.dislike}</span>
+                <span className="comment-action">
+                    {comment.dislikes.length}
+                </span>
             </span>
         </Tooltip>,
     ];
+
+    console.log(comment);
+
     const ExampleComment = ({ children }) => (
         <Comment
             actions={actions}
-            author={<a>{comment.author}</a>}
-            avatar={<Avatar src={comment.avatar} alt={comment.author} />}
+            author={<a>{comment.user && comment.user.username}</a>}
+            avatar={
+                <Avatar
+                    src={comment.user && comment.user.profilePicture}
+                    alt="user picture"
+                />
+            }
             content={<p>{comment.content}</p>}
             datetime={
-                <Tooltip title={comment.datetime}>
-                    <span>{comment.datetime}</span>
+                <Tooltip title={comment.createdAt}>
+                    <span>{comment.createdAt}</span>
                 </Tooltip>
             }
         >
             <div className="rate-comment">
-                <Rate disabled defaultValue={comment.star} />
+                <Rate disabled value={comment.star} />
             </div>
             {children}
         </Comment>
@@ -58,7 +82,25 @@ function UserComments(props) {
     return (
         <div className="user-comments">
             <ExampleComment>
-                {comment.cmt_item.length ? (
+                <div className="comments-media">
+                    {comment.media.image.map((item) => (
+                        <div className="image-comment">
+                            <Image width={100} src={item.url} key={item._id} />
+                        </div>
+                    ))}
+                    {comment.media.video.map((item) => (
+                        <>
+                            <video
+                                controls
+                                src={item.url}
+                                className="d-block w-100"
+                                alt={item.url}
+                                style={{ width: '200px' }}
+                            />
+                        </>
+                    ))}
+                </div>
+                {commentsReply.length ? (
                     <Button
                         type="link"
                         icon={
@@ -70,35 +112,60 @@ function UserComments(props) {
                         }
                         onClick={handleCommentsList}
                     >
-                        {!statusHeight ? 'Xem' : 'Ẩn'} {comment.cmt_item.length}{' '}
+                        {!statusHeight ? 'Xem' : 'Ẩn'} {commentsReply.length}{' '}
                         câu trả lời
                     </Button>
                 ) : (
                     ''
                 )}
-                {comment.cmt_item.map((item) => (
-                    <div
-                        className="list-comment-item"
-                        key={item.id_author}
-                        style={{
-                            height: statusHeight ? 'auto' : '0px',
-                        }}
-                    >
-                        <Comment
-                            actions={actions}
-                            author={<a>{item.author}</a>}
-                            avatar={
-                                <Avatar src={item.avatar} alt={item.author} />
-                            }
-                            content={<p>{item.content}</p>}
-                            datetime={
-                                <Tooltip title={item.datetime}>
-                                    <span>{item.datetime}</span>
-                                </Tooltip>
-                            }
-                        />
-                    </div>
-                ))}
+
+                {commentsReply.length
+                    ? commentsReply.map((itemCmt, i) => (
+                          <div
+                              className="list-comment-item"
+                              key={i}
+                              style={{
+                                  height: statusHeight ? 'auto' : '0px',
+                              }}
+                          >
+                              <Comment
+                                  author={<a>{itemCmt.user.username}</a>}
+                                  avatar={
+                                      <Avatar
+                                          src={
+                                              itemCmt.user.profilePicture ||
+                                              humanImg
+                                          }
+                                          alt={itemCmt.user.username}
+                                      />
+                                  }
+                                  content={itemCmt.content}
+                                  datetime={
+                                      <Tooltip title={itemCmt.createdAt}>
+                                          <span>
+                                              {moment(
+                                                  itemCmt.createdAt,
+                                              ).fromNow()}
+                                          </span>
+                                      </Tooltip>
+                                  }
+                              >
+                                  <div
+                                      className="comment-actions"
+                                      style={{
+                                          display: 'flex',
+                                          justifyContent: 'flex-start',
+                                          alignItems: 'baseline',
+                                          transform: 'translateY(-10px)',
+                                      }}
+                                  >
+                                      <ActionItem item={itemCmt} />
+                                  </div>
+                              </Comment>
+                          </div>
+                      ))
+                    : ''}
+                <hr />
             </ExampleComment>
         </div>
     );

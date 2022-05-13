@@ -1,12 +1,16 @@
 const Product = require('../models/Product.js');
 const Comments = require('../models/Comment.js');
+const mongoose = require('mongoose');
 
 const Pagination = (req) => {
     let page = Number(req.query.page) * 1 || 1;
     let limit = Number(req.query.limit) * 1 || 4;
-    let skip = (page - 1) * limit;
-
-    return { page, limit, skip };
+    if (req.query.skip) {
+        return { page, limit, skip: +req.query.skip };
+    } else {
+        let skip = (page - 1) * limit;
+        return { page, limit, skip };
+    }
 };
 
 const Pagination2 = (req) => {
@@ -55,6 +59,7 @@ const product = {
     },
     getProduct: async (req, res) => {
         const { limit, skip } = Pagination(req);
+
         try {
             const { productId } = req.params;
             const comments = await Comments.find({ productId });
@@ -83,6 +88,51 @@ const product = {
             return res
                 .status(200)
                 .json({ product, total, totalCmt: comments.length });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    getProductPagination: async (req, res) => {
+        const { limit, skip } = Pagination(req);
+
+        try {
+            const Data = await Product.aggregate([
+                {
+                    $facet: {
+                        totalData: [
+                            { $sort: { createdAt: -1 } },
+                            { $skip: skip },
+                            { $limit: limit },
+                        ],
+                        totalCount: [
+                            { $sort: { createdAt: -1 } },
+                            { $count: 'count' },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        count: { $arrayElemAt: ['$totalCount.count', 0] },
+                        totalData: 1,
+                    },
+                },
+            ]);
+
+            const products = Data[0].totalData;
+            const count = Data[0].count;
+
+            // Pagination
+            let total = 0;
+
+            if (count % limit === 0) {
+                total = count / limit;
+            } else {
+                total = Math.floor(count / limit) + 1;
+            }
+            console.log({ length: products.length, total, count });
+
+            res.status(200).json({ products, total, count });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err.message });
@@ -253,8 +303,6 @@ const product = {
         try {
             const { keyword, minPrice, maxPrice } = req.query;
 
-            console.log({ keyword, minPrice, maxPrice });
-
             if (maxPrice !== undefined) {
                 let products = await Product.aggregate([
                     {
@@ -305,6 +353,77 @@ const product = {
 
                 return res.status(200).json({ products });
             }
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    getProductsInStore: async (req, res) => {
+        try {
+            const products = await Product.find();
+            return res.status(200).json({ products });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    searchProductToDB: async (req, res) => {
+        const { keys } = req.query;
+
+        try {
+            let query = [];
+            if (keys) {
+                query.push({
+                    $match: {
+                        $or: [
+                            {
+                                name: { $regex: keys, $options: 'i' },
+                            },
+                            {
+                                category: { $regex: keys, $options: 'i' },
+                            },
+                            {
+                                'description.trademark': {
+                                    $regex: keys,
+                                    $options: 'i',
+                                },
+                            },
+                        ],
+                    },
+                });
+            }
+            let products = await Product.aggregate(query);
+            return res.status(200).json({ products });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    removeProductToDB: async (req, res) => {
+        const { productID } = req.params;
+        try {
+            await Product.deleteOne({ _id: productID });
+            return res.status(200).json({ productID });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    updateDataProductToDB: async (req, res) => {
+        const { productID } = req.params;
+
+        const productIdObj = mongoose.Types.ObjectId(productID);
+
+        try {
+            const product = await Product.update(
+                { _id: productIdObj },
+                {
+                    $set: {
+                        ...req.body,
+                    },
+                },
+            );
+            res.status(200).json({ product });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err.message });

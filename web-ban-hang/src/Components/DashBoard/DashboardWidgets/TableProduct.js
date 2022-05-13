@@ -1,40 +1,43 @@
-import React, { forwardRef, memo, useState } from 'react';
+import React, { forwardRef, memo } from 'react';
 import PropTypes from 'prop-types';
 import Navigation from './Navigation';
-import Pagination from './Pagination';
 import numberWithCommas from '../../../utils/numberWithCommas';
 import { Empty, Popconfirm, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
+import Paginations from '../../ProductItem/Comment/Pagination';
+import { useDispatch } from 'react-redux';
+import { getProductToPagination } from '../../../Store/Reducer/productsDBReducer';
 
 const TableProduct = forwardRef((props, ref) => {
     const {
         products,
-        productsPerPage,
-        totalProduct,
-        paginate,
-        isShowCategoryOptions,
+        total,
         handleRemoveProductItem,
         comments_users,
         handleEditProduct,
         setVisible,
         visible,
         product,
-        setProduct,
         active,
         setActive,
         handleOnNavigation,
         productsSearch,
+        totalCmt,
     } = props;
+    const dispatch = useDispatch();
 
     const handleSetVisible = () => {
         setVisible(false);
     };
 
     const handleSetActiveProductDetail = () => {
-        setProduct(null);
         setActive(null);
     };
 
+    const handlePagination = (num) => {
+        const search = `?page=${num}`;
+        dispatch(getProductToPagination({ search }));
+    };
     const handleRenderUITabletItem = (products) => {
         if (products) {
             return products.map((item, index) => (
@@ -61,46 +64,40 @@ const TableProduct = forwardRef((props, ref) => {
                         {numberWithCommas(item.price)}
                         <sup> đ</sup>
                     </td>
-                    {!isShowCategoryOptions && (
-                        <td className="name">
-                            <div className="name-action">
-                                <Tooltip
-                                    title="Xem chi tiết sản phẩm"
-                                    color="yellow"
-                                >
-                                    <i
-                                        className="fad fa-info-circle"
-                                        onClick={() =>
-                                            handleOnNavigation(index, item)
-                                        }
-                                    ></i>
-                                </Tooltip>
-
-                                <Tooltip title="Sửa sản phẩm" color="geekblue">
-                                    <Link to="/dashboard/widgets/update-product">
-                                        <i
-                                            className="fad fa-edit"
-                                            onClick={() =>
-                                                handleEditProduct(item)
-                                            }
-                                        ></i>
-                                    </Link>
-                                </Tooltip>
-                                <Popconfirm
-                                    title="Bạn có chắc chắn muốn xóa sản phẩm này ?"
-                                    onConfirm={() =>
-                                        handleRemoveProductItem(item)
+                    <td className="name">
+                        <div className="name-action">
+                            <Tooltip
+                                title="Xem chi tiết sản phẩm"
+                                color="yellow"
+                            >
+                                <i
+                                    className="fad fa-info-circle"
+                                    onClick={() =>
+                                        handleOnNavigation(index, item)
                                     }
-                                    okText="Yes"
-                                    cancelText="No"
-                                >
-                                    <Tooltip title="Xóa sản phẩm" color="red">
-                                        <i className="fad fa-trash-alt"></i>
-                                    </Tooltip>
-                                </Popconfirm>
-                            </div>
-                        </td>
-                    )}
+                                ></i>
+                            </Tooltip>
+
+                            <Tooltip title="Sửa sản phẩm" color="geekblue">
+                                <Link to="/dashboard/widgets/update-product">
+                                    <i
+                                        className="fad fa-edit"
+                                        onClick={() => handleEditProduct(item)}
+                                    ></i>
+                                </Link>
+                            </Tooltip>
+                            <Popconfirm
+                                title="Bạn có chắc chắn muốn xóa sản phẩm này ?"
+                                onConfirm={() => handleRemoveProductItem(item)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Tooltip title="Xóa sản phẩm" color="red">
+                                    <i className="fad fa-trash-alt"></i>
+                                </Tooltip>
+                            </Popconfirm>
+                        </div>
+                    </td>
                 </tr>
             ));
         } else {
@@ -126,13 +123,13 @@ const TableProduct = forwardRef((props, ref) => {
                         <th style={{ width: '45%' }}>Name</th>
                         <th
                             style={{
-                                width: !isShowCategoryOptions ? '15%' : '20%',
+                                width: '20%',
                             }}
                         >
                             Trademark
                         </th>
                         <th>Price</th>
-                        {!isShowCategoryOptions && <th></th>}
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -141,19 +138,18 @@ const TableProduct = forwardRef((props, ref) => {
                         : handleRenderUITabletItem(products)}
                 </tbody>
             </table>
-            <Navigation
-                visible={visible}
-                handleSetVisible={handleSetVisible}
-                product={product}
-                handleSetActiveProductDetail={handleSetActiveProductDetail}
-                comments_users={comments_users}
-            />
-            <Pagination
-                productsPerPage={productsPerPage}
-                totalProducts={totalProduct}
-                paginate={paginate}
-                ref={ref}
-            />
+            {visible && (
+                <Navigation
+                    visible={visible}
+                    handleSetVisible={handleSetVisible}
+                    product={product}
+                    handleSetActiveProductDetail={handleSetActiveProductDetail}
+                    comments_users={comments_users}
+                    totalCmt={totalCmt}
+                />
+            )}
+
+            <Paginations total={total} callBack={handlePagination} />
         </>
     );
 });

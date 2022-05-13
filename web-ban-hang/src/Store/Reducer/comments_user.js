@@ -15,6 +15,19 @@ export const getCommentsUserApi = createAsyncThunk(
     },
 );
 
+export const getCommentsToStore = createAsyncThunk(
+    'getCommentsToStore/getCommentsToStoreFetch',
+    async () => {
+        try {
+            const res = await axios.get(`${url}/comment/all`);
+            return res.data;
+        } catch (err) {
+            console.log(err);
+            toast.error('Get Comments is failed!');
+        }
+    },
+);
+
 export const getCommentsAllApi = createAsyncThunk(
     'commentsUsers/commentsUserAllFetch',
     async () => {
@@ -47,8 +60,6 @@ export const insertCmt = createAsyncThunk(
 export const likeComment = createAsyncThunk(
     'likeComment/likeCommentFetch',
     async ({ comment, product, tokenAuth, user, dispatch }) => {
-        console.log({ comment, product, tokenAuth, user });
-
         try {
             const res = await axios.post(
                 `${url}/comment/${comment._id}`,
@@ -126,6 +137,14 @@ const commentsUserSlice = createSlice({
     },
     reducers: {},
     extraReducers: {
+        // get cmts
+        [getCommentsToStore.pending]: (state, action) => {},
+        [getCommentsToStore.fulfilled]: (state, action) => {
+            if (action.payload) {
+                state.comments = action.payload.comments;
+            }
+        },
+        [getCommentsToStore.rejected]: (state, action) => {},
         // get cmts
         [getCommentsUserApi.pending]: (state, action) => {},
         [getCommentsUserApi.fulfilled]: (state, action) => {

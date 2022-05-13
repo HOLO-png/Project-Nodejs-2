@@ -189,8 +189,6 @@ function Pay(props) {
         }
     }, [cartProducts, linkText]);
 
-    console.log(isError);
-
     useEffect(() => {
         if (isRedirectToSuccessPage) {
             if (payMethod === 'Thanh Toán Khi Nhận Hàng') {

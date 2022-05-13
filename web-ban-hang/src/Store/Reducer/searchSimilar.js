@@ -22,6 +22,22 @@ export const handleSearchSimilar = createAsyncThunk(
     },
 );
 
+export const searchProductToDB = createAsyncThunk(
+    'searchProductToDB/searchProductToDBFetch',
+    async ({ keys }) => {
+        try {
+            const res = await axios.get(
+                `${url}/products/search-productDB?keys=${keys}`,
+            );
+            console.log(res.data);
+            return res.data;
+        } catch (err) {
+            console.log(err);
+            toast.error('Lấy sản phẩm thất bại');
+        }
+    },
+);
+
 const searchSimilarSlice = createSlice({
     name: 'searchSimilar', // ten cua action
     initialState: {
@@ -36,9 +52,6 @@ const searchSimilarSlice = createSlice({
                 return (
                     item.name.toLowerCase().indexOf(keyWord.toLowerCase()) !==
                         -1 ||
-                    item.description.format
-                        .toLowerCase()
-                        .indexOf(keyWord.toLowerCase()) !== -1 ||
                     item.description.trademark
                         .toLowerCase()
                         .indexOf(keyWord.toLowerCase()) !== -1 ||
@@ -65,6 +78,16 @@ const searchSimilarSlice = createSlice({
             state.loadingSimilar = false;
         },
         [handleSearchSimilar.rejected]: (state, action) => {},
+
+        // search similar
+        [searchProductToDB.pending]: (state, action) => {},
+        [searchProductToDB.fulfilled]: (state, action) => {
+            if (action.payload) {
+                state.searchSimilar = action.payload.products;
+                state.loadingSimilar = false;
+            }
+        },
+        [searchProductToDB.rejected]: (state, action) => {},
     },
 });
 
