@@ -66,6 +66,21 @@ const orderCtrl = {
             return res.status(500).json(err);
         }
     },
+    updateStatusOrder: async (req, res) => {
+        const { orderId } = req.params;
+        const { complete } = req.body;
+        console.log({ orderId, complete });
+
+        try {
+            const order = await Order.findOne({ _id: orderId });
+            order.complete = complete;
+            await order.save();
+            return res.status(200).json({ order });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    },
 };
 
 module.exports = orderCtrl;

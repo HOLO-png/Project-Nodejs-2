@@ -5,6 +5,8 @@ const auth = require('../middleware/auth.js');
 router.post('/', auth, orderCtrl.createOrder);
 router.get('/all', orderCtrl.getOrdersInStore);
 router.get('/', auth, orderCtrl.getOrderUser);
+router.put('/:orderId', orderCtrl.updateStatusOrder);
+
 
 
 module.exports = router;

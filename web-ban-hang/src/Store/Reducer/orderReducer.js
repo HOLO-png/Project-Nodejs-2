@@ -63,6 +63,21 @@ export const handleGetOrdersInStore = createAsyncThunk(
     },
 );
 
+export const handleUpdateStatusOrder = createAsyncThunk(
+    'handleUpdateStatusOrder/handleUpdateStatusOrderFetch',
+    async ({ orderId, complete }) => {
+        try {
+            const res = await axios.put(`${url}/order/${orderId}`, {
+                complete,
+            });
+            return res.data;
+        } catch (err) {
+            toast.error(`Get orders failed!`);
+            console.log(err);
+        }
+    },
+);
+
 const orderSlice = createSlice({
     name: 'order',
     initialState: {
@@ -100,6 +115,21 @@ const orderSlice = createSlice({
             }
         },
         [handleGetOrder.rejected]: (state, action) => {},
+
+        //fetch activation email
+        [handleUpdateStatusOrder.pending]: (state, action) => {},
+        [handleUpdateStatusOrder.fulfilled]: (state, action) => {
+            if (action.payload) {
+                const orders = state.orders.map((order) =>
+                    order._id === action.payload.order._id
+                        ? action.payload.order
+                        : order,
+                );
+                state.orders = orders;
+                console.log(state.orders);
+            }
+        },
+        [handleUpdateStatusOrder.rejected]: (state, action) => {},
     },
 });
 

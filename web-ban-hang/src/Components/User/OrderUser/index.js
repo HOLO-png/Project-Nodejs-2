@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { authSelector } from '../../../Store/Reducer/authReducer';
 import {
     handleGetOrder,
+    handleUpdateStatusOrder,
     orderSelector,
 } from '../../../Store/Reducer/orderReducer';
 const { TabPane } = Tabs;
@@ -64,12 +65,12 @@ function OrderUser(props) {
         setProductWaitingConfirm(orderWaitingConfirm);
 
         const orderDelivery = orders.filter(
-            (item) => item.complete === 'driver',
+            (item) => item.complete === 'confirm',
         );
         setDelivery(orderDelivery);
 
         const orderDelivered = orders.filter(
-            (item) => item.complete === 'driver complete',
+            (item) => item.complete === 'driver',
         );
         setDelivered(orderDelivered);
 
@@ -90,26 +91,24 @@ function OrderUser(props) {
         setVisible(false);
     };
 
-    const handleCancelOrderProduct = (order) => {
-        const objData = {
-            ...order,
-            status: {
-                title: 'Đã hủy đơn hàng',
-                icon: 'fa-ban',
-            },
-            active: false,
-        };
+    const handleCancelOrderProduct = (dataOrder) => {
+        setVisible(false);
+        dispatch(
+            handleUpdateStatusOrder({
+                orderId: dataOrder._id,
+                complete: 'cancel',
+            }),
+        );
     };
 
-    const handleOrderRecovery = (order) => {
-        const objData = {
-            ...order,
-            status: {
-                title: 'Đang chờ xử lý',
-                icon: 'fa-badge-check',
-            },
-        };
+    const handleOrderRecovery = (dataOrder) => {
         setVisible(false);
+        dispatch(
+            handleUpdateStatusOrder({
+                orderId: dataOrder._id,
+                complete: 'pending',
+            }),
+        );
     };
 
     const handleSetValueSearchOrder = (value) => {

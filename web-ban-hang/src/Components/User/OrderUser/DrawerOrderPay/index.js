@@ -14,6 +14,8 @@ import {
 import OrderUserProfile from './OrderUserProfile';
 import OrderProducts from './OrderProducts';
 import numberWithCommas from '../../../../utils/numberWithCommas';
+import { useDispatch } from 'react-redux';
+import { handleUpdateStatusOrder } from '../../../../Store/Reducer/orderReducer';
 
 function DrawerOrderPay(props) {
     const {
@@ -25,6 +27,7 @@ function DrawerOrderPay(props) {
         handleCancelOrderProduct,
         handleOrderRecovery,
     } = props;
+    const dispatch = useDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const showModal = () => {
