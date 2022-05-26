@@ -13,7 +13,10 @@ router.get('/search', productsCtrl.searchProduct);
 router.get('/search-productDB', productsCtrl.searchProductToDB);
 router.get('/star', productsCtrl.filterStarProducts);
 router.get('/price', productsCtrl.filterPriceProduct);
+
+// product detail page
 router.get('/:productId', productsCtrl.getProduct);
+
 router.post('/', productsCtrl.createProduct);
 router.put('/:productId', auth, productsCtrl.updateProductLike);
 router.put('/update-data/:productID', productsCtrl.updateDataProductToDB);

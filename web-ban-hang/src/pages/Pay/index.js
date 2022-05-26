@@ -8,6 +8,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     addressApiSelector,
     getAddressApi,
+    getFeeServiceApi,
+    getLeadTimeApi,
+    getProvinceApi,
+    getServicePackageApi,
+    handleResetFeeServiceChange,
 } from '../../Store/Reducer/apiAddress';
 import ProductsPay from '../../Components/Pay/ProductPay';
 import { useHistory, useParams } from 'react-router';
@@ -22,6 +27,7 @@ import { cartSelector } from '../../Store/Reducer/cartReducer';
 import { authSelector } from '../../Store/Reducer/authReducer';
 import {
     getUserAddress,
+    getUserAddressAdmin,
     insertUserAddress,
     updateStatusUserAddress,
     updateUserAddress,
@@ -80,7 +86,7 @@ function Pay(props) {
     // data cart products
     const cartProducts = useSelector(cartSelector);
     // data user address
-    const userAddress = useSelector(userAddressSelector);
+    const userAddressSlt = useSelector(userAddressSelector);
     const loading = useSelector(loadingSelector);
     const payment = useSelector(paymentSelector);
     const orderSlt = useSelector(orderSelector);
@@ -91,16 +97,16 @@ function Pay(props) {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [modalText, setModalText] = useState('Content of the modal');
     const [valueAddress, setvalueAddress] = useState({
-        tinh: '',
-        quan: '',
-        xa: '',
-        mota: '',
+        tinh: null,
+        quan: null,
+        xa: null,
+        mota: null,
     });
     const [objAddress, setObjAddress] = useState({
-        tinh: '',
-        quan: '',
-        xa: '',
-        mota: '',
+        tinh: null,
+        quan: null,
+        xa: null,
+        mota: null,
     });
     const [inputName, setInputName] = useState('');
     const [inputNumber, setInputNumber] = useState('');
@@ -114,18 +120,29 @@ function Pay(props) {
     const [payMethodActive, setPayMethodActive] = useState(null);
     const [isRedirectToSuccessPage, setIsRedirectToSuccessPage] =
         useState(false);
+    const [feeService, setFeeServince] = useState('');
+    const [serviceFee, setServiceFee] = useState(null);
+    const [serviceTypeId, setServiceTypeId] = useState(null);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const result = [];
 
     const { order, isError } = orderSlt;
 
     const { paymentUrl } = payment;
 
+    const { servicePackage, leadTime, feeServiceChange } = address_api;
+
+    const {userAddress, userAddressAdmin} = userAddressSlt;
+
     useEffect(() => {
-        dispatch(getAddressApi());
         if (auth.tokenAuth && auth.user) {
-            dispatch(getUserAddress({ token: auth.tokenAuth }));
+            dispatch(getUserAddress({ userId: auth.user._id }));
+            dispatch(getUserAddressAdmin());
         } else {
             history.push('/buyer/signin');
         }
+
     }, [auth, history, dispatch]);
 
     useEffect(() => {
@@ -189,9 +206,13 @@ function Pay(props) {
                     });
                 }
             });
+            
             setProducts(payProducts);
+            if(!payProducts.length) {
+                history.push('/cart');
+            }
         }
-    }, [cartProducts, linkText]);
+    }, [cartProducts, linkText,history]);
 
     useEffect(() => {
         if (isRedirectToSuccessPage) {
@@ -311,27 +332,114 @@ function Pay(props) {
                             }
                         }
                     }
+
                 } else {
                     dispatch(insertUserAddress(data));
                 }
+                dispatch(handleResetFeeServiceChange());
             }
             setChangeCheckbox(false);
             setUserAddressDefault(null);
             setVisible(false);
         }, 1000);
+
     };
 
     const onHandleValueImportAddress = (obj) => {
         setObjAddress(obj);
     };
 
-    const handleCancel = () => {
-        if (address_user_api) {
-            setInputName(address_user_api.username || '');
-            setInputNumber(address_user_api.phoneNumber || '');
+    useEffect(() => {
+        if (userAddress) {
+            if(userAddressAdmin) {
+                if (userAddress.items.length) {
+                userAddress.items.forEach((item) => {
+                    if (item.status) {
+                        dispatch(
+                            getServicePackageApi({
+                                toDistrict: item.address.quan.DistrictID,
+                                fromDistrict: userAddressAdmin.address.quan.DistrictID
+                            }),
+                        );
+                    }
+                });
+            }
+            }
         }
-        setVisible(false);
-        setChangeCheckbox(false);
+    }, [userAddress, userAddressAdmin, dispatch]);
+
+    useEffect(() => {
+        if (servicePackage) {
+            if (address_user_api) {
+                if (products) {
+                    servicePackage.data.forEach((item) => {
+                        if (item) {
+                            if (!item.total) {
+                                const data = {
+                                    toDistrict:
+                                        address_user_api.address.quan.DistrictID,
+                                    serviceTypeId: item.service_type_id,
+                                    toWardCode:
+                                        address_user_api.address.xa.WardCode,
+                                    coupon: null,
+                                    products,
+                                    fromDistrict: userAddressAdmin.address.quan.DistrictID,
+                                    sumProduct,
+                                };
+                                dispatch(getFeeServiceApi(data));
+                            } else {
+                                dispatch(
+                                    getLeadTimeApi({
+                                        toDistrictId:
+                                            address_user_api.address.quan
+                                                .DistrictID,
+                                        toWardCode:
+                                            address_user_api.address.xa.WardCode,
+                                        serviceId: item.service_id,
+                                        fromDistrict: userAddressAdmin.address.quan.DistrictID
+                                    }),
+                                );
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }, [servicePackage, dispatch, address_user_api, products, sumProduct, userAddressAdmin]);
+
+    useEffect(() => {
+        if (servicePackage) {
+            servicePackage.data.forEach(item => {
+                feeServiceChange.forEach(ele => {
+                    if (item.service_type_id === ele.serviceTypeId) {
+                        result.push({ ...item, ...ele })
+                    }
+                });
+
+            });
+        }
+        const x = result.filter((obj, index, arr) => {
+            return arr.map(mapObj => mapObj.service_type_id).indexOf(obj.serviceTypeId) === index;
+        });
+        console.log(result);
+        setServiceFee(x);
+    }, [feeServiceChange, servicePackage]);
+
+    const handleCancel = () => {
+        if (userAddress) {
+            if (!userAddress.items.length) {
+                history.push(`/cart`);
+            } else {
+                if (address_user_api) {
+                    setInputName(address_user_api.username || '');
+                    setInputNumber(address_user_api.phoneNumber || '');
+                }
+                setVisible(false);
+                setChangeCheckbox(false);
+            }
+        } else {
+            history.push(`/cart`);
+        }
     };
 
     function onChangeCheckbox(e) {
@@ -346,18 +454,22 @@ function Pay(props) {
         if (!isEmptyObject(valueAddress || {})) {
             if (payMethod === 'Thanh toán Online') {
                 if (payMethodActive) {
-                    switch (payMethodActive.title) {
-                        case 'PayPal':
-                            dispatch(setLoadingAction(true));
-                            dispatch(
-                                createPayment({
-                                    products,
-                                    email: auth.user.email,
-                                    message,
-                                }),
-                            );
-                            break;
-                        default:
+                    if (feeService) {
+                        switch (payMethodActive.title) {
+                            case 'PayPal':
+                                dispatch(setLoadingAction(true));
+                                dispatch(
+                                    createPayment({
+                                        products,
+                                        email: auth.user.email,
+                                        message,
+                                        paymentFee: feeService,
+                                        serviceTypeId
+                                    }),
+                                );
+                                break;
+                            default:
+                        }
                     }
                 }
             } else if (payMethod === 'Thanh Toán Khi Nhận Hàng') {
@@ -369,23 +481,28 @@ function Pay(props) {
                         });
                         if (productsId.length) {
                             if (userAddress.items.length) {
-                                userAddress.items.forEach((item) => {
-                                    if (item.status) {
-                                        dispatch(setLoadingAction(true));
-                                        dispatch(
-                                            handleAddOrder({
-                                                tokenAuth: auth.tokenAuth,
-                                                username: item.username,
-                                                phoneNumber: item.phoneNumber,
-                                                city: item.address,
-                                                productsID: productsId,
-                                                isPayment: false,
-                                                message,
-                                            }),
-                                        );
-                                        setIsRedirectToSuccessPage(true);
-                                    }
-                                });
+                                if (feeService) {
+                                    userAddress.items.forEach((item) => {
+                                        if (item.status) {
+                                            dispatch(setLoadingAction(true));
+                                            dispatch(
+                                                handleAddOrder({
+                                                    tokenAuth: auth.tokenAuth,
+                                                    username: item.username,
+                                                    phoneNumber:
+                                                        item.phoneNumber,
+                                                    city: item.address,
+                                                    productsID: productsId,
+                                                    isPayment: false,
+                                                    paymentFee: feeService,
+                                                    serviceTypeId,
+                                                    message,
+                                                }),
+                                            );
+                                            setIsRedirectToSuccessPage(true);
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
@@ -465,6 +582,12 @@ function Pay(props) {
                     products_api={products}
                     loading={loading}
                     handleChangeMessage={handleChangeMessage}
+                    serviceFee={serviceFee}
+                    feeService={feeService}
+                    setFeeServince={setFeeServince}
+                    leadTime={leadTime}
+                    servicePackage={servicePackage}
+                    setServiceTypeId={setServiceTypeId}
                 />
                 <Voucher loading={loading} />
                 <Payment
@@ -475,6 +598,7 @@ function Pay(props) {
                     handleShowPayTable={handleShowPayTable}
                     payMethodActive={payMethodActive}
                     setPayMethodActive={setPayMethodActive}
+                    leadTime={leadTime}
                 />
                 <PayMethod
                     isShowTablePay={isShowTablePay}

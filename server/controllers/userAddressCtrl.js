@@ -1,11 +1,12 @@
 const UserAddress = require('../models/UserAddress.js');
+const User = require('../models/User.js');
+
 
 const userAddressCtrl = {
     createUserAddress: async (req, res) => {
         try {
             if (req.user.id) {
                 const { address, username, phoneNumber, status } = req.body;
-                console.log(address, username, phoneNumber, status);
 
                 const userAddress = await UserAddress.findOne({
                     userId: req.user.id,
@@ -90,19 +91,17 @@ const userAddressCtrl = {
         }
     },
     getUserAddress: async (req, res) => {
-        try {
-            if (req.user.id) {
-                const userAddress = await UserAddress.findOne({
-                    userId: req.user.id,
-                });
+        const { userId } = req.query;
 
-                return res.status(200).json({ userAddress });
-            } else {
-                throw { status: 500, message: 'You are not logged in' };
-            }
+        try {
+            const userAddress = await UserAddress.findOne({
+                userId,
+            });
+
+            return res.status(200).json({ userAddress });
         } catch (err) {
-            console.log(error);
-            return res.status(500).json({ msg: error.message });
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
         }
     },
     updateUserAddressItem: async (req, res) => {
@@ -200,7 +199,7 @@ const userAddressCtrl = {
                         (item) => item._id.toString() !== userAddressId,
                     );
 
-                    const isCheck = userAddress.items.every((item) => {
+                    const isCheck = userAddress.items.some((item) => {
                         if (!item.status) {
                             return true;
                         }
@@ -224,6 +223,17 @@ const userAddressCtrl = {
             return res.status(500).json({ msg: err.message });
         }
     },
+    getUserAddressAdmin: async (req, res) => {
+        try {
+            const user = await User.findOne({isAdmin: true});
+            const userAddressAdmin = await UserAddress.findOne({userId: user._id});
+            console.log(userAddressAdmin);
+            return res.status(200).json({ userAddressAdmin });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    }
 };
 
 module.exports = userAddressCtrl;

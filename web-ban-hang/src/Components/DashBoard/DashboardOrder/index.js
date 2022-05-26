@@ -1,9 +1,36 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
-import PropTypes from 'prop-types';
-import OrderItem from './OrderItem';
+import React, { useEffect } from 'react';
+import CardOrder from './CardOrder';
+import TabOrder from './TabOrder';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    handleGetOrdersInStore,
+    orderSelector,
+} from '../../../Store/Reducer/orderReducer';
+import {
+    getUserAddress,
+    userAddressSelector,
+} from '../../../Store/Reducer/userAddressReducer';
+import { authSelector } from '../../../Store/Reducer/authReducer';
 
 function DashboardOrder(props) {
+    const dispatch = useDispatch();
+    const orderSlt = useSelector(orderSelector);
+    const userAddressSlt = useSelector(userAddressSelector);
+    const auth = useSelector(authSelector);
+    const { orders } = orderSlt;
+
+    const {userAddress, userAddressAdmin} = userAddressSlt;
+
+    useEffect(() => {
+        if (auth.user) {
+            dispatch(getUserAddress({ userId: auth.user._id }));
+            dispatch(handleGetOrdersInStore());
+        }
+    }, [dispatch, auth]);
+
+    console.log(userAddress);
+
     return (
         <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
             <div className="row">
@@ -27,7 +54,7 @@ function DashboardOrder(props) {
                 <div className="col-md-12">
                     <div className="panel panel-default articles">
                         <div className="panel-heading">
-                            Danh Sách Đơn Đặt Hàng
+                            Sơ lược đơn đặt hàng
                             <ul className="pull-right panel-settings panel-button-tab-right">
                                 <li className="dropdown">
                                     <a
@@ -74,18 +101,44 @@ function DashboardOrder(props) {
                                     </ul>
                                 </li>
                             </ul>
-                            <span className="pull-right clickable panel-toggle panel-button-tab-left">
-                                <i class="fad fa-user-plus"></i>
-                            </span>
                         </div>
-                        <div className="panel-body articles-container">
-                            {/* <OrderItem />    */}
+                        <div className="orders-container">
+                            <div className="panel-body articles-container order-container">
+                                <div class="wrapper">
+                                    <CardOrder
+                                        title="Tất cả đơn hàng"
+                                        count={orders && orders.length}
+                                    />
+                                </div>
+                            </div>
+                            <div className="panel-body articles-container order-container">
+                                <div class="wrapper">
+                                    <CardOrder
+                                        title="Giao hàng chậm"
+                                        count="0"
+                                    />
+                                </div>
+                            </div>
+                            <div className="panel-body articles-container order-container">
+                                <div class="wrapper">
+                                    <CardOrder title="Xử lý chậm" count="0" />
+                                </div>
+                            </div>
+                            <div className="panel-body articles-container order-container">
+                                <div class="wrapper">
+                                    <CardOrder
+                                        title="Chưa đối soát"
+                                        count="0"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <OrderItem />
-            <OrderItem />
+            <div className="tab-order">
+                <TabOrder orders={orders} userAddress={userAddress} userAddressAdmin={userAddressAdmin}/>
+            </div>
         </div>
     );
 }

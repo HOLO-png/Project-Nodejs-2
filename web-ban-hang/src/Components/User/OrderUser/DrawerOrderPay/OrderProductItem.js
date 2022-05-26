@@ -7,8 +7,6 @@ function OrderProductItem(props) {
     const { item } = props;
     const [visibleImage, setVisibleImage] = useState(false);
 
-    console.log(item);
-
     return (
         <div className="order__product-item">
             <div className="order__product-item-image">

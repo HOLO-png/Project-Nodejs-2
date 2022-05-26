@@ -8,6 +8,7 @@ export const getSearchProductCategoryApi = createAsyncThunk(
     'getSearchProductCategory/getSearchProductCategoryFetch',
     async ({ keyword, numPage }) => {
         let limit = 8;
+        console.log( keyword, numPage);
         try {
             const res = await axios.get(
                 `${url}/products/search?keyword=${keyword}`,

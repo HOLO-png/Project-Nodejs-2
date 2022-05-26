@@ -73,7 +73,7 @@ function ProductDesInsert(props) {
         setIndexCategory,
         indexCategory,
         isCheckCreate,
-                        setIsCheckCreate,
+        setIsCheckCreate,
     } = props;
 
     const dispatch = useDispatch();
@@ -242,13 +242,34 @@ function ProductDesInsert(props) {
     const handleFilterPropertyValues = () => {
         const defaultTitle = [];
         const descTitle = [];
+
         if (product_config.status === 'update') {
             var resultInputConfig = Object.keys(product_config).map((key) => [
                 key,
                 product_config[key],
             ]);
 
-            resultInputConfig.forEach((item) => {
+            var resultInputFeild = input_feild.map((item) => {
+                const result = [item.value, ''];
+                return result;
+            });
+
+            function remove_duplicates_safe(arr) {
+                var seen = {};
+                var ret_arr = [];
+                for (var i = 0; i < arr.length; i++) {
+                    if (!(arr[i][0] in seen)) {
+                        ret_arr.push(arr[i]);
+                        seen[arr[i][0]] = true;
+                    }
+                }
+                return ret_arr;
+            }
+
+            remove_duplicates_safe([
+                ...resultInputConfig,
+                ...resultInputFeild,
+            ]).forEach((item) => {
                 if (
                     item[0] !== '_id' &&
                     item[0] !== 'description' &&
@@ -340,21 +361,6 @@ function ProductDesInsert(props) {
     };
 
     useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.forEach((ele) => {
-                const inputId = ele.getAttribute('id');
-                if (inputId === inputElement) {
-                    ele.style.color = 'red';
-                    ele.scrollIntoView({
-                        behavior: 'auto',
-                        block: 'center',
-                        inline: 'center',
-                    });
-                } else {
-                    ele.style.color = 'black';
-                }
-            });
-        }
         window.addEventListener('mousemove', (e) => {
             if (
                 !e.target.closest('#userId') &&
@@ -366,7 +372,7 @@ function ProductDesInsert(props) {
         return () => {
             window.removeEventListener('mousemove', null);
         };
-    }, []);
+    }, [inputElement]);
 
     useEffect(() => {
         if (inputRef.current) {
@@ -387,6 +393,7 @@ function ProductDesInsert(props) {
                     arrayCheck[0].length,
                 );
                 inputRef.current.forEach((ele) => {
+                    console.log(ele);
                     if (ele) {
                         const inputId = ele.getAttribute('id');
                         if (inputId === inputElement) {

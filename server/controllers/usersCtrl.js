@@ -1,6 +1,8 @@
 const User = require('../models/User.js');
-// const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
+const Comment = require('../models/Comment.js');
+const UserAddress = require('../models/UserAddress.js');
+const Order = require('../models/Order.js');
+const Cart = require('../models/Cart.js');
 
 const user = {
     getUserInfo: async (req, res) => {
@@ -45,7 +47,6 @@ const user = {
             const users = await User.find({ isAdmin: false }).select(
                 '-password',
             );
-            console.log(users);
 
             return res.status(200).json({ users });
         } catch (err) {
@@ -58,6 +59,22 @@ const user = {
             const { userId } = req.params;
             const user = await User.findOne({ _id: userId });
             return res.status(200).json({ user });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    deleteUser: async (req, res) => {
+        const { userId } = req.params;
+
+        try {
+            await User.deleteOne({ _id: userId });
+            await Cart.deleteOne({ userId: userId });
+            await Comment.deleteMany({ user: userId });
+            await UserAddress.deleteMany({ userId: userId });
+            await Order.deleteMany({ userID: userId });
+
+            return res.status(200).json({ userId });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err.message });

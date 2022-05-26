@@ -4,8 +4,16 @@ const Order = require('../models/Order.js');
 
 const orderCtrl = {
     createOrder: async (req, res) => {
-        const { username, phoneNumber, city, productsID, isPayment, message } =
-            req.body;
+        const {
+            username,
+            phoneNumber,
+            city,
+            productsID,
+            isPayment,
+            message,
+            paymentFee,
+            serviceTypeId
+        } = req.body;
         const { id } = req.user;
 
         try {
@@ -30,6 +38,8 @@ const orderCtrl = {
                         userID: id,
                         isPayment,
                         message,
+                        paymentFee,
+                        serviceTypeId
                     });
 
                     const newOrder = await order.save();

@@ -28,6 +28,7 @@ function DashboardMain(props) {
     const comments = useSelector(commentsUserSelector);
     const usersDB = useSelector(usersSelector);
     const productsDB = useSelector(productsDBSelector);
+
     const { users } = usersDB;
     const { orders } = orderSlt;
     const { count } = productsDB;
@@ -42,56 +43,54 @@ function DashboardMain(props) {
     console.log(productsDB);
 
     return (
-        <>
-            <div className="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
-                <div className="row">
-                    <ol className="breadcrumb">
-                        <li>
-                            <a href="#">
-                                <em className="fa fa-home" />
-                            </a>
-                        </li>
-                        <li className="active">Dashboard</li>
-                    </ol>
-                </div>
-                {/*/.row*/}
-                <div className="row">
-                    <div className="col-lg-12">
-                        <h1 className="page-header">Dashboard</h1>
-                    </div>
-                </div>
-                {/*/.row*/}
-                <div className="panel panel-container">
-                    <div className="row">
-                        <TotalCate
-                            data1={{
-                                data: orders,
-                                title: 'Orders',
-                                icon: 'fa fa-xl fa-shopping-cart color-blue',
-                            }}
-                            data2={{
-                                data: comments,
-                                title: 'Comments',
-                                icon: 'fa fa-xl fa-comments color-orange',
-                            }}
-                            data3={{
-                                data: users,
-                                title: 'Users',
-                                icon: 'fa fa-xl fa-users color-teal',
-                            }}
-                            data4={{
-                                data: Array(count),
-                                title: 'Products',
-                                icon: 'fa fa-xl fa-search color-red',
-                            }}
-                        />
-                        <PercentProduct />
-                    </div>
-                    <Chart />
-                    {/*/.row*/}
+        <div className="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+            <div className="row">
+                <ol className="breadcrumb">
+                    <li>
+                        <a href="#">
+                            <em className="fa fa-home" />
+                        </a>
+                    </li>
+                    <li className="active">Dashboard</li>
+                </ol>
+            </div>
+            {/*/.row*/}
+            <div className="row">
+                <div className="col-lg-12">
+                    <h1 className="page-header">Dashboard</h1>
                 </div>
             </div>
-        </>
+            {/*/.row*/}
+            <div className="panel panel-container">
+                <div className="row">
+                    <TotalCate
+                        data1={{
+                            data: orders,
+                            title: 'Orders',
+                            icon: 'fa fa-xl fa-shopping-cart color-blue',
+                        }}
+                        data2={{
+                            data: comments,
+                            title: 'Comments',
+                            icon: 'fa fa-xl fa-comments color-orange',
+                        }}
+                        data3={{
+                            data: users,
+                            title: 'Users',
+                            icon: 'fa fa-xl fa-users color-teal',
+                        }}
+                        data4={{
+                            data: Array(count),
+                            title: 'Products',
+                            icon: 'fa fa-xl fa-search color-red',
+                        }}
+                    />
+                    <PercentProduct />
+                </div>
+                <Chart />
+                {/*/.row*/}
+            </div>
+        </div>
     );
 }
 

@@ -7,6 +7,8 @@ router.get('/', auth, usersCtrl.getUserInfo);
 router.get('/all', usersCtrl.getUsersInStore);
 router.get('/:userId', usersCtrl.getUseToDB);
 router.put('/', auth, usersCtrl.updateUserProfile);
+router.delete('/:userId', usersCtrl.deleteUser);
+
 
 
 module.exports = router;

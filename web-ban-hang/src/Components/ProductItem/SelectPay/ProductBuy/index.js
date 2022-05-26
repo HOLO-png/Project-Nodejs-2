@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 
 function ProductBuy(props) {
     const {
-        productObj,
         handleProductToCart,
         product,
         handleProductToBuy,
@@ -14,7 +13,6 @@ function ProductBuy(props) {
         productObjChange,
     } = props;
     const [productCart, setproductCart] = useState({});
-
 
     useEffect(() => {
         const productItem =
@@ -29,6 +27,12 @@ function ProductBuy(props) {
                       capacity: product.description,
                       trademark: product.description.trademark,
                       category: product.category,
+                      sizeInformation: {
+                          height: product.height,
+                          length: product.length,
+                          weight: product.weight,
+                          width: product.width,
+                      },
                   }
                 : {};
         productObjChange && Object.keys(productObjChange).length !== 0

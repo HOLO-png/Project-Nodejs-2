@@ -43,6 +43,7 @@ export const insertCmt = createAsyncThunk(
             const res = await axios.post(`${url}/comment`, obj.newComment, {
                 headers: { Authorization: obj.auth.tokenAuth },
             });
+            
             const comment = { ...res.data, user: obj.auth.user };
             const newProductUpdateComment = {
                 ...obj.product,

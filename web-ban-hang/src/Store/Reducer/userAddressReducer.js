@@ -7,15 +7,26 @@ const url = 'http://localhost:8800/api';
 
 export const getUserAddress = createAsyncThunk(
     'getUserAddress/getUserAddressFetch',
-    async ({ token }) => {
+    async ({ userId }) => {
         try {
-            const res = await axios.get(`${url}/user-address`, {
-                headers: { Authorization: token },
-            });
+            const res = await axios.get(`${url}/user-address?userId=${userId}`);
             return res.data;
         } catch (err) {
             console.log(err);
             toast.error('error');
+        }
+    },
+);
+
+export const getUserAddressAdmin = createAsyncThunk(
+    'getUserAddressAdmin/getUserAddressAdminFetch',
+    async () => {
+        try {
+            const res = await axios.get(`${url}/user-address/admin`);
+            return res.data;
+        } catch (err) {
+            console.log(err);
+            toast.error('get user address admin failed');
         }
     },
 );
@@ -27,8 +38,6 @@ export const insertUserAddress = createAsyncThunk(
             const res = await axios.post(`${url}/user-address`, data, {
                 headers: { Authorization: data.tokenAuth },
             });
-            console.log(res.data);
-
             return res.data;
         } catch (err) {
             console.log(err);
@@ -48,7 +57,6 @@ export const updateUserAddress = createAsyncThunk(
                     headers: { Authorization: data.tokenAuth },
                 },
             );
-            console.log(res.data);
 
             return res.data;
         } catch (err) {
@@ -70,7 +78,6 @@ export const updateStatusUserAddress = createAsyncThunk(
                     headers: { Authorization: tokenAuth },
                 },
             );
-            console.log(res.data);
 
             return res.data;
         } catch (err) {
@@ -90,7 +97,6 @@ export const deleteUserAddress = createAsyncThunk(
                     headers: { Authorization: tokenAuth },
                 },
             );
-            console.log(res.data);
 
             return res.data;
         } catch (err) {
@@ -104,11 +110,25 @@ const userAddressSlice = createSlice({
     name: 'userAddress',
     initialState: {
         userAddress: JSON.parse(localStorage.getItem('userAddress')) || null,
+        userAddressAdmin: null
     },
     reducers: {},
     extraReducers: {
         // get cart product
-        [getUserAddress.pending]: (state, action) => {},
+        [getUserAddressAdmin.pending]: (state, action) => { },
+        [getUserAddressAdmin.fulfilled]: (state, action) => {
+            if (action.payload) {
+                action.payload.userAddressAdmin.items.forEach(item => {
+                    if (item.status) {
+                        state.userAddressAdmin = item;
+                    }
+                });
+            }
+        },
+        [getUserAddressAdmin.rejected]: (state, action) => { },
+
+        // get cart product
+        [getUserAddress.pending]: (state, action) => { },
         [getUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
@@ -118,10 +138,10 @@ const userAddressSlice = createSlice({
                 );
             }
         },
-        [getUserAddress.rejected]: (state, action) => {},
+        [getUserAddress.rejected]: (state, action) => { },
 
         // get cart product
-        [deleteUserAddress.pending]: (state, action) => {},
+        [deleteUserAddress.pending]: (state, action) => { },
         [deleteUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
@@ -131,10 +151,10 @@ const userAddressSlice = createSlice({
                 );
             }
         },
-        [deleteUserAddress.rejected]: (state, action) => {},
+        [deleteUserAddress.rejected]: (state, action) => { },
 
         // insert cart product
-        [insertUserAddress.pending]: (state, action) => {},
+        [insertUserAddress.pending]: (state, action) => { },
         [insertUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.savedUserAddress;
@@ -144,9 +164,9 @@ const userAddressSlice = createSlice({
                 );
             }
         },
-        [insertUserAddress.rejected]: (state, action) => {},
+        [insertUserAddress.rejected]: (state, action) => { },
         // insert cart product
-        [updateUserAddress.pending]: (state, action) => {},
+        [updateUserAddress.pending]: (state, action) => { },
         [updateUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
@@ -156,10 +176,10 @@ const userAddressSlice = createSlice({
                 );
             }
         },
-        [updateUserAddress.rejected]: (state, action) => {},
+        [updateUserAddress.rejected]: (state, action) => { },
 
         // insert cart product
-        [updateStatusUserAddress.pending]: (state, action) => {},
+        [updateStatusUserAddress.pending]: (state, action) => { },
         [updateStatusUserAddress.fulfilled]: (state, action) => {
             if (action.payload) {
                 state.userAddress = action.payload.userAddress;
@@ -169,14 +189,14 @@ const userAddressSlice = createSlice({
                 );
             }
         },
-        [updateStatusUserAddress.rejected]: (state, action) => {},
+        [updateStatusUserAddress.rejected]: (state, action) => { },
     },
 });
 
 const userAddressReducer = userAddressSlice.reducer;
 
 export const userAddressSelector = (state) =>
-    state.userAddressReducer.userAddress;
+    state.userAddressReducer;
 
 // export const { handleAmountProduct } = userAddressSlice.actions;
 

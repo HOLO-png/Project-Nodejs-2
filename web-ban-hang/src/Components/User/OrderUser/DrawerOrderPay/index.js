@@ -1,21 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    Col,
-    Drawer,
-    Row,
-    Space,
-    List,
-    Avatar,
-    Image,
-    Modal,
-} from 'antd';
+import { Button, Drawer, Space, Modal } from 'antd';
 import OrderUserProfile from './OrderUserProfile';
 import OrderProducts from './OrderProducts';
 import numberWithCommas from '../../../../utils/numberWithCommas';
-import { useDispatch } from 'react-redux';
-import { handleUpdateStatusOrder } from '../../../../Store/Reducer/orderReducer';
 
 function DrawerOrderPay(props) {
     const {
@@ -27,7 +15,6 @@ function DrawerOrderPay(props) {
         handleCancelOrderProduct,
         handleOrderRecovery,
     } = props;
-    const dispatch = useDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const showModal = () => {
@@ -94,7 +81,7 @@ function DrawerOrderPay(props) {
                         dataOrder &&
                             dataOrder.products.reduce((accumulator, item) => {
                                 return accumulator + item.price * item.qty;
-                            }, 0),
+                            }, 0) + dataOrder.paymentFee,
                     )}
                     <sup
                         style={{

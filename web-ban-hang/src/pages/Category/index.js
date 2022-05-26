@@ -30,6 +30,7 @@ function Category(props) {
     const productsCategory = useSelector(categorySelector);
     const { products, isload, total, count, trademark } = productsCategory;
 
+    console.log(category, keyWork);
     const num = history.location.search.slice(6) || 1;
     const { error, isLoading, data } = useGetAllCategoryQuery({
         category,

@@ -17,6 +17,20 @@ export const getUsersInStore = createAsyncThunk(
     },
 );
 
+export const deleteUser = createAsyncThunk(
+    'deleteUser/deleteUserFetch',
+    async ({ user }) => {
+        try {
+            const res = await axios.delete(`${url}/users/${user._id}`);
+            toast.success(`Bạn đã xóa thành công ${user.username}`);
+            return res.data;
+        } catch (err) {
+            console.log(err);
+            toast.error(`${err.message} 😓`);
+        }
+    },
+);
+
 export const getUser = createAsyncThunk(
     'getUser/getUserFetch',
     async ({ userId }) => {
@@ -51,6 +65,17 @@ const usersSlice = createSlice({
             state.user = action.payload.user;
         },
         [getUser.rejected]: (state, action) => {},
+
+        // get user
+        [deleteUser.pending]: (state, action) => {},
+        [deleteUser.fulfilled]: (state, action) => {
+            const { userId } = action.payload;
+            if (userId) {
+                const users = state.users.filter((user) => user._id !== userId);
+                state.users = users;
+            }
+        },
+        [deleteUser.rejected]: (state, action) => {},
     },
 });
 

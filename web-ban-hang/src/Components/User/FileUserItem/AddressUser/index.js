@@ -37,10 +37,9 @@ const FileUserAddress = styled.div`
     }
     .address-title {
         height: 85px;
-    box-shadow: 2px 2px 10px 0px #ececec;
-    padding: 20px;
+        box-shadow: 2px 2px 10px 0px #ececec;
+        padding: 20px;
     }
-}
 `;
 
 const FileUserTitle = styled.div`
@@ -61,22 +60,26 @@ function AddressUser(props) {
     const dispatch = useDispatch();
     const address_api = useSelector(addressApiSelector);
     const auth = useSelector(authSelector);
-    const userAddress = useSelector(userAddressSelector);
+    const userAddressSlt = useSelector(userAddressSelector);
     const [modal, setModal] = useState(false);
     const [nameUser, setNameUser] = useState('');
     const [dataAddress, setDataAddress] = useState({});
     const [numberPhone, setNumberPhone] = useState('');
     const [objAddress, setObjAddress] = useState({
-        tinh: '',
-        quan: '',
-        xa: '',
-        mota: '',
+        tinh: null,
+        quan: null,
+        xa: null,
+        mota: null,
     });
 
     useEffect(() => {
-        dispatch(getAddressApi());
-        dispatch(getUserAddress({ token: auth.tokenAuth }));
-    }, [auth.tokenAuth, dispatch]);
+        if (auth.user) {
+            dispatch(getAddressApi());
+            dispatch(getUserAddress({ userId: auth.user._id }));
+        }
+    }, [auth.user, dispatch]);
+
+    const {userAddress, userAddressAdmin} = userAddressSlt;
 
     const onChangeName = (e) => {
         setNameUser(e.target.value);

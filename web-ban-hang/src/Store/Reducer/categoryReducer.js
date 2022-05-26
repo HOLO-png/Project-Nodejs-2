@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const categoryApi = createApi({
     reducerPath: 'categoryApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8800/api/category',
+        baseUrl: 'http://localhost:8800/api/category/',
     }),
     keepUnusedDataFor: 60,
     endpoints: (builder) => ({

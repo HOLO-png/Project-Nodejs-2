@@ -56,7 +56,6 @@ export const deleteProductsInCart = createAsyncThunk(
             return res.data;
         } catch (err) {
             console.log(err);
-            toast.error(`${err.message} 😓`);
         }
     },
 );
@@ -77,6 +76,7 @@ export const handleAddProductToCart = createAsyncThunk(
                     category: data.obj.category,
                     image: data.obj.image[0].data,
                     capacity: data.obj.capacity,
+                    sizeInformation: data.obj.sizeInformation,
                 },
                 {
                     headers: { Authorization: data.user.tokenAuth },
@@ -110,6 +110,7 @@ export const handleAddProductToCartBuyAction = createAsyncThunk(
                     category: data.obj.category,
                     image: data.obj.image[0].data,
                     capacity: data.obj.capacity,
+                    sizeInformation: data.obj.sizeInformation,
                 },
                 {
                     headers: { Authorization: data.user.tokenAuth },

@@ -114,9 +114,10 @@ function AddressContentBox(props) {
                                 </Form.Item>
                                 <Form.Item label="Địa Chỉ">
                                     <p className="user-name">
-                                        {item.address.mota} ~ {item.address.xa}{' '}
-                                        ~ {item.address.quan} ~{' '}
-                                        {item.address.tinh}
+                                        {item.address.mota} ~{' '}
+                                        {item.address.xa.WardName} ~{' '}
+                                        {item.address.quan.DistrictName} ~{' '}
+                                        {item.address.tinh.ProvinceName}
                                     </p>
                                 </Form.Item>
                             </Form>

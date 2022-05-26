@@ -131,14 +131,6 @@ function SriceShock(props) {
             },
         ],
     };
-
-    // const handleProductCheck = () => {
-    //     openNotification(
-    //         'Ahihi Ko Bấm Đc Đâu 🧨',
-    //         'Hiện tại thì tui chưa thêm sản phẩm này nên tạm thời lướt chỗ khác đi nha 😁',
-    //     );
-    // };
-
     const handleRenderProductUI = (products) => {
         if (products) {
             return products
@@ -210,8 +202,8 @@ function SriceShock(props) {
                                               to={`/product/${
                                                   item.category
                                               }/${item.name.replace(
-                                                  / /g,
-                                                  '-',
+                                                  /[^\w\s]/gi,
+                                                  '',
                                               )}/${item._id}`}
                                           >
                                               <Badge.Ribbon

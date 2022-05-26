@@ -6,10 +6,13 @@ import NavigationCustomer from './NavigationCustomer';
 import TopUser from './TopUser';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    deleteUser,
     getUser,
     getUsersInStore,
     usersSelector,
 } from '../../../Store/Reducer/usersReducer';
+import { getUserAddress } from '../../../Store/Reducer/userAddressReducer';
+import { setLoadingAction } from '../../../Store/Reducer/loadingReducer';
 
 function DashboardCustomer(props) {
     const dispatch = useDispatch();
@@ -26,14 +29,17 @@ function DashboardCustomer(props) {
         setVisible(false);
     };
 
-    console.log(user);
-
     const handleShowNavigation = (userId) => {
         dispatch(getUser({ userId }));
+        dispatch(getUserAddress({ userId }));
         setVisible(true);
     };
 
-    const confirm = (item) => {};
+    const confirm = (item) => {
+        dispatch(setLoadingAction(true));
+        dispatch(deleteUser({ user: item }));
+        dispatch(setLoadingAction(false));
+    };
 
     return (
         <div className="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
@@ -113,7 +119,7 @@ function DashboardCustomer(props) {
                                 <i class="fad fa-user-plus"></i>
                             </span>
                         </div>
-                        <div className="panel-body articles-container">
+                        <div className="panel-body articles-container table-customer">
                             <TableCustomer
                                 users={users}
                                 confirm={confirm}

@@ -66,6 +66,7 @@ const ProductSchema = new mongoose.Schema(
         likes: [],
         comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
     },
+    { strict: false },
     { timestamps: true },
 );
 

@@ -10,7 +10,7 @@ const { NganLuong } = require('vn-payments');
 
 const paypalProductCtrl = {
     createPaypalPayment: async (req, res) => {
-        const { products, email,message } = req.body;
+        const { products, email, message, paymentFee,serviceTypeId } = req.body;
 
         const formatter = new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -44,7 +44,7 @@ const paypalProductCtrl = {
                     payment_method: 'paypal',
                 },
                 redirect_urls: {
-                    return_url: `http://localhost:8800/api/payment/success?total=${total}&email=${email}`,
+                    return_url: `http://localhost:8800/api/payment/success?total=${total}&email=${email}&paymentFee=${paymentFee}&serviceTypeId=${serviceTypeId}`,
                     cancel_url: 'http://localhost:8800/api/payment/cancel',
                 },
                 transactions: [
@@ -88,7 +88,7 @@ const paypalProductCtrl = {
     },
     getPaypalPaymentSuccess: async (req, res) => {
         try {
-            const { PayerID, paymentId, total, email } = req.query;
+            const { PayerID, paymentId, total, email, paymentFee,serviceTypeId } = req.query;
 
             const execute_payment_json = {
                 payer_id: PayerID,
@@ -136,7 +136,10 @@ const paypalProductCtrl = {
                                     username: `${last_name} ${first_name}`,
                                     productsId: stringItemId,
                                     isPayment: 'true',
-                                    message: payment.transactions[0].description
+                                    message:
+                                        payment.transactions[0].description,
+                                    paymentFee,
+                                    serviceTypeId
                                 },
                             }),
                         );

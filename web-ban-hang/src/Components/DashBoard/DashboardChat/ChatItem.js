@@ -2,12 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { renderPhotoAccout } from '../../../utils/avartarChange';
-import { useGetMessage } from '../../../Hooks/useGetMessage';
 
 function ChatItem(props) {
     const { activeClass, user, onClick } = props;
-    const messageArray = useGetMessage(user.uid);
-    console.log(messageArray);
 
     return (
         <div
@@ -40,9 +37,9 @@ function ChatItem(props) {
                             )}
                         </div>
                         <p>
-                            {messageArray && messageArray.length
+                            {/* {messageArray && messageArray.length
                                 ? messageArray[0].message
-                                : 'Bạn chưa có tin nhắn'}
+                                : 'Bạn chưa có tin nhắn'} */}
                         </p>
                     </div>
                 </div>

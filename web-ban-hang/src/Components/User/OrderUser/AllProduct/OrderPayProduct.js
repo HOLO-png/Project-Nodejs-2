@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Avatar, Badge, Button } from 'antd';
+import { Badge } from 'antd';
 import numberWithCommas from '../../../../utils/numberWithCommas';
 import { renderPhotoAccout } from '../../../../utils/avartarChange';
 
@@ -148,9 +148,10 @@ function OrderPayProduct(props) {
                         </div>
                         <div className="user-order__pay-product-item__address-info">
                             <span>
-                                Địa chỉ giao hàng: {order.city.tinh} -{' '}
-                                {order.city.quan} - {order.city.xa} -{' '}
-                                {order.city.mota}
+                                Địa chỉ giao hàng:{' '}
+                                {order.city.tinh.ProvinceName} -{' '}
+                                {order.city.quan.DistrictName} -{' '}
+                                {order.city.xa.WardName} - {order.city.mota}
                             </span>
                         </div>
                     </div>

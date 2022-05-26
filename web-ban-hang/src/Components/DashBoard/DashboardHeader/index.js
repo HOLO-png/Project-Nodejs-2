@@ -16,7 +16,7 @@ function DashboardHeader(props) {
             <div className="container-fluid">
                 <div className="navbar-header">
                     <a className="navbar-brand">
-                        <Link to="/home">
+                        <Link to="/">
                             <span>Shop IPhone </span>
                         </Link>
                         Admin

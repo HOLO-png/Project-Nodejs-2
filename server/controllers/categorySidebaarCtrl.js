@@ -85,6 +85,7 @@ const categoryProductCtrl = {
     handleGetProductsCategory: async (req, res) => {
         const { limit, skip } = Pagination(req);
         const { category, keyword } = req.query;
+
         try {
             if (keyword === 'all') {
                 let products = await Product.aggregate([
@@ -208,8 +209,6 @@ const categoryProductCtrl = {
             const { star, keyword, category } = req.body;
 
             const starNumber = Number(star);
-
-            console.log({ star, keyword, category });
 
             if (starNumber === 5) {
                 if (keyword === 'all') {
@@ -447,7 +446,6 @@ const categoryProductCtrl = {
     },
     filterTrademarkProduct: async (req, res) => {
         const { limit, skip } = Pagination(req);
-        console.log(req.query);
 
         try {
             const { trademarkName, category } = req.query;

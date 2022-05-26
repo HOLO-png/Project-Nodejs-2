@@ -1,16 +1,53 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 
 function ChatMessing(props) {
-    const { handleSubmitMessage, message, setMessage } = props;
+    const { handleSubmitMessage, message, setMessage, setMedia, media } = props;
+
+    const handleChangeMedia = (e) => {
+        const files = [...e.target.files];
+        let err = '';
+        let newMedia = [];
+
+        files.forEach(file => {
+            if(!file) {
+                return err = 'File does not exist';
+            }
+
+            if(file.size > 1024 * 1024 * 5) {
+                return err = 'the image/video largest is 5mb'
+            }
+
+            return newMedia.push(file)
+        });
+
+        if(err) {
+            toast.warning(err);
+        }
+        setMedia([...media, ...newMedia]);
+    }
+
+    console.log(media);
     return (
-        <div className="row chat-messing">
+        <div>
+            <div className='show-media'>
+                {media.map(item => (
+                    <div>
+                        {/* {item.type.match(/video/i)
+                        ?
+                        :
+                        } */}
+                    </div>
+                ))}
+            </div>
+            <div className="row chat-messing">
             <div className="col-lg-1">
                 <i class="fad fa-plus-circle"></i>
             </div>
             <div className="col-lg-1 image-file">
                 <i class="fad fa-file-image"></i>
-                <input type="file" className="image-file-input" />
+                <input type="file" className="image-file-input" name="file" id="file" multiple accept='image/*,video/*' onChange={handleChangeMedia}/>
             </div>
             <div className="col-lg-1">
                 <i class="fad fa-photo-video"></i>
@@ -28,6 +65,8 @@ function ChatMessing(props) {
                 <i class="fad fa-paper-plane"></i>
             </div>
         </div>
+        </div>
+        
     );
 }
 

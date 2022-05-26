@@ -6,7 +6,6 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import CategorySearch from './CategorySearch';
 import { Link } from 'react-router-dom';
 import { openNotification } from '../../../utils/messageAlear';
-import { getSearchProductCategoryApi } from '../../../Store/Reducer/searchProductCategory';
 import { useDispatch } from 'react-redux';
 import { getSearchItemUserApi } from '../../../Store/Reducer/searchItem';
 

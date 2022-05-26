@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Helmet from '../../Components/Helmet';
 import Section from '../../Components/Section';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams,useHistory } from 'react-router-dom';
 import SuccessModalCheckout from '../../Components/SuccessModalCheckout';
 import useQuery from '../../Hooks/useQuery.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,13 +14,14 @@ import {
 import { authSelector } from '../../Store/Reducer/authReducer';
 import {
     getUserAddress,
-    userAddressSelector,
 } from '../../Store/Reducer/userAddressReducer';
 import { setLoadingAction } from '../../Store/Reducer/loadingReducer';
 
 function OrderSuccess(props) {
     const { paymentId } = useParams();
     const dispatch = useDispatch();
+    const history = useHistory();
+
     const query = useQuery();
     const auth = useSelector(authSelector);
     const cartProducts = JSON.parse(localStorage.getItem('cart'));
@@ -34,6 +35,12 @@ function OrderSuccess(props) {
     const messageOrder = query.get('message');
 
     useEffect(() => {
+        if(!auth.user && !auth.tokenAuth) {
+            history.push('/buyer/sign-in')
+        }
+    }, [history, auth]);
+
+    useEffect(() => {
         dispatch(setLoadingAction(false));
         if (query.get('productsId')) {
             if (query.get('productsId').split('-').length) {
@@ -44,29 +51,32 @@ function OrderSuccess(props) {
 
     useEffect(() => {
         if (productsId && productsId.length) {
-            if (cartProducts.itemsChecked) {
-                if (cartProducts.data.items) {
-                    const cartProductsChange = cartProducts.data.items.some(
-                        function (item) {
-                            if (productsId.includes(item._id.toString()))
-                                return true;
-                            else return false;
-                        },
-                    );
-                    setIsCheckProductsToCart(cartProductsChange);
-                }
-            } else {
-                if (cartProducts.cart) {
-                    const cartProductsChange = cartProducts.cart.items.some(
-                        function (item) {
-                            if (productsId.includes(item._id.toString()))
-                                return true;
-                            else return false;
-                        },
-                    );
-                    setIsCheckProductsToCart(cartProductsChange);
+            if(cartProducts) {
+                if (cartProducts.itemsChecked) {
+                    if (cartProducts.data.items) {
+                        const cartProductsChange = cartProducts.data.items.some(
+                            function (item) {
+                                if (productsId.includes(item._id.toString()))
+                                    return true;
+                                else return false;
+                            },
+                        );
+                        setIsCheckProductsToCart(cartProductsChange);
+                    }
+                } else {
+                    if (cartProducts.cart) {
+                        const cartProductsChange = cartProducts.cart.items.some(
+                            function (item) {
+                                if (productsId.includes(item._id.toString()))
+                                    return true;
+                                else return false;
+                            },
+                        );
+                        setIsCheckProductsToCart(cartProductsChange);
+                    }
                 }
             }
+            
         }
     }, [cartProducts, productsId]);
 
@@ -90,7 +100,7 @@ function OrderSuccess(props) {
             }
         }
     }, [
-        cartProducts._id,
+        cartProducts,
         dispatch,
         isCheckProductsToCart,
         order,
@@ -99,32 +109,40 @@ function OrderSuccess(props) {
     ]);
 
     useEffect(() => {
-        if (auth) {
-            dispatch(getUserAddress({ token: auth.tokenAuth }));
+        if (auth.user) {
+            dispatch(getUserAddress({ userId: auth.user._id }));
         }
     }, [dispatch, auth]);
 
     useEffect(() => {
         if (auth.tokenAuth) {
             if (productsId && productsId.length) {
-                if (userAddress.items.length) {
-                    userAddress.items.forEach((item) => {
-                        if (item.status) {
-                            dispatch(
-                                handleAddOrder({
-                                    tokenAuth: auth.tokenAuth,
-                                    username: item.username,
-                                    phoneNumber: item.phoneNumber,
-                                    city: item.address,
-                                    productsID: productsId,
-                                    isPayment: JSON.parse(
-                                        query.get('isPayment'),
-                                    ),
-                                    message: messageOrder,
-                                }),
-                            );
-                        }
-                    });
+                if (userAddress) {
+                    if (userAddress.items.length) {
+                        userAddress.items.forEach((item) => {
+                            if (item.status) {
+                                dispatch(
+                                    handleAddOrder({
+                                        tokenAuth: auth.tokenAuth,
+                                        username: item.username,
+                                        phoneNumber: item.phoneNumber,
+                                        city: item.address,
+                                        productsID: productsId,
+                                        isPayment: JSON.parse(
+                                            query.get('isPayment'),
+                                        ),
+                                        message: messageOrder,
+                                        paymentFee: JSON.parse(
+                                            query.get('paymentFee'),
+                                        ),
+                                        serviceTypeId: JSON.parse(
+                                            query.get('serviceTypeId'),
+                                        ),
+                                    }),
+                                );
+                            }
+                        });
+                    }
                 }
             }
         }

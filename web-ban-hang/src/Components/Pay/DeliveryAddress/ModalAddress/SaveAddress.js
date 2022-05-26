@@ -55,9 +55,9 @@ function SaveAddress({
                                             [ {item.username} - (+84){' '}
                                             {item.phoneNumber} ]{' '}
                                             {item.address.mota} -{' '}
-                                            {item.address.xa} -{' '}
-                                            {item.address.quan} -{' '}
-                                            {item.address.tinh}
+                                            {item.address.xa.WardName} -{' '}
+                                            {item.address.quan.DistrictName} -{' '}
+                                            {item.address.tinh.ProvinceName}
                                         </Radio>
                                     </Radio.Group>
                                 </div>

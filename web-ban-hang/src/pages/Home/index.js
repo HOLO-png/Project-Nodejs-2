@@ -53,8 +53,8 @@ export default function Home() {
     const [productsSelect, setProductsSelect] = useState([]);
     const [pageNum, setPageNum] = useState(1);
     const [limitNum, setLimitNum] = useState(5);
-    const observer = useRef(null);
 
+    const observer = useRef(null);
     const { error, isLoading } = useGetAllProductsQuery({ pageNum, limitNum });
 
     useEffect(() => {

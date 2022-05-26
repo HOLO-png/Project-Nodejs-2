@@ -17,15 +17,15 @@ const UserAddressSchema = new mongoose.Schema({
             },
             address: {
                 tinh: {
-                    type: String,
+                    type: Object,
                     required: true,
                 },
                 quan: {
-                    type: String,
+                    type: Object,
                     required: true,
                 },
                 xa: {
-                    type: String,
+                    type: Object,
                     required: true,
                 },
                 mota: {

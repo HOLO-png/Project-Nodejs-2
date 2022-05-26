@@ -464,11 +464,15 @@ export const nav_dashboard = [
         link: '/dashboard/chat',
         icon: 'fad fa-sms',
     },
-
     {
         name: 'News',
         link: '/dashboard/news',
         icon: 'fad fa-newspaper',
+    },
+    {
+        name: 'ConfigStore',
+        link: '/dashboard/store',
+        icon: 'fad fa-store',
     },
     {
         name: 'Logout',

@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Input, Row, Select } from 'antd';
+import { useDispatch } from 'react-redux';
+import {
+    getDistrictApi,
+    getProvinceApi,
+    getWardApi,
+} from '../../../../Store/Reducer/apiAddress';
+import { toast } from 'react-toastify';
 const { Option } = Select;
 
 function SelecteValue(props) {
@@ -11,21 +18,25 @@ function SelecteValue(props) {
         widthInput,
         objAddress,
     } = props;
-    
-    const [stateAddress, setStateAddress] = useState([]);
-    const [cities, setCities] = useState('');
+    const { dataProvince, dataWard, dataDistrict } = address_api;
 
-    const [stateSecond, setStateSecond] = useState([]);
-    const [secondCity, setSecondCity] = useState('');
+    const dispatch = useDispatch();
 
-    const [stateThir, setStateThir] = useState([]);
-    const [thirCity, setThirCity] = useState('');
+    const [cities, setCities] = useState(null);
+
+    const [secondCity, setSecondCity] = useState(null);
+
+    const [thirCity, setThirCity] = useState(null);
 
     const [input, setInput] = useState('');
 
     useEffect(() => {
-        address_api.length && setStateAddress(address_api);
-    }, [address_api]);
+        return () => {
+            setCities(null);
+            setSecondCity(null);
+            setThirCity(null);
+        };
+    }, []);
 
     useEffect(() => {
         onHandleValueImportAddress({
@@ -37,24 +48,41 @@ function SelecteValue(props) {
     }, [cities, input, secondCity, thirCity]);
 
     const handleProvinceChange = (value) => {
-        setCities(stateAddress[value].name);
-        setStateSecond(stateAddress[value].districts);
-        setSecondCity(stateAddress[value].districts[0].name);
+        setCities(dataProvince[value]);
     };
 
     const onSecondCityChange = (value) => {
-        setSecondCity(stateSecond[value].name);
-        setStateThir(stateSecond[value].wards);
-        setThirCity(stateSecond[value].wards[0].name);
+        setSecondCity(dataDistrict[value]);
     };
 
     const onThirCityChange = (value) => {
-        setThirCity(stateThir[value].name);
+        setThirCity(dataWard[value]);
     };
 
     const handleChangeInput = (e) => {
         setInput(e.target.value);
     };
+
+    const handleGetProvince = () => {
+        dispatch(getProvinceApi());
+    };
+
+    const handleGetDistrict = () => {
+        if (cities) {
+            dispatch(getDistrictApi({ provinceId: cities.ProvinceID }));
+        } else {
+            toast.warning('Hãy chọn tỉnh/thành phố trước!');
+        }
+    };
+
+    const handleGetWard = () => {
+        if (secondCity) {
+            dispatch(getWardApi({ districtID: secondCity.DistrictID }));
+        } else {
+            toast.warning('Hãy chọn phường/xã trước!');
+        }
+    };
+    console.log(objAddress);
 
     return (
         <div
@@ -74,15 +102,16 @@ function SelecteValue(props) {
                         style={{ width: widthInput, height: 40 }}
                         value={
                             cities
-                                ? cities
-                                : objAddress.tinh !== ''
-                                ? objAddress.tinh
+                                ? cities.ProvinceName
+                                : objAddress.tinh !== null
+                                ? objAddress.tinh.ProvinceName
                                 : 'Tỉnh / Thành Phố'
                         }
+                        onClick={handleGetProvince}
                         onChange={handleProvinceChange}
                     >
-                        {stateAddress.map((province, index) => (
-                            <Option key={index}>{province.name}</Option>
+                        {dataProvince.map((province, index) => (
+                            <Option key={index}>{province.ProvinceName}</Option>
                         ))}
                     </Select>
                 </Col>
@@ -94,15 +123,16 @@ function SelecteValue(props) {
                         style={{ width: widthInput, height: 40 }}
                         value={
                             secondCity
-                                ? secondCity
-                                : objAddress.quan !== ''
-                                ? objAddress.quan
+                                ? secondCity.DistrictName
+                                : objAddress.quan !== null
+                                ? objAddress.quan.DistrictName
                                 : 'Quận / Huyện'
                         }
+                        onClick={handleGetDistrict}
                         onChange={onSecondCityChange}
                     >
-                        {stateSecond.map((province, index) => (
-                            <Option key={index}>{province.name}</Option>
+                        {dataDistrict.map((district, index) => (
+                            <Option key={index}>{district.DistrictName}</Option>
                         ))}
                     </Select>
                 </Col>
@@ -119,15 +149,16 @@ function SelecteValue(props) {
                         style={{ width: widthInput, height: 40 }}
                         value={
                             thirCity
-                                ? thirCity
-                                : objAddress.xa !== ''
-                                ? objAddress.xa
+                                ? thirCity.WardName
+                                : objAddress.xa !== null
+                                ? objAddress.xa.WardName
                                 : 'Phường / Xã'
                         }
+                        onClick={handleGetWard}
                         onChange={onThirCityChange}
                     >
-                        {stateThir.map((province, index) => (
-                            <Option key={index}>{province.name}</Option>
+                        {dataWard.map((ward, index) => (
+                            <Option key={index}>{ward.WardName}</Option>
                         ))}
                     </Select>
                 </Col>
@@ -137,7 +168,7 @@ function SelecteValue(props) {
                 >
                     <Input
                         placeholder="Số Nhà, Đường,..."
-                        style={{ height: 40 }}
+                        style={{ height: 40, width: widthInput }}
                         onChange={handleChangeInput}
                         value={input ? input : objAddress.mota}
                     />

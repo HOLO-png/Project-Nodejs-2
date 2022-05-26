@@ -40,8 +40,6 @@ import { toast } from 'react-toastify';
 import { humanImg } from '../../assets/fake-data/human';
 import { useGetAllProductsQuery } from '../../Store/Reducer/productsReducer';
 
-// import { AuthContext } from '../../Context/AuthProvider';
-
 const ProductsItem = styled.div`
     transform: translateY(20px);
     .slick-slide {
@@ -397,6 +395,12 @@ export default function Products() {
                         trademark: product.description.trademark,
                         category: product.category,
                         capacity: product.description,
+                        sizeInformation: {
+                            height: product.height,
+                            length: product.length,
+                            weight: product.weight,
+                            width: product.width,
+                        },
                     });
             }
         }

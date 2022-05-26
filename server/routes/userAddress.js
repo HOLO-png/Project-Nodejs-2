@@ -2,7 +2,8 @@ const router = require('express').Router();
 const userAddressCtrl = require('../controllers/userAddressCtrl.js');
 const auth = require('../middleware/auth.js');
 
-router.get('/', auth, userAddressCtrl.getUserAddress);
+router.get('/', userAddressCtrl.getUserAddress);
+router.get('/admin', userAddressCtrl.getUserAddressAdmin);
 router.post('/', auth, userAddressCtrl.createUserAddress);
 router.put('/:userAddressId', auth, userAddressCtrl.updateUserAddressItem);
 router.patch(

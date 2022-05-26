@@ -32,8 +32,9 @@ const product = {
     },
     getProducts: async (req, res) => {
         const { limit } = Pagination2(req);
+        
         try {
-            const products = await Product.find({ status: 0 })
+            const products = await Product.find()
                 .sort('-createdAt')
                 .limit(limit);
 
@@ -414,6 +415,8 @@ const product = {
 
         const productIdObj = mongoose.Types.ObjectId(productID);
 
+        console.log(req.body);
+
         try {
             const product = await Product.update(
                 { _id: productIdObj },
@@ -423,6 +426,8 @@ const product = {
                     },
                 },
             );
+            console.log(product);
+
             res.status(200).json({ product });
         } catch (err) {
             console.log(err);

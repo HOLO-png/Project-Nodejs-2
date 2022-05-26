@@ -23,6 +23,14 @@ const OrderSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        paymentFee: {
+            type: Number,
+            required: true,
+        },
+        serviceTypeId: {
+            type: Number,
+            required: true,
+        }
     },
     { timestamps: true },
 );

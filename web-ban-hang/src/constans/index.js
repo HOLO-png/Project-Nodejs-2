@@ -42,6 +42,7 @@ import VerifyEmail from '../pages/VerifyEmail';
 import ActivationEmail from '../pages/ActivationEmail';
 import OrderSuccess from '../pages/OrderSuccess';
 import OrderCancel from '../pages/OrderCancel';
+import DashboardStore from '../Components/DashBoard/DashboardStore';
 // const Home = React.lazy(() => import('../pages/Home'));
 
 export const MAIN_ROUTES = [
@@ -296,6 +297,12 @@ export const DASHBOARD_ROUTES = [
         path: '/dashboard/news',
         exact: false,
         component: DashboardNews,
+    },
+    {
+        name: 'Dashboard Store',
+        path: '/dashboard/store',
+        exact: false,
+        component: DashboardStore,
     },
     {
         name: 'Dashboard Logout',

@@ -2,13 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import AllProduct from './AllProduct';
 import WaitingConfirm from './WaitingConfirm';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import ScaleLoader from 'react-spinners/ScaleLoader';
 import Helmet from '../../Helmet';
 import DrawerOrderPay from './DrawerOrderPay';
-import { openNotification } from '../../../utils/messageAlear';
-import { Link } from 'react-router-dom';
 import { authSelector } from '../../../Store/Reducer/authReducer';
 import {
     handleGetOrder,
@@ -139,7 +136,7 @@ function OrderUser(props) {
     };
 
     return (
-        <Helmet title="Payment">
+        <Helmet title="Order User">
             <OrderUserConFirm>
                 <Tabs defaultActiveKey="1" type="card" size={110}>
                     <TabPane tab="Tất cả đơn hàng" key="1">
@@ -154,28 +151,28 @@ function OrderUser(props) {
                     </TabPane>
                     <TabPane tab="Đang chờ xử lý" key="2">
                         <WaitingConfirm
-                            order={productWaitingConfirm}
+                            orders={productWaitingConfirm}
                             photoURL={profilePicture}
                             handleOrderActive={handleOrderActive}
                         />
                     </TabPane>
                     <TabPane tab="Đang giao hàng" key="3">
                         <WaitingConfirm
-                            order={delivery}
+                            orders={delivery}
                             photoURL={profilePicture}
                             handleOrderActive={handleOrderActive}
                         />
                     </TabPane>
                     <TabPane tab="Đã giao hàng" key="5">
                         <WaitingConfirm
-                            order={delivered}
+                            orders={delivered}
                             photoURL={profilePicture}
                             handleOrderActive={handleOrderActive}
                         />
                     </TabPane>
                     <TabPane tab="Đã huỷ đơn hàng" key="6">
                         <WaitingConfirm
-                            order={cancelOrder}
+                            orders={cancelOrder}
                             photoURL={profilePicture}
                             handleOrderActive={handleOrderActive}
                         />

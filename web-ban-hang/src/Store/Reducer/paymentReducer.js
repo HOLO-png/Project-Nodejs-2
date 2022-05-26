@@ -7,12 +7,15 @@ const url = 'http://localhost:8800/api';
 
 export const createPayment = createAsyncThunk(
     'PaymentInsert/PaymentInsert',
-    async ({ products, email, message }) => {
+    async ({ products, email, message, paymentFee,serviceTypeId }) => {
+
         try {
             const res = await axios.post(`${url}/payment`, {
                 products,
                 email,
                 message,
+                paymentFee,
+                serviceTypeId
             });
 
             return res.data;

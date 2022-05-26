@@ -49,6 +49,7 @@ function LoginForm(props) {
         }, 500);
     };
 
+    console.log(auth);
     useEffect(() => {
         if (auth.register) {
             history.push('/verify-email');

@@ -22,30 +22,7 @@ export const productsApi = createApi({
 });
 
 // Export hooks for usage in functional components, which are
-// auto-generated based on the defined endpoints
 export const { useGetAllProductsQuery, usePostProductMutation } = productsApi;
-
-// export const handleRemoveProduct = createAsyncThunk(
-//     'products/productsRemove',
-//     async (obj) => {
-//         await axios.delete(`http://localhost:3000/product_api/${obj.id}`);
-//         return obj;
-//     },
-// );
-
-// export const handleUpdateProduct = createAsyncThunk(
-//     'products/productsUpdate',
-//     async (obj) => {
-//         const newproducts = {
-//             ...obj,
-//         };
-//         await axios.put(
-//             `http://localhost:3000/product_api/${obj.id}`,
-//             newproducts,
-//         );
-//         return newproducts;
-//     },
-// );
 
 const productsSlice = createSlice({
     name: 'products', // ten cua action
@@ -71,6 +48,7 @@ const productsSlice = createSlice({
                 state.loading = false;
             },
         );
+        
         builder.addMatcher(
             productsApi.endpoints.postProduct.matchFulfilled,
             (state, action) => {
@@ -84,23 +62,6 @@ const productsSlice = createSlice({
                 }
             },
         );
-        // [handleInsertProduct.rejected]: (state, action) => {},
-        // //delete coins product all
-        // [handleRemoveProduct.pending]: (state, action) => {},
-        // [handleRemoveProduct.fulfilled]: (state, action) => {
-        //     state.products = state.products.filter(
-        //         (ar) => ar.id !== action.payload.id,
-        //     );
-        // },
-        // [handleRemoveProduct.rejected]: (state, action) => {},
-        // // update cart product
-        // [handleUpdateProduct.pending]: (state, action) => {},
-        // [handleUpdateProduct.fulfilled]: (state, action) => {
-        //     state.products = state.products.map(function (item) {
-        //         return item.id === action.payload.id ? action.payload : item;
-        //     });
-        // },
-        // [handleUpdateProduct.rejected]: (state, action) => {},
     },
 });
 

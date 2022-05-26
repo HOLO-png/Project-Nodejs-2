@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Avatar } from 'antd';
+import numberWithCommas from '../../../../utils/numberWithCommas';
 
 function OrderUserProfile(props) {
     const { photoURL, dataOrder } = props;
@@ -51,8 +52,9 @@ function OrderUserProfile(props) {
                             Địa Chỉ:
                         </span>
                         <span className="order__user-address-text">
-                            {dataOrder.city.mota}, {dataOrder.city.quan},{' '}
-                            {dataOrder.city.xa}, {dataOrder.city.tinh}
+                            {dataOrder.city.tinh.ProvinceName} -{' '}
+                            {dataOrder.city.quan.DistrictName} -{' '}
+                            {dataOrder.city.xa.WardName} - {dataOrder.city.mota}
                         </span>
                     </div>
                     <div className="order__user-date-time">
@@ -63,12 +65,21 @@ function OrderUserProfile(props) {
                             {orderCreated}
                         </span>
                     </div>
+
                     <div className="order__user-message">
                         <span className="order__user-message-title">
                             Lời nhắn:
                         </span>
                         <span className="order__user-message-text">
                             {dataOrder.message || 'Không có lời nhắn'}
+                        </span>
+                    </div>
+                    <div className="order__user-date-time">
+                        <span className="order__user-date-time-title">
+                            Phí shipping:
+                        </span>
+                        <span className="order__user-date-time-text">
+                            {numberWithCommas(dataOrder.paymentFee)} đ
                         </span>
                     </div>
                 </div>

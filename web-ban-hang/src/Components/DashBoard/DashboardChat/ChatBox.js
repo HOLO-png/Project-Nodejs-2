@@ -12,21 +12,21 @@ function ChatBox(props) {
                         class="chat-img pull-left"
                         style={{ marginBottom: 9 }}
                     >
-                        {renderPhotoAccout(
+                        {/* {renderPhotoAccout(
                             chatUser.photoURL,
                             50,
                             chatUser.displayName,
-                        )}
+                        )} */}
                     </span>
                 </div>
                 <div className="col-lg-9">
                     <div class="chat-body clearfix">
                         <div class="clearfix-header">
                             <strong class="primary-font">
-                                {chatStarted ? chatUser.displayName : ''}
+                                {/* {chatStarted ? chatUser.displayName : ''} */}
                             </strong>
                             <br />
-                            {chatUser.isOnline ? (
+                            {/* {chatUser.isOnline ? (
                                 <div className="active-acount">
                                     <div className="active-acount-check"></div>
                                     <small class="text-muted">
@@ -37,7 +37,7 @@ function ChatBox(props) {
                                 <small>
                                     {moment().format('YYYY-MM-DD HH:mm:ss')}
                                 </small>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>

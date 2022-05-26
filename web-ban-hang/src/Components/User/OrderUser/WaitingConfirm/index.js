@@ -7,7 +7,7 @@ import OrderPayProducts from '../AllProduct/OrderPayProducts';
 const WaitingConfirmItem = styled.div``;
 
 function WaitingConfirm(props) {
-    const { order, photoURL, handleOrderActive } = props;
+    const { orders, photoURL, handleOrderActive } = props;
 
     const handleChangeDataValue = () => {};
     return (
@@ -28,9 +28,9 @@ function WaitingConfirm(props) {
                     }}
                 >
                     <div className="add-product__processing">
-                        {order.length !== 0 ? (
+                        {orders.length !== 0 ? (
                             <OrderPayProducts
-                                orders={order}
+                                orders={orders}
                                 handleOrderActive={handleOrderActive}
                                 photoURL={photoURL}
                                 handleChangeDataValue={handleChangeDataValue}

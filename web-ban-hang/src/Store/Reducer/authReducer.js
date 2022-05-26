@@ -23,7 +23,7 @@ export const updateProfileUser = createAsyncThunk(
 // handle feature for Login Page
 export const fetchSignupAction = createAsyncThunk(
     'signup/signupFetch',
-    async (data) => {
+    async (data,{ rejectWithValue }) => {
         try {
             await axios.post(`${url}/auth/register`, {
                 username: data.name,
@@ -36,6 +36,7 @@ export const fetchSignupAction = createAsyncThunk(
         } catch (err) {
             console.log(err);
             toast.error(`${err.message} 😓`);
+            return rejectWithValue(err.response.data);
         }
     },
 );
@@ -187,7 +188,9 @@ const authSlice = createSlice({
         [fetchSignupAction.fulfilled]: (state, action) => {
             state.auth.register = true;
         },
-        [fetchSignupAction.rejected]: (state, action) => {},
+        [fetchSignupAction.rejected]: (state, action) => {
+            state.auth.register = false;
+        },
 
         //fetch activation email
         [loginSocialAction.pending]: (state, action) => {},

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button, Col, Empty, Row, Skeleton } from 'antd';
+import { Button, Col, Empty, Modal, Row, Skeleton, Tooltip } from 'antd';
 import { Input } from 'antd';
 import Product from './Product';
+import numberWithCommas from '../../../utils/numberWithCommas';
 
 const { TextArea } = Input;
 
@@ -100,7 +101,40 @@ const ProductsPayStyle = styled.div`
     }
 `;
 function ProductsPay(props) {
-    const { products_api, loading, handleChangeMessage } = props;
+    const {
+        products_api,
+        loading,
+        handleChangeMessage,
+        serviceFee,
+        feeService,
+        setFeeServince,
+        leadTime,
+        servicePackage,
+        setServiceTypeId
+    } = props;
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [active, setActive] = useState(null);
+    const [time, setTime] = useState('');
+
+    useEffect(() => {
+        if (leadTime) {
+            const timeLine = new Date(leadTime).toLocaleDateString('en-GB');
+
+            setTime(timeLine);
+        }
+    }, [leadTime]);
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
 
     const renderProductApi = products_api.map((product, index) =>
         loading ? (
@@ -123,6 +157,23 @@ function ProductsPay(props) {
             <Product key={product._id} product={product} />
         ),
     );
+
+    const handleSetFeeService = (fee, index) => {
+        setFeeServince(fee.data.total);
+        setServiceTypeId(fee.service_type_id);
+        setActive(index);
+    };
+    useEffect(() => {
+        if (serviceFee) {
+            if (serviceFee.length) {
+                setFeeServince(serviceFee[0].data.total);
+                setServiceTypeId(serviceFee[0].service_type_id)
+                setActive(0);
+            }
+        }
+    }, [serviceFee]);
+
+    console.log(serviceFee);
     return (
         <ProductsPayStyle>
             <div className="products-pay">
@@ -204,20 +255,97 @@ function ProductsPay(props) {
                                     Đơn Vị Vận Chuyển
                                 </div>
                                 <div className="contact-shop__price">
-                                    ₫32.700
+                                    {numberWithCommas(feeService)}₫
+                                </div>
+                            </div>
+                            <div className="contact-shop__message-price">
+                                <div className="contact-shop__message">
+                                    Thời gian giao hàng ước tính:
+                                </div>
+                                <div className="contact-shop__price">
+                                    {time}
                                 </div>
                             </div>
                             <div className="contact-shop__content">
-                                Nhanh
                                 <p className="contact-shop__info-ship">
-                                    Nhận hàng vào 10 Th09 - 14 Th09 (Người bán ở
-                                    trong khu vực giãn cách, thời gian giao hàng
-                                    sẽ chậm hơn dự kiến.)
+                                    {servicePackage &&
+                                        servicePackage.code_message_value}
                                 </p>
                             </div>
-                            <Button type="link" disabled>
+
+                            <Button
+                                type="link"
+                                disabled={serviceFee && serviceFee.length === 0}
+                                onClick={showModal}
+                            >
                                 Thay Đổi
                             </Button>
+
+                            <Modal
+                                title="Đơn vị vận chuyển"
+                                visible={isModalVisible}
+                                onOk={handleOk}
+                                onCancel={handleCancel}
+                            >
+                                <div class="cards">
+                                    {serviceFee &&
+                                        serviceFee.map((item, index) => {
+                                            if (item) {
+                                                return (
+                                                    <Tooltip
+                                                        title={`
+                                                     Phí dịch vụ: ${numberWithCommas(
+                                                            item.data.service_fee,
+                                                        )}₫. Phí khai giá hàng hóa: ${numberWithCommas(
+                                                            item.data.insurance_fee,
+                                                        )}₫. Phí gửi hàng tại bưu cục: ${numberWithCommas(
+                                                            item.data.pick_station_fee,
+                                                        )}₫. Phí giao lại hàng: ${numberWithCommas(
+                                                            item.data.r2s_fee,
+                                                        )}₫. `}
+                                                        color="#2db7f5"
+                                                        className="card"
+                                                        key={index}
+                                                    >
+                                                        <div
+                                                            class="card card-1"
+                                                            onClick={() =>
+                                                                handleSetFeeService(
+                                                                    item,
+                                                                    index,
+                                                                )
+                                                            }
+                                                        >
+                                                            {active === index ? (
+                                                                <div class="card__icon">
+                                                                    <i class="fas fa-check"></i>
+                                                                </div>
+                                                            ) : (
+                                                                ''
+                                                            )}
+
+                                                            <h2 class="card__title">
+                                                                Tổng chi phí:
+                                                                <p className="payment__price">
+                                                                    {numberWithCommas(
+                                                                        item.data.total,
+                                                                    )}
+                                                                    ₫
+                                                                </p>
+                                                            </h2>
+                                                            <p class="card__apply">
+                                                                <p class="card__link">
+                                                                    Phương thức vận chuyển: {item.short_name}{' '}
+                                                                </p>
+                                                            </p>
+                                                        </div>
+                                                    </Tooltip>
+
+                                                )
+                                            }
+                                        })}
+                                </div>
+                            </Modal>
                         </Col>
                     )}
                 </Row>
