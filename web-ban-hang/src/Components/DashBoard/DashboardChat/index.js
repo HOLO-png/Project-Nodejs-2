@@ -6,6 +6,12 @@ import ChatBox from './ChatBox';
 import ChatBoxContent from './ChatBoxContent';
 import ChatMessing from './ChatMessing';
 import moment from 'moment';
+import { Input } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
+import { messageInfoToast } from '../../../utils/messageInfoToast';
+import axios from 'axios';
+
 function DashboardChat(props) {
     const [chatStarted, setChatStarted] = useState(true);
     const [chatUser, setChatUser] = useState(null);
@@ -13,16 +19,36 @@ function DashboardChat(props) {
     const [conversationsArray, setConversationsArray] = useState(null);
     const [userId, setUserId] = useState(null);
     const [media, setMedia] = useState([]);
+    const [load, setLoad] = useState(false);
+    const [search, setSearch] = useState('');
+    const [searchUser, setSearchUser] = useState([]);
+
+    const URL = 'http://localhost:8800/api';
 
 
     const handleSubmitMessage = () => {
-        
+
     };
 
     const handleGetRealtimeConversation = async (user) => {
-        
+
     };
 
+    const handleProcessingSearchers = async (e) => {
+        e.preventDefault();
+
+        if (!search) return setSearchUser([]);;
+        try {
+            setLoad(true);
+            const res = await axios.get(`${URL}/users/search?username=${search}`);
+            setSearchUser(res.data.users);
+        } catch (err) {
+            console.log(err);
+            messageInfoToast(false, 'get user failed!')
+        }
+    }
+
+    console.log(searchUser);
     return (
         <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
             <div className="row">
@@ -97,6 +123,12 @@ function DashboardChat(props) {
                                 <i class="fad fa-user-plus"></i>
                             </span>
                         </div>
+                        <form onClick={handleProcessingSearchers}>
+                            <div class="form-group">
+                                <Input size="large" placeholder="large size" prefix={<UserOutlined />} onChange={(e) => setSearch(e.target.value)} />
+                                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                            </div>
+                        </form>
                         <div className="panel-body articles-container container-chat-box">
                             <ChatList />
                         </div>

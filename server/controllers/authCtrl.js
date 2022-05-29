@@ -296,21 +296,6 @@ const authCtrl = {
             return res.status(500).json({ msg: error.message });
         }
     },
-    searchUsers: async (req, res) => {
-        try {
-            const users = await User.find({
-                username: {
-                    $regex: new RegExp(req.query.username, 'i'),
-                },
-            })
-                .limit(10)
-                .select('username profilePicture gender');
-
-            res.status(200).json(users);
-        } catch (error) {
-            return res.status(500).json({ msg: error.message });
-        }
-    },
 };
 
 const validateEmail = (email) => {

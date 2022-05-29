@@ -80,6 +80,22 @@ const user = {
             return res.status(500).json({ msg: err.message });
         }
     },
+    searchUsers: async (req, res) => {
+        const {username} = req.query;
+        try {
+            const users = await User.find({
+                username: {
+                    $regex: new RegExp(username, 'i'),
+                },
+            })
+                .limit(10)
+                .select('username profilePicture gender');
+
+            return res.status(200).json({users});
+        } catch (error) {
+            return res.status(500).json({ msg: error.message });
+        }
+    },
 };
 
 module.exports = user;
