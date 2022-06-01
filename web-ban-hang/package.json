@@ -108,5 +108,8 @@
   "bugs": {
     "url": "https://github.com/HOLO-png/electronic-shop-web/issues"
   },
-  "proxy": "http://localhost:8800/api"
+  "proxy": "http://localhost:8800/api",
+  "engines": {
+    "node": "16.15.0"
+  }
 }

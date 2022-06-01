@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "cd server && node server.js",
     "server": "cd server && npm start",
     "client": "cd web-ban-hang && npm start",
     "server-install": "cd server && npm install",
     "client-install": "cd web-ban-hang && npm install",
-
     "install-all": "concurrently \"npm run server-install\" \"npm run client-install\" ",
     "dev": "concurrently \"npm run server\" \"npm run client\" ",
     "heroku-postbuild": "cd web-ban-hang && npm install && npm run build"
@@ -26,5 +26,8 @@
   "homepage": "https://github.com/HOLO-png/Project-Nodejs-2#readme",
   "dependencies": {
     "concurrently": "^7.2.1"
+  },
+  "engines": {
+    "node": "16.15.0"
   }
 }
