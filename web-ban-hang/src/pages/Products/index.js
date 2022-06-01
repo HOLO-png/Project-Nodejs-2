@@ -25,7 +25,7 @@ import {
     insertCmt,
 } from '../../Store/Reducer/comments_user';
 import { handleProductStatus } from '../../Store/Reducer/current_product';
-import { authSelector } from '../../Store/Reducer/authReducer';
+import { authSelector, signingSuccess } from '../../Store/Reducer/authReducer';
 import {
     loadingSelector,
     setLoadingAction,
@@ -39,6 +39,8 @@ import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { humanImg } from '../../assets/fake-data/human';
 import { useGetAllProductsQuery } from '../../Store/Reducer/productsReducer';
+import jwt_decode from 'jwt-decode';
+import axios from 'axios';
 
 const ProductsItem = styled.div`
     transform: translateY(20px);
@@ -365,7 +367,7 @@ const ProductsItem = styled.div`
     }
 `;
 
-export default function Products() {
+export default function Products({axiosJWT}) {
     const dispatch = useDispatch();
     const history = useHistory();
     const { id, category } = useParams();
@@ -377,6 +379,7 @@ export default function Products() {
     const cart = useSelector(cartSelector);
     const [productObjChange, setProductObjChange] = useState(null);
     const [amout, setAmout] = useState(1);
+
 
     const { product, totalCmt } = productStore;
 
@@ -459,12 +462,12 @@ export default function Products() {
             };
             dispatch(handleUpdateProduct(newProduct));
         }
-        dispatch(insertCmt({ auth: user, newComment, dispatch, product }));
+        dispatch(insertCmt({ auth: user, newComment, dispatch, product, axiosJWT }));
     };
 
     const handleProductToCart = (obj) => {
         if (user.user && user.tokenAuth) {
-            dispatch(handleAddProductToCart({ cart, obj, amout, user }));
+            dispatch(handleAddProductToCart({ cart, obj, amout, user, axiosJWT }));
         } else {
             toast.warning('Bạn cần phải đăng nhập để sử dụng dịch vụ này');
             history.push('/buyer/signin');
@@ -480,6 +483,7 @@ export default function Products() {
                     amout,
                     user,
                     isChecked: true,
+                    axiosJWT
                 }),
             );
         } else {
@@ -507,6 +511,7 @@ export default function Products() {
                             auth={user}
                             productId={product._id}
                             product={product}
+                            axiosJWT={axiosJWT}
                         />
                     </Col>
                     <Col
@@ -549,6 +554,7 @@ export default function Products() {
                 handleInSertCmt={handleInSertCmt}
                 user={user.user}
                 tokenAuth={user.tokenAuth}
+                axiosJWT={axiosJWT}
             />
         </Helmet>
     );

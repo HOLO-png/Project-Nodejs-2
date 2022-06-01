@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import NotFound from '../../pages/NotFound';
 
 export default function Layout(props) {
-    const { name, component: YourComponent, exact, path } = props;
+    const { name, component: YourComponent, exact, path, axiosJWT } = props;
 
     return (
         <Route
@@ -12,8 +12,9 @@ export default function Layout(props) {
             exact={exact}
             path={path}
             component={YourComponent}
-            render={(routeProps) => <YourComponent {...routeProps} />}
-        />
+        >
+            <YourComponent axiosJWT={axiosJWT}/>
+        </Route>
     );
 }
 

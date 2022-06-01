@@ -51,6 +51,7 @@ function ProductCmts(props) {
         handleComments,
         user,
         tokenAuth,
+        axiosJWT
     } = props;
 
     return (
@@ -101,6 +102,7 @@ function ProductCmts(props) {
                     handleComments={handleComments}
                     user={user}
                     tokenAuth={tokenAuth}
+                    axiosJWT={axiosJWT}
                 />
             </div>
         </ProductsCmt>

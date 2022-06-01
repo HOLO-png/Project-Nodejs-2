@@ -28,11 +28,14 @@ import {
 } from '../../Store/Reducer/loadingReducer';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { css } from 'styled-components';
-import { authSelector, getUserByToken } from '../../Store/Reducer/authReducer';
+import { authSelector, getUserByToken, signingSuccess } from '../../Store/Reducer/authReducer';
 import {
     cartSelector,
     getOrCreateCartToUserApi,
 } from '../../Store/Reducer/cartReducer';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
 
 const override = css`
     display: block;
@@ -46,12 +49,43 @@ function App() {
     const loading = useSelector(loadingSelector);
     const auth = useSelector(authSelector);
     const cart = useSelector(cartSelector);
+    let axiosJWT = axios.create();
 
     const user = localStorage.getItem('user');
     const token = localStorage.getItem('token');
 
     const dispatch = useDispatch();
     const [confirmOpen, setConfirmOpen] = useState(true);
+
+    const refreshToken = async () => {
+        try {
+            const res = await axios.post('http://localhost:8800/api/auth/refresh_token', {
+                withCredentials: true
+            })
+            return res.data;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    axiosJWT.interceptors.request.use(
+        async (config) => {
+            let date = new Date();
+            if (auth.tokenAuth) {
+                const decodeToken = jwt_decode(auth.tokenAuth);
+                if (decodeToken.exp < date.getTime() / 1000) {
+                    const data = await refreshToken();
+                    console.log(data);
+                    dispatch(signingSuccess(data));
+                    config.headers['Authorization'] = data.access_token;
+                }
+                return config;
+            }return config;
+        },
+        (err) => {
+            return Promise.reject(err)
+        }
+    )
 
     useEffect(() => {
         if (user && token) {
@@ -71,13 +105,13 @@ function App() {
 
     useEffect(() => {
         if (auth.tokenAuth) {
-            dispatch(getOrCreateCartToUserApi(auth.tokenAuth));
+            dispatch(getOrCreateCartToUserApi({ token: auth.tokenAuth, axiosJWT }));
         }
     }, [dispatch, auth.tokenAuth]);
 
     useEffect(() => {
         if (auth.tokenAuth) {
-            dispatch(getUserByToken({ token: auth.tokenAuth }));
+            dispatch(getUserByToken({ token: auth.tokenAuth, axiosJWT }));
         }
     }, [dispatch, auth.tokenAuth]);
 
@@ -100,6 +134,7 @@ function App() {
                             component={route.component}
                             exact={route.exact}
                             path={route.path}
+                            axiosJWT={axiosJWT}
                         />
                     )
                 );
@@ -118,6 +153,7 @@ function App() {
                     component={route.component}
                     exact={route.exact}
                     path={route.path}
+                    axiosJWT={axiosJWT}
                 />
             );
         });

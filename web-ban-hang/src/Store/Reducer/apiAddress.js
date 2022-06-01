@@ -1,11 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-import GHN from 'giaohangnhanh';
 
 const tokenKeys = '874008ef-d7ee-11ec-ac64-422c37c6de1b';
 const shopId = 113395;
-
 
 const apiProvince =
     'https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province';
@@ -25,17 +22,13 @@ const apiServiceCharge =
 const apiLeadTime =
     'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime';
 
-const ghn = new GHN(tokenKeys, { test: true });
-
-console.log(ghn);
 
 export const getAddressApi = createAsyncThunk(
     'addressApi/addressApiFetch',
     async () => {
-        const response = await axios.get(
-            `https://provinces.open-api.vn/api/?depth=3`,
-        );
-        return response.data;
+        let res = await fetch(`https://provinces.open-api.vn/api/?depth=3`)
+        let commits = await res.json();
+        return commits;
     },
 );
 
@@ -43,17 +36,18 @@ export const getDistrictApi = createAsyncThunk(
     'getDistrictApi/getDistrictApiFetch',
     async ({ provinceId }) => {
         try {
-            const res = await axios.post(
-                `${apiDistrict}`,
-                { province_id: provinceId },
-                {
-                    headers: {
-                        token: tokenKeys,
-                    },
-                },
-            );
 
-            return res.data;
+            let res = await fetch(apiDistrict, {
+                method: 'POST',
+                headers: {
+                    token: tokenKeys,
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({ province_id: provinceId })
+            });
+
+            let commits = await res.json();
+            return commits;
         } catch (err) {
             console.log(err);
             toast.error('Get District failed');
@@ -65,17 +59,19 @@ export const getWardApi = createAsyncThunk(
     'getWardApi/getWardApiFetch',
     async ({ districtID }) => {
         try {
-            const res = await axios.post(
-                `${apiWard}`,
-                { district_id: districtID },
+            let res = await fetch(
+                apiWard,
                 {
+                    method: 'POST',
                     headers: {
                         token: tokenKeys,
+                        'Content-Type': 'application/json;charset=utf-8'
                     },
+                    body: JSON.stringify({ district_id: districtID })
                 },
-            );
-
-            return res.data;
+            )
+            let commits = await res.json();
+            return commits;
         } catch (err) {
             console.log(err);
             toast.error('Get District failed');
@@ -87,11 +83,11 @@ export const getProvinceApi = createAsyncThunk(
     'getProvinceApi/getProvinceApiFetch',
     async () => {
         try {
-            const res = await axios.get(`${apiProvince}`, {
+            let res = await fetch(apiProvince, {
                 headers: { token: tokenKeys },
-            });
-
-            return res.data;
+            })
+            let commits = await res.json();
+            return commits;
         } catch (err) {
             console.log(err);
             toast.error('Get Province failed');
@@ -103,18 +99,23 @@ export const getServicePackageApi = createAsyncThunk(
     'getServicePackageApi/getServicePackageApiFetch',
     async ({ toDistrict, fromDistrict }) => {
         try {
-            const res = await axios.post(
-                `${apiServicePackage}`,
+            let res = await fetch(
+                apiServicePackage,
                 {
-                    shop_id: shopId,
-                    from_district: fromDistrict,
-                    to_district: toDistrict,
+                    method: 'POST',
+                    headers: {
+                        token: tokenKeys,
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        shop_id: shopId,
+                        from_district: fromDistrict,
+                        to_district: toDistrict,
+                    })
                 },
-                {
-                    headers: { token: tokenKeys },
-                },
-            );
-            return res.data;
+            )
+            let commits = await res.json();
+            return commits;
         } catch (err) {
             console.log(err);
             toast.error('Get Province failed');
@@ -126,20 +127,26 @@ export const getLeadTimeApi = createAsyncThunk(
     'getLeadTimeApi/getLeadTimeApiFetch',
     async ({ toDistrictId, toWardCode, serviceId, fromDistrict }) => {
         try {
-            const res = await axios.post(
-                `${apiLeadTime}`,
+            let res = await fetch(
+                apiLeadTime,
                 {
-                    from_district_id: fromDistrict,
-                    from_ward_code: toWardCode,
-                    to_district_id: toDistrictId,
-                    to_ward_code: toWardCode,
-                    service_id: serviceId,
+                    method: 'POST',
+                    headers: {
+                        shopId: shopId,
+                        token: tokenKeys,
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        from_district_id: fromDistrict,
+                        from_ward_code: toWardCode,
+                        to_district_id: toDistrictId,
+                        to_ward_code: toWardCode,
+                        service_id: serviceId,
+                    })
                 },
-                {
-                    headers: { shopId: shopId, token: tokenKeys },
-                },
-            );
-            return res.data;
+            )
+            let commits = await res.json();
+            return commits;
         } catch (err) {
             console.log(err);
             toast.error('Get Lead Time failed');
@@ -160,59 +167,63 @@ export const getFeeServiceApi = createAsyncThunk(
     }) => {
         try {
             if (serviceTypeId) {
-                const res = await axios.post(
-                    `${apiServiceCharge}`,
+                let res = await fetch(
+                    apiServiceCharge,
                     {
-                        from_district_id: fromDistrict,
-                        service_type_id: serviceTypeId,
-                        to_district_id: toDistrict,
-                        to_ward_code: toWardCode,
-                        weight:  Math.round(products.reduce(
-                            (accumulator, item) => {
-                                return (
-                                    accumulator +
-                                    Number(item.sizeInformation.weight)
-                                );
-                            },
-                            0,
-                        )),
-                        length:  Math.round(products.reduce(
-                            (accumulator, item) => {
-                                return (
-                                    accumulator +
-                                    Number(item.sizeInformation.length)
-                                );
-                            },
-                            0,
-                        )),
-                        width:  Math.round(products.reduce(
-                            (accumulator, item) => {
-                                return (
-                                    accumulator +
-                                    Number(item.sizeInformation.width)
-                                );
-                            },
-                            0,
-                        )),
-                        height: Math.round(products.reduce(
-                            (accumulator, item) => {
-                                return (
-                                    accumulator +
-                                    Number(item.sizeInformation.height)
-                                );
-                            },
-                            0,
-                        )),
-                       
-                        insurance_value: sumProduct,
-                        coupon: coupon,
+                        method: 'POST',
+                        headers: {
+                            token: tokenKeys, shopId, 'Content-Type': 'application/json;charset=utf-8'
+                        },
+                        body: JSON.stringify({
+                            from_district_id: fromDistrict,
+                            service_type_id: serviceTypeId,
+                            to_district_id: toDistrict,
+                            to_ward_code: toWardCode,
+                            weight: Math.round(products.reduce(
+                                (accumulator, item) => {
+                                    return (
+                                        accumulator +
+                                        Number(item.sizeInformation.weight)
+                                    );
+                                },
+                                0,
+                            )),
+                            length: Math.round(products.reduce(
+                                (accumulator, item) => {
+                                    return (
+                                        accumulator +
+                                        Number(item.sizeInformation.length)
+                                    );
+                                },
+                                0,
+                            )),
+                            width: Math.round(products.reduce(
+                                (accumulator, item) => {
+                                    return (
+                                        accumulator +
+                                        Number(item.sizeInformation.width)
+                                    );
+                                },
+                                0,
+                            )),
+                            height: Math.round(products.reduce(
+                                (accumulator, item) => {
+                                    return (
+                                        accumulator +
+                                        Number(item.sizeInformation.height)
+                                    );
+                                },
+                                0,
+                            )),
+
+                            insurance_value: sumProduct,
+                            coupon: coupon,
+                        })
                     },
-                    {
-                        headers: { token: tokenKeys, shopId },
-                    },
-                );
-                console.log(res.data);
-                return { ...res.data, serviceTypeId };
+                )
+                let commits = await res.json();
+                console.log(commits);
+                return commits;
             }
         } catch (err) {
             console.log(err);

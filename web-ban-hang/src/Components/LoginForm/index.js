@@ -36,10 +36,13 @@ function LoginForm(props) {
     };
 
     useEffect(() => {
-        if (user && token) {
+        if (user && token && auth.isForgetPassword) {
+            history.push('/');
+        }else if (user && token){
             history.goBack();
         }
-    }, [history, token, user]);
+
+    }, [history, token, user,auth]);
 
     const handleLoginSignup = (val) => {
         dispatch(setLoadingAction(true));
@@ -49,7 +52,6 @@ function LoginForm(props) {
         }, 500);
     };
 
-    console.log(auth);
     useEffect(() => {
         if (auth.register) {
             history.push('/verify-email');
@@ -76,6 +78,7 @@ function LoginForm(props) {
             dispatch(setLoadingAction(false));
         }, 500);
     };
+    console.log(auth);
 
     const handleGgLogin = (response) => {
         dispatch(setLoadingAction(true));
@@ -88,8 +91,6 @@ function LoginForm(props) {
             dispatch(setLoadingAction(false));
         }, 500);
     };
-
-    console.log(isActive);
 
     return (
         <div className="form">

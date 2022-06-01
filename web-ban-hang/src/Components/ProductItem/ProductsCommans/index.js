@@ -59,6 +59,7 @@ function ProductsCommans(props) {
         user,
         tokenAuth,
         products_api,
+        axiosJWT
     } = props;
 
     return (
@@ -79,6 +80,7 @@ function ProductsCommans(props) {
                         handleComments={handleComments}
                         user={user}
                         tokenAuth={tokenAuth}
+                        axiosJWT={axiosJWT}
                     />
                 </Col>
                 <Col className="gutter-row" span={5}>

@@ -26,7 +26,7 @@ const OrderUserConFirm = styled.div`
     }
 `;
 
-function OrderUser(props) {
+function OrderUser({axiosJWT}) {
     const dispatch = useDispatch();
     const auth = useSelector(authSelector);
     const orderSlt = useSelector(orderSelector);
@@ -42,10 +42,12 @@ function OrderUser(props) {
     const [orderSearch, setOrderSearch] = useState(null);
 
     const { profilePicture } = auth.user;
+    const { tokenAuth } = auth;
+
 
     useEffect(() => {
         if (auth.tokenAuth) {
-            dispatch(handleGetOrder({ tokenAuth: auth.tokenAuth }));
+            dispatch(handleGetOrder({ tokenAuth: auth.tokenAuth, axiosJWT }));
         }
     }, [dispatch, auth.tokenAuth]);
 
@@ -94,6 +96,8 @@ function OrderUser(props) {
             handleUpdateStatusOrder({
                 orderId: dataOrder._id,
                 complete: 'cancel',
+                axiosJWT,
+                tokenAuth
             }),
         );
     };
@@ -104,6 +108,8 @@ function OrderUser(props) {
             handleUpdateStatusOrder({
                 orderId: dataOrder._id,
                 complete: 'pending',
+                axiosJWT,
+                tokenAuth
             }),
         );
     };

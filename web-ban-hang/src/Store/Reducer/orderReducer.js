@@ -8,6 +8,7 @@ const url = 'http://localhost:8800/api';
 const dateGetOrder = `https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shift/date`;
 const apiOrderCreate =
     'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create';
+axios.defaults.withCredentials = true;
 
 export const handleAddOrder = createAsyncThunk(
     'handleAddOrder/handleAddOrderFetch',
@@ -21,12 +22,13 @@ export const handleAddOrder = createAsyncThunk(
             isPayment,
             message,
             paymentFee,
-            serviceTypeId
+            serviceTypeId,
+            axiosJWT
         },
         { rejectWithValue },
     ) => {
         try {
-            const res = await axios.post(
+            const res = await axiosJWT.post(
                 `${url}/order`,
                 {
                     username,
@@ -53,9 +55,9 @@ export const handleAddOrder = createAsyncThunk(
 
 export const handleGetOrder = createAsyncThunk(
     'handleGetOrder/handleGetOrderFetch',
-    async ({ tokenAuth }) => {
+    async ({ tokenAuth, axiosJWT }) => {
         try {
-            const res = await axios.get(`${url}/order`, {
+            const res = await axiosJWT.get(`${url}/order`, {
                 headers: { Authorization: tokenAuth },
             });
             return res.data;
@@ -165,10 +167,12 @@ export const handleCreateOrderToGHN = createAsyncThunk(
 
 export const handleUpdateStatusOrder = createAsyncThunk(
     'handleUpdateStatusOrder/handleUpdateStatusOrderFetch',
-    async ({ orderId, complete }) => {
+    async ({ orderId, complete, tokenAuth, axiosJWT }) => {
         try {
-            const res = await axios.put(`${url}/order/${orderId}`, {
+            const res = await axiosJWT.put(`${url}/order/${orderId}`, {
                 complete,
+            }, {
+                headers: { Authorization: tokenAuth }
             });
             return res.data;
         } catch (err) {

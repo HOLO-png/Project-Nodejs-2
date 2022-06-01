@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const url = 'http://localhost:8800/api';
+axios.defaults.withCredentials = true;
 
 export const getProductApi = createAsyncThunk(
     'product/productFetch',
@@ -23,9 +24,9 @@ export const getProductApi = createAsyncThunk(
 
 export const putUpdateLikeProduct = createAsyncThunk(
     'updateProduct/updateProductFetch',
-    async ({ auth, productId }) => {
+    async ({ auth, productId, axiosJWT }) => {
         try {
-            await axios.put(`${url}/products/${productId}`, null, {
+            await axiosJWT.put(`${url}/products/${productId}`, null, {
                 headers: { Authorization: auth.tokenAuth },
             });
             return auth.user._id;

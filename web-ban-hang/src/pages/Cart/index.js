@@ -128,7 +128,7 @@ const CartPage = styled.div`
     }
 `;
 
-function Cart(props) {
+function Cart({axiosJWT}) {
     const dispatch = useDispatch();
     const cartProducts = useSelector(cartSelector);
     const totalProducts = useSelector(totalProductsSelector);

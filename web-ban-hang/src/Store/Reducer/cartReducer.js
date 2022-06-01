@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const url = 'http://localhost:8800/api';
+axios.defaults.withCredentials = true;
 
 const messageToCart = (status) => {
     if (status) {
@@ -27,10 +28,10 @@ const messageToCart = (status) => {
 
 export const getOrCreateCartToUserApi = createAsyncThunk(
     'getOrCreateCartToUserApi/getOrCreateCartToUserApiFetch',
-    async (tokenAuth) => {
+    async ({token, axiosJWT}) => {
         try {
-            const res = await axios.post(`${url}/cart`, null, {
-                headers: { Authorization: tokenAuth },
+            const res = await axiosJWT.post(`${url}/cart`, null, {
+                headers: { Authorization: token },
             });
             return res.data;
         } catch (err) {
@@ -63,8 +64,9 @@ export const deleteProductsInCart = createAsyncThunk(
 export const handleAddProductToCart = createAsyncThunk(
     'handleAddProductToCart/handleAddProductToCartFetch',
     async (data) => {
+        const {axiosJWT} = data;
         try {
-            const res = await axios.post(
+            const res = await axiosJWT.post(
                 `${url}/cart/${data.cart._id}`,
                 {
                     productId: data.obj._id,
@@ -96,9 +98,9 @@ export const handleAddProductToCartBuyAction = createAsyncThunk(
     'handleAddProductToCartBuyAction/handleAddProductToCartBuyActionFetch',
     async (data) => {
         const { isChecked } = data;
-
+        const {axiosJWT} = data;
         try {
-            const res = await axios.post(
+            const res = await axiosJWT.post(
                 `${url}/cart/${data.cart._id}`,
                 {
                     productId: data.obj._id,

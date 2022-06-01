@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const url = 'http://localhost:8800/api';
+axios.defaults.withCredentials = true;
 
 // handle feature for User Page
 export const updateProfileUser = createAsyncThunk(
@@ -23,7 +24,7 @@ export const updateProfileUser = createAsyncThunk(
 // handle feature for Login Page
 export const fetchSignupAction = createAsyncThunk(
     'signup/signupFetch',
-    async (data,{ rejectWithValue }) => {
+    async (data, { rejectWithValue }) => {
         try {
             await axios.post(`${url}/auth/register`, {
                 username: data.name,
@@ -93,6 +94,17 @@ export const forgotPasswordCall = createAsyncThunk(
     },
 );
 
+export const handleLogout = createAsyncThunk(
+    'handleLogout/handleLogoutAction',
+    async () => {
+        try {
+            await axios.post(`${url}/auth/logout`, null);
+        } catch (error) {
+            toast.error(`Đã xuất hiện lỗi vui lòng thực hiện lại 😓`);
+        }
+    },
+);
+
 export const fetchActivationEmail = createAsyncThunk(
     'ActivationEmail/fetchActivationEmail',
     async (activation_token) => {
@@ -113,15 +125,13 @@ export const fetchActivationEmail = createAsyncThunk(
 
 export const getUserByToken = createAsyncThunk(
     'userByToken/getUserByToken',
-    async ({ token }) => {
+    async ({ token, axiosJWT }) => {
         try {
-            const res = await axios.get(`${url}/users`, {
+            const res = await axiosJWT.get(`${url}/users`, {
                 headers: { Authorization: token },
             });
             return res.data;
         } catch (error) {
-            console.log('exited');
-
             console.log({ msg: error.message });
             toast.error(`${error.message} 😓`);
             localStorage.removeItem('user');
@@ -161,6 +171,7 @@ const authSlice = createSlice({
             user: JSON.parse(localStorage.getItem('user')) || null,
             tokenAuth: JSON.parse(localStorage.getItem('token')) || null,
             register: false,
+            isForgetPassword: false
         },
     },
     reducers: {
@@ -170,10 +181,17 @@ const authSlice = createSlice({
             state.auth.user = null;
             state.auth.tokenAuth = null;
         },
+        signingSuccess: (state, action) => {
+            const token = action.payload.access_token;
+            state.auth.tokenAuth = token;
+            localStorage.setItem('token', JSON.stringify(token));
+
+            state.auth.register = false;
+        }
     },
     extraReducers: {
         //update user profile
-        [updateProfileUser.pending]: (state, action) => {},
+        [updateProfileUser.pending]: (state, action) => { },
         [updateProfileUser.fulfilled]: (state, action) => {
             const data = action.payload;
             if (data) {
@@ -181,10 +199,10 @@ const authSlice = createSlice({
                 localStorage.setItem('user', JSON.stringify(state.auth.user));
             }
         },
-        [updateProfileUser.rejected]: (state, action) => {},
+        [updateProfileUser.rejected]: (state, action) => { },
 
         //fetch activation email
-        [fetchSignupAction.pending]: (state, action) => {},
+        [fetchSignupAction.pending]: (state, action) => { },
         [fetchSignupAction.fulfilled]: (state, action) => {
             state.auth.register = true;
         },
@@ -193,11 +211,11 @@ const authSlice = createSlice({
         },
 
         //fetch activation email
-        [loginSocialAction.pending]: (state, action) => {},
+        [loginSocialAction.pending]: (state, action) => { },
         [loginSocialAction.fulfilled]: (state, action) => {
             if (action.payload) {
                 const user = action.payload.newUser || action.payload.user;
-                const token = action.payload.refresh_token;
+                const token = action.payload.accessToken;
 
                 state.auth.user = user;
                 state.auth.tokenAuth = token;
@@ -207,27 +225,28 @@ const authSlice = createSlice({
                 state.auth.register = false;
             }
         },
-        [loginSocialAction.rejected]: (state, action) => {},
+        [loginSocialAction.rejected]: (state, action) => { },
 
         // reset password email
-        [resetPasswordCall.pending]: (state, action) => {},
+        [resetPasswordCall.pending]: (state, action) => { },
         [resetPasswordCall.fulfilled]: (state, action) => {
             state.auth.register = false;
+            state.auth.isForgetPassword = true;
         },
-        [resetPasswordCall.rejected]: (state, action) => {},
+        [resetPasswordCall.rejected]: (state, action) => { },
 
         //forgot password email
-        [forgotPasswordCall.pending]: (state, action) => {},
+        [forgotPasswordCall.pending]: (state, action) => { },
         [forgotPasswordCall.fulfilled]: (state, action) => {
             state.auth.register = true;
         },
-        [forgotPasswordCall.rejected]: (state, action) => {},
+        [forgotPasswordCall.rejected]: (state, action) => { },
 
         //fetch activation email
-        [fetchActivationEmail.pending]: (state, action) => {},
+        [fetchActivationEmail.pending]: (state, action) => { },
         [fetchActivationEmail.fulfilled]: (state, action) => {
             if (action.payload) {
-                const token = action.payload.refresh_token;
+                const token = action.payload.accessToken;
                 const user = action.payload.newUser;
 
                 state.auth.user = user;
@@ -244,7 +263,7 @@ const authSlice = createSlice({
         },
 
         // get users authentication
-        [getUserByToken.pending]: (state, action) => {},
+        [getUserByToken.pending]: (state, action) => { },
         [getUserByToken.fulfilled]: (state, action) => {
             if (action.payload) {
                 localStorage.setItem('user', JSON.stringify(action.payload));
@@ -252,15 +271,28 @@ const authSlice = createSlice({
             }
         },
         [getUserByToken.rejected]: (state, action) => {
-            // this.action.push('/buyer/signin');
             console.log(action.payload);
         },
 
-        // Signin
-        [fetchSigninAction.pending]: (state, action) => {},
+        // get users authentication
+        [handleLogout.pending]: (state, action) => { },
+        [handleLogout.fulfilled]: (state, action) => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userAddress');
+            state.auth.user = null;
+            state.auth.tokenAuth = null;
+            state.auth.isForgetPassword = false;
+        },
+        [handleLogout.rejected]: (state, action) => {
+            console.log(action.payload);
+        },
+
+        // Signing
+        [fetchSigninAction.pending]: (state, action) => { },
         [fetchSigninAction.fulfilled]: (state, action) => {
-            if (action.payload.refresh_token && action.payload.user) {
-                const token = action.payload.refresh_token;
+            if (action.payload.accessToken && action.payload.user) {
+                const token = action.payload.accessToken;
                 const user = action.payload.user;
 
                 state.auth.user = user;
@@ -280,6 +312,6 @@ const authSlice = createSlice({
 const authReducer = authSlice.reducer;
 
 export const authSelector = (state) => state.authReducer.auth;
-export const { logoutAction } = authSlice.actions;
+export const { logoutAction, signingSuccess } = authSlice.actions;
 
 export default authReducer;

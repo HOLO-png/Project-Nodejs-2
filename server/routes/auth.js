@@ -8,6 +8,8 @@ router.post('/activate', authCtrl.activateEmail);
 
 router.post('/login', authCtrl.login);
 
+router.post('/refresh_token', authCtrl.getAccessToken);
+
 router.post('/forgot-password', authCtrl.forgotPassword);
 
 router.post('/reset-password', auth, authCtrl.resetPassword);
@@ -16,5 +18,8 @@ router.post('/reset-password', auth, authCtrl.resetPassword);
 router.post('/google_login', authCtrl.googleLogin);
 
 router.post('/facebook_login', authCtrl.facebookLogin);
+
+router.post('/logout', authCtrl.logout);
+
 
 module.exports = router;

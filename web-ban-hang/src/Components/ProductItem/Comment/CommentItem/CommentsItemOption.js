@@ -58,6 +58,7 @@ function CommentsItemOption({
     tokenAuth,
     replyComment,
     setReplyComment,
+    axiosJWT
 }) {
     const dispatch = useDispatch();
     const videoRef = useRef(null);
@@ -71,14 +72,14 @@ function CommentsItemOption({
             setIsLike(false);
             setLoadLike(true);
             dispatch(
-                unLikeComment({ comment, product, tokenAuth, user, dispatch }),
+                unLikeComment({ comment, product, tokenAuth, user, dispatch, axiosJWT }),
             );
             setLoadLike(false);
         } else {
             setIsLike(true);
             setLoadLike(true);
             dispatch(
-                likeComment({ comment, product, tokenAuth, user, dispatch }),
+                likeComment({ comment, product, tokenAuth, user, dispatch, axiosJWT }),
             );
             setLoadLike(false);
         }
@@ -108,9 +109,6 @@ function CommentsItemOption({
     function handleButtonClick(e) {
         console.log('click left button', e);
     }
-
-    console.log(comment);
-    
 
     return (
         <UploadStyle key={comment._id}>

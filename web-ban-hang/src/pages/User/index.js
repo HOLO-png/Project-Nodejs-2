@@ -59,7 +59,7 @@ const UserChoice = styled.div`
 `;
 
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub3', 'sub4'];
-function PurchaseOrder(props) {
+function PurchaseOrder({axiosJWT}) {
     const auth = useSelector(authSelector);
     const { location } = useParams();
     const [openKeys, setOpenKeys] = useState([location]);
@@ -84,6 +84,7 @@ function PurchaseOrder(props) {
                     exact={route.exact}
                     path={route.path}
                     location={location}
+                    axiosJWT={axiosJWT}
                 />
             );
         });

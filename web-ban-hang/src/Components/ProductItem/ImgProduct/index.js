@@ -11,7 +11,7 @@ ImgProduct.defaultProps = {
 };
 
 function ImgProduct(props) {
-    let { productImg, imageArr, loading, likes, auth, productId, product } =
+    let { productImg, imageArr, loading, likes, auth, productId, product, axiosJWT } =
         props;
     const [imgAdd, setImgAdd] = useState('');
     const [active, setActive] = useState(0);
@@ -122,6 +122,7 @@ function ImgProduct(props) {
                     likes={likes}
                     auth={auth}
                     productId={productId}
+                    axiosJWT={axiosJWT}
                 />
             </div>
         </>

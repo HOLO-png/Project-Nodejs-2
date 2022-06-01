@@ -56,7 +56,7 @@ const FileUserTitle = styled.div`
     }
 `;
 
-function AddressUser(props) {
+function AddressUser({axiosJWT}) {
     const dispatch = useDispatch();
     const address_api = useSelector(addressApiSelector);
     const auth = useSelector(authSelector);

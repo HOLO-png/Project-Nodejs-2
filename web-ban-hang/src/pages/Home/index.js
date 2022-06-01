@@ -45,7 +45,7 @@ const style = {
     fontSize: 33,
 };
 
-export default function Home() {
+export default function Home({axiosJWT}) {
     const dispatch = useDispatch();
     const height = 'auto';
     const products_api = useSelector(productsSelector);

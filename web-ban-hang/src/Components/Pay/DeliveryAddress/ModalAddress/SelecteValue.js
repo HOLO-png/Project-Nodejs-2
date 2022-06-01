@@ -20,6 +20,7 @@ function SelecteValue(props) {
     } = props;
     const { dataProvince, dataWard, dataDistrict } = address_api;
 
+    console.log(address_api);
     const dispatch = useDispatch();
 
     const [cities, setCities] = useState(null);

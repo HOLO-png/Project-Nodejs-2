@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import CommentsItemOption from './CommentsItemOption';
 
 function CommentItem(props) {
-    const { handleInSertCmt, user, product, setValue, value, tokenAuth } =
+    const { handleInSertCmt, user, product, setValue, value, tokenAuth,axiosJWT } =
         props;
     const [index, setIndex] = useState(null);
     const [idAuthor, setIdAuthor] = useState(null);
@@ -73,6 +73,7 @@ function CommentItem(props) {
                         replyComment={replyComment}
                         setReplyComment={setReplyComment}
                         product={product}
+                        axiosJWT={axiosJWT}
                     />
                 );
             });

@@ -37,18 +37,18 @@ function ForgotPassword(props) {
     });
 
     const handleSubmit = (val) => {
-        dispatch(setLoadingAction(true));
         dispatch(forgotPasswordCall(val.email));
+
     };
 
     useEffect(() => {
-        if (auth.register) {
+        if (auth.isForgetPassword) {
             history.push('/verify-email');
             setTimeout(() => {
                 dispatch(setLoadingAction(false));
             }, 500);
         }
-    }, [dispatch, history, auth.register]);
+    }, [dispatch, history, auth.isForgetPassword]);
 
     return (
         <div className="form">

@@ -17,7 +17,7 @@ import {
 } from '../../Store/Reducer/userAddressReducer';
 import { setLoadingAction } from '../../Store/Reducer/loadingReducer';
 
-function OrderSuccess(props) {
+function OrderSuccess({axiosJWT}) {
     const { paymentId } = useParams();
     const dispatch = useDispatch();
     const history = useHistory();
@@ -138,6 +138,7 @@ function OrderSuccess(props) {
                                         serviceTypeId: JSON.parse(
                                             query.get('serviceTypeId'),
                                         ),
+                                        axiosJWT
                                     }),
                                 );
                             }

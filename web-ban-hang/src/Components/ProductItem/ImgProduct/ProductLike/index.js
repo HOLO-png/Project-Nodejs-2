@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom';
 function ProductLike(props) {
     const history = useHistory();
     const dispatch = useDispatch();
-    const { loading, likes, auth, productId } = props;
+    const { loading, likes, auth, productId, axiosJWT } = props;
     const [like, setLike] = useState(false);
 
     useEffect(() => {
@@ -22,7 +22,7 @@ function ProductLike(props) {
 
     const handleUpdateLikeProduct = () => {
         if (auth.user && auth.tokenAuth) {
-            dispatch(putUpdateLikeProduct({ auth, productId }));
+            dispatch(putUpdateLikeProduct({ auth, productId, axiosJWT }));
         } else {
             toast.warning('Bạn cần phải đăng nhập để sử dụng dịch vụ này');
             history.push('/buyer/signin');
@@ -36,7 +36,7 @@ function ProductLike(props) {
             <i
                 className="fas fa-heart"
                 onClick={() =>
-                    dispatch(putUpdateLikeProduct({ auth, productId }))
+                    dispatch(putUpdateLikeProduct({ auth, productId, axiosJWT }))
                 }
             ></i>
         );

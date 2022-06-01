@@ -16,7 +16,7 @@ import {
 } from '../../../Store/Reducer/product';
 
 function Comments(props) {
-    const { commentsUser, product, handleInSertCmt, user, tokenAuth } = props;
+    const { commentsUser, product, handleInSertCmt, user, tokenAuth,axiosJWT } = props;
     const history = useHistory();
     const dispatch = useDispatch();
 
@@ -103,7 +103,7 @@ function Comments(props) {
         media.forEach(async (element) => {
             if (element.type === 'video/mp4') {
                 setvideo([element]);
-            } else if (element.type === 'image/jpeg') {
+            } else if (element.type === 'image/jpeg' || element.type === 'image/png') {
                 setimg(media);
             }
         });
@@ -147,6 +147,7 @@ function Comments(props) {
                 setValue={setValue}
                 value={value}
                 tokenAuth={tokenAuth}
+                axiosJWT={axiosJWT}
             />
             <Paginations total={total} callBack={handlePagination} />
             <br />

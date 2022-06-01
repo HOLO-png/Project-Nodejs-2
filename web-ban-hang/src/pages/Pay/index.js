@@ -7,10 +7,8 @@ import DeliveryAddress from '../../Components/Pay/DeliveryAddress';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     addressApiSelector,
-    getAddressApi,
     getFeeServiceApi,
     getLeadTimeApi,
-    getProvinceApi,
     getServicePackageApi,
     handleResetFeeServiceChange,
 } from '../../Store/Reducer/apiAddress';
@@ -75,7 +73,7 @@ const messageToCart = (status, text) => {
     }
 };
 
-function Pay(props) {
+function Pay({axiosJWT}) {
     const dispatch = useDispatch();
     const history = useHistory();
     const { linkText } = useParams();
@@ -300,6 +298,7 @@ function Pay(props) {
                     address,
                     status: true,
                     tokenAuth: auth.tokenAuth,
+                    axiosJWT
                 };
 
                 if (address_user_api) {
@@ -325,6 +324,7 @@ function Pay(props) {
                                     updateStatusUserAddress({
                                         tokenAuth: auth.tokenAuth,
                                         userAddressId: userAddressDefault,
+                                        axiosJWT
                                     }),
                                 );
                             } else {
@@ -421,7 +421,6 @@ function Pay(props) {
         const x = result.filter((obj, index, arr) => {
             return arr.map(mapObj => mapObj.service_type_id).indexOf(obj.serviceTypeId) === index;
         });
-        console.log(result);
         setServiceFee(x);
     }, [feeServiceChange, servicePackage]);
 
@@ -497,6 +496,7 @@ function Pay(props) {
                                                     paymentFee: feeService,
                                                     serviceTypeId,
                                                     message,
+                                                    axiosJWT
                                                 }),
                                             );
                                             setIsRedirectToSuccessPage(true);

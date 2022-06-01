@@ -1,4 +1,6 @@
 const User = require('../models/User.js');
+const Token = require('../models/Token.js');
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sendEMail = require('../utils/sendMail.js');
@@ -59,7 +61,7 @@ const authCtrl = {
             res.status(200).json({ msg: 'Register success!!' });
         } catch (error) {
             console.log(error);
-            
+
             return res.status(500).json({ msg: error.message });
         }
     },
@@ -87,10 +89,25 @@ const authCtrl = {
                 password,
             });
 
-            const userObj = await newUser.save();
-            const refresh_token = createAccessToken({ id: userObj._id });
+            await newUser.save();
 
-            return res.status(200).json({ newUser, refresh_token });
+            const access_token = createAccessToken({ id: user._id });
+            const refresh_token = createRefreshToken({ id: newUser._id });
+
+            res.cookie('refreshtoken', refresh_token, {
+                httpOnly: true,
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            });
+
+            const newToken = new Token({
+                userId: user._id,
+                refreshToken: refresh_token,
+            });
+
+            await newToken.save();
+
+            return res.status(200).json({ newUser, accessToken: access_token });
         } catch (error) {
             console.log(error);
             return res.status(500).json({ msg: error.message });
@@ -111,9 +128,74 @@ const authCtrl = {
                     msg: 'This email and/or password does not exists!',
                 });
 
-            const refresh_token = createAccessToken({ id: user._id });
+            const access_token = createAccessToken({ id: user._id });
+            const refresh_token = createRefreshToken({ id: user._id });
 
-            res.status(200).json({ user, refresh_token });
+            const newToken = new Token({
+                userId: user._id,
+                refreshToken: refresh_token,
+            });
+
+            await newToken.save();
+
+            res.setHeader('refreshtoken', refresh_token);
+
+            res.cookie('refreshtoken', refresh_token, {
+                httpOnly: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                sameSite: "strict",
+                secure: false,
+            });
+
+            return res.status(200).json({ user, accessToken: access_token });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    getAccessToken: async (req, res) => {
+        try {
+            const rf_token = req.cookies.refreshtoken;
+            if (rf_token) {
+                if (!rf_token) return res.status(400).json({ msg: "Please login now!" });
+
+                let tokens = await Token.find();
+
+                const isCheckToken = tokens.some(token => token.refreshToken === rf_token);
+
+                if (!isCheckToken) {
+                    return res.status(403).json({ msg: "refresh token is not valid!" });
+                }
+
+                jwt.verify(rf_token, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+                    if (err) return res.status(400).json({ msg: "Please login now!" });
+
+                    const access_token = createAccessToken({ id: user.id });
+                    const newRefreshToken = createRefreshToken({ id: user.id });
+
+                    res.cookie('refreshtoken', newRefreshToken, {
+                        httpOnly: false,
+                        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                        sameSite: "strict",
+                        secure: false,
+                        path: '/'
+                    });
+
+                    console.log({ access_token, newRefreshToken });
+
+                    const newToken = new Token({
+                        userId: user.id,
+                        refreshToken: newRefreshToken,
+                    });
+
+                    await newToken.save();
+
+                    return res.status(200).json({ access_token });
+                });
+            } else {
+                return res.status(403).json({ msg: "token is invalid!" });
+            }
+
         } catch (err) {
             console.log(err);
             return res.status(500).json({ msg: err.message });
@@ -210,9 +292,16 @@ const authCtrl = {
                         .status(400)
                         .json({ msg: 'Password is incorrect' });
                 }
-                const refresh_token = createAccessToken({ id: user._id });
+                const access_token = createAccessToken({ id: user._id });
+                const refresh_token = createRefreshToken({ id: user._id });
 
-                res.status(200).json({ user, refresh_token });
+                res.cookie('refreshtoken', refresh_token, {
+                    httpOnly: true,
+                    path: 'http://localhost:8800/api/auth/refresh_token',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                });
+
+                res.status(200).json({ user: user, accessToken: access_token });
             } else {
                 const newUser = new User({
                     username: name,
@@ -223,10 +312,16 @@ const authCtrl = {
 
                 await newUser.save();
 
-                const refresh_token = createAccessToken({
-                    id: newUser._id,
+                const access_token = createAccessToken({ id: newUser._id });
+                const refresh_token = createRefreshToken({ id: newUser._id });
+
+                res.cookie('refreshtoken', refresh_token, {
+                    httpOnly: true,
+                    path: 'http://localhost:8800/api/auth/refresh_token',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 });
-                res.status(200).json({ newUser, refresh_token });
+
+                res.status(200).json({ newUser, accessToken: access_token });
             }
         } catch (error) {
             console.log(error);
@@ -261,8 +356,6 @@ const authCtrl = {
 
             const user = await User.findOne({ email });
 
-            console.log({ user });
-
             if (user) {
                 const isMatch = await bcrypt.compare(password, user.password);
 
@@ -271,9 +364,15 @@ const authCtrl = {
                         .status(400)
                         .json({ msg: 'Password is incorrect' });
                 }
-                const refresh_token = createAccessToken({ id: user._id });
+                const refresh_token = createRefreshToken({ id: user._id });
 
-                res.status(200).json({ user, refresh_token });
+                res.cookie('refreshtoken', refresh_token, {
+                    httpOnly: true,
+                    path: 'http://localhost:8800/api/auth/refresh_token',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                });
+
+                res.status(200).json({ msg: "login social success" });
             } else {
                 const newUser = new User({
                     username: name,
@@ -285,15 +384,36 @@ const authCtrl = {
                 await newUser.save();
                 console.log(newUser);
 
-                const refresh_token = createAccessToken({
-                    id: newUser._id,
+                const refresh_token = createRefreshToken({ id: newUser._id });
+
+                res.cookie('refreshtoken', refresh_token, {
+                    httpOnly: true,
+                    path: 'http://localhost:8800/api/auth/refresh_token',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
                 });
 
-                res.status(200).json({ newUser, refresh_token });
+                res.status(200).json({ msg: "login social success" });
             }
         } catch (error) {
             console.log(error);
             return res.status(500).json({ msg: error.message });
+        }
+    },
+    logout: async (req, res) => {
+        try {
+            res.clearCookie('refreshtoken', { path: '/' });
+            return res.status(200).json({ msg: "Logged out." });
+        } catch (err) {
+            return res.status(500).json({ msg: err.message });
+        }
+    },
+    getUserInfor: async (req, res) => {
+        try {
+            const user = await Users.findById(req.user.id).select('-password');
+            res.status(200).json(user);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ msg: err.message });
         }
     },
 };
@@ -311,9 +431,12 @@ const createActivationToken = (payload) => {
 };
 
 const createAccessToken = (payload) => {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '2d',
-    });
-};
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15s' });
+}
+
+const createRefreshToken = (payload) => {
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+}
 
 module.exports = authCtrl;
+

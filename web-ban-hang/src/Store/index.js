@@ -13,7 +13,6 @@ import searchItemReducer from './Reducer/searchItem';
 import addressApiReducer from './Reducer/apiAddress';
 import searchSimilarReducer from './Reducer/searchSimilar';
 import payProductsReducer from './Reducer/product_pay';
-import categoryProductsReducer from './Reducer/category_product_api';
 import InputFieldsReducer from './Reducer/input_field';
 import categoryReducer from './Reducer/categoryReducer';
 import ImageFieldsReducer from './Reducer/config_input_image';
@@ -47,7 +46,6 @@ export const store = configureStore({
         addressApiReducer,
         searchSimilarReducer,
         payProductsReducer,
-        categoryProductsReducer,
         InputFieldsReducer,
         ImageFieldsReducer,
         SelectFieldsReducer,

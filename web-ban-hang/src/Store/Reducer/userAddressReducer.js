@@ -35,7 +35,7 @@ export const insertUserAddress = createAsyncThunk(
     'insertUserAddress/insertUserAddressFetch',
     async (data) => {
         try {
-            const res = await axios.post(`${url}/user-address`, data, {
+            const res = await data.axiosJWT.post(`${url}/user-address`, data, {
                 headers: { Authorization: data.tokenAuth },
             });
             return res.data;
@@ -50,7 +50,7 @@ export const updateUserAddress = createAsyncThunk(
     'updateUserAddress/updateUserAddressFetch',
     async ({ data, userAddressId }) => {
         try {
-            const res = await axios.put(
+            const res = await data.axiosJWT.put(
                 `${url}/user-address/${userAddressId}`,
                 data,
                 {
@@ -68,10 +68,9 @@ export const updateUserAddress = createAsyncThunk(
 
 export const updateStatusUserAddress = createAsyncThunk(
     'updateStatusUserAddress/updateStatusUserAddressFetch',
-    async ({ tokenAuth, userAddressId }) => {
-        console.log({ tokenAuth, userAddressId });
+    async ({ tokenAuth, userAddressId, axiosJWT }) => {
         try {
-            const res = await axios.patch(
+            const res = await axiosJWT.patch(
                 `${url}/user-address/status/${userAddressId}`,
                 null,
                 {
@@ -89,9 +88,9 @@ export const updateStatusUserAddress = createAsyncThunk(
 
 export const deleteUserAddress = createAsyncThunk(
     'deleteUserAddress/deleteUserAddressFetch',
-    async ({ tokenAuth, userAddressId }) => {
+    async ({ tokenAuth, userAddressId, axiosJWT }) => {
         try {
-            const res = await axios.delete(
+            const res = await axiosJWT.delete(
                 `${url}/user-address/${userAddressId}`,
                 {
                     headers: { Authorization: tokenAuth },

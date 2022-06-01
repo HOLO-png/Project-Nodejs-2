@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Link, useHistory } from 'react-router-dom';
 // import { AuthContext } from '../../../Context/AuthProvider';
 import { renderPhotoAccout } from '../../../utils/avartarChange';
-import { logoutAction } from '../../../Store/Reducer/authReducer';
+import { handleLogout, logoutAction } from '../../../Store/Reducer/authReducer';
 import { useDispatch } from 'react-redux';
 import { setLoadingAction } from '../../../Store/Reducer/loadingReducer';
 import { handleResetCartUser } from '../../../Store/Reducer/cartReducer';
@@ -42,10 +42,10 @@ function User({ user }) {
         };
     }, []);
 
-    const handleLogout = () => {
+    const handleLogoutForm = () => {
         dispatch(handleResetCartUser());
         dispatch(setLoadingAction(true));
-        dispatch(logoutAction());
+        dispatch(handleLogout());
         setTimeout(() => {
             dispatch(setLoadingAction(false));
         }, 500);
@@ -131,7 +131,7 @@ function User({ user }) {
                         )}
                         <div className="header__menu__item__user-drawer-accout">
                             <i className="fad fa-sign-in-alt"></i>
-                            <span onClick={handleLogout}>Đăng xuất</span>
+                            <span onClick={handleLogoutForm}>Đăng xuất</span>
                         </div>
                     </div>
                 )}

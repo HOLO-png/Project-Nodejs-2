@@ -47,14 +47,14 @@ function CommentItemProduct(props) {
                           }}
                       >
                           <Comment
-                              author={<a>{itemCmt.user.username}</a>}
+                              author={<a>{itemCmt.user?.username}</a>}
                               avatar={
                                   <Avatar
                                       src={
-                                          itemCmt.user.profilePicture ||
+                                          itemCmt.user?.profilePicture ||
                                           humanImg
                                       }
-                                      alt={itemCmt.user.username}
+                                      alt={itemCmt.user?.username}
                                   />
                               }
                               content={itemCmt.content}
