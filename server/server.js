@@ -82,12 +82,12 @@ app.use('/api/user-address', userAddressRoute);
 app.use('/api/payment', paymentRoute);
 app.use('/api/order', orderRoute);
 
-// if(process.env.NODE_ENV === 'production') {
-//     app.use(express.static('../web-ban-hang/build'))
-//     app.get('*', (req, res) => {
-//         res.sendFile(path.join(__dirname, 'web-ban-hang', 'build', 'index.html'));
-//     })
-// }
+if(process.env.NODE_ENV === 'production') {
+    app.use(express.static('../web-ban-hang/build'))
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, 'web-ban-hang', 'build', 'index.html'));
+    })
+}
 
 const PORT = process.env.PORT;
 

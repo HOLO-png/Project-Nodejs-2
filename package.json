@@ -2,8 +2,8 @@
   "name": "webbanhangreact",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
+    "start": "concurrently \"cd server && npm start\" \"cd web-ban-hang && npm start\" ",
     "server": "cd server && npm start",
     "client": "cd web-ban-hang && npm start",
     "server-install": "cd server && npm install",
