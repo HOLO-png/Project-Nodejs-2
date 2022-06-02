@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
 const paypal = require('paypal-rest-sdk');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
