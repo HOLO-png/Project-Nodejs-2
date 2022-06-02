@@ -30,6 +30,26 @@ const OrderSchema = new mongoose.Schema(
         serviceTypeId: {
             type: Number,
             required: true,
+        },
+        isDelivery: {
+            type: Boolean,
+            default: false
+        },
+        returnMessage: {
+            type: String,
+            default: ''
+        },
+        orderCode: {
+            type: String,
+            default: ''
+        },
+        expectedDeliveryTime: {
+            type: String,
+            default: ''
+        },
+        tokenPrintCode: {
+            type: String,
+            default: ''
         }
     },
     { timestamps: true },

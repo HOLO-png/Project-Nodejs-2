@@ -109,8 +109,6 @@ const userAddressCtrl = {
             const { userAddressId } = req.params;
             const { address, username, phoneNumber, status } = req.body;
 
-            console.log({ address, username, phoneNumber, status });
-
             if (req.user.id) {
                 const userAddress = await UserAddress.findOne({
                     userId: req.user.id,
@@ -159,7 +157,6 @@ const userAddressCtrl = {
     setIsActiveUserAddressItem: async (req, res) => {
         try {
             const { userAddressId } = req.params;
-            console.log({ userAddressId });
 
             if (req.user.id) {
                 const userAddress = await UserAddress.findOne({

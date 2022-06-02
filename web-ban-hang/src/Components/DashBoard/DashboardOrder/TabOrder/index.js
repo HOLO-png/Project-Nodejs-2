@@ -6,7 +6,7 @@ import TableOrder from '../TableOrder';
 import OrderDrawerBox from '../OrderDrawerBox';
 const { TabPane } = Tabs;
 
-function TabOrder({ orders, userAddress, userAddressAdmin }) {
+function TabOrder({ orders, userAddress, userAddressAdmin, axiosJWT }) {
     const [visible, setVisible] = useState(false);
     const [orderItem, setOrderItem] = useState(null);
 
@@ -91,6 +91,7 @@ function TabOrder({ orders, userAddress, userAddressAdmin }) {
                 setVisible={setVisible}
                 orderItem={orderItem}
                 userAddress={userAddress}
+                axiosJWT={axiosJWT}
                 userAddressAdmin={userAddressAdmin}
             />
         </div>

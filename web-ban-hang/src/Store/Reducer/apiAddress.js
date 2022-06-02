@@ -222,8 +222,7 @@ export const getFeeServiceApi = createAsyncThunk(
                     },
                 )
                 let commits = await res.json();
-                console.log(commits);
-                return commits;
+                return {data: commits.data, serviceTypeId };
             }
         } catch (err) {
             console.log(err);

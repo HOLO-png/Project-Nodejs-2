@@ -26,7 +26,7 @@ function OrderSuccess({axiosJWT}) {
     const auth = useSelector(authSelector);
     const cartProducts = JSON.parse(localStorage.getItem('cart'));
     const userAddress = JSON.parse(localStorage.getItem('userAddress'));
-    const [productsId, setProductsId] = useState(null);
+    const [productsId, setProductsId] = useState([]);
     const orderSlt = useSelector(orderSelector);
     const [isActiveModalSuccess, setIsActiveModalSuccess] = useState(false);
     const [isCheckProductsToCart, setIsCheckProductsToCart] = useState(false);
@@ -116,7 +116,7 @@ function OrderSuccess({axiosJWT}) {
 
     useEffect(() => {
         if (auth.tokenAuth) {
-            if (productsId && productsId.length) {
+                if (productsId && productsId.length) {
                 if (userAddress) {
                     if (userAddress.items.length) {
                         userAddress.items.forEach((item) => {
@@ -146,8 +146,9 @@ function OrderSuccess({axiosJWT}) {
                     }
                 }
             }
+            
         }
-    }, [auth, dispatch]);
+    }, [dispatch, productsId.length]);
 
     return (
         <Helmet title="Order Success">

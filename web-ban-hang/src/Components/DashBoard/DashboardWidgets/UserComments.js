@@ -126,6 +126,7 @@ function UserComments(props) {
                               key={i}
                               style={{
                                   height: statusHeight ? 'auto' : '0px',
+                                  display: statusHeight ? 'block' : 'none',
                               }}
                           >
                               <Comment

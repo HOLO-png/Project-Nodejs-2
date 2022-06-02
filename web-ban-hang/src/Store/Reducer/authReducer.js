@@ -8,9 +8,9 @@ axios.defaults.withCredentials = true;
 // handle feature for User Page
 export const updateProfileUser = createAsyncThunk(
     'updateProfileUser/updateProfileUserFetch',
-    async ({ tokenAuth, data }) => {
+    async ({ tokenAuth, data, axiosJWT }) => {
         try {
-            await axios.put(`${url}/users`, data, {
+            await axiosJWT.put(`${url}/users`, data, {
                 headers: { Authorization: tokenAuth, data },
             });
             return data;

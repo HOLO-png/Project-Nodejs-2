@@ -73,7 +73,7 @@ const messageToCart = (status, text) => {
     }
 };
 
-function Pay({axiosJWT}) {
+function Pay({ axiosJWT }) {
     const dispatch = useDispatch();
     const history = useHistory();
     const { linkText } = useParams();
@@ -131,7 +131,7 @@ function Pay({axiosJWT}) {
 
     const { servicePackage, leadTime, feeServiceChange } = address_api;
 
-    const {userAddress, userAddressAdmin} = userAddressSlt;
+    const { userAddress, userAddressAdmin } = userAddressSlt;
 
     useEffect(() => {
         if (auth.tokenAuth && auth.user) {
@@ -204,13 +204,14 @@ function Pay({axiosJWT}) {
                     });
                 }
             });
-            
+
             setProducts(payProducts);
-            if(!payProducts.length) {
+            if (!payProducts.length) {
                 history.push('/cart');
             }
         }
-    }, [cartProducts, linkText,history]);
+    }, [cartProducts, linkText, history]);
+
 
     useEffect(() => {
         if (isRedirectToSuccessPage) {
@@ -351,19 +352,19 @@ function Pay({axiosJWT}) {
 
     useEffect(() => {
         if (userAddress) {
-            if(userAddressAdmin) {
+            if (userAddressAdmin) {
                 if (userAddress.items.length) {
-                userAddress.items.forEach((item) => {
-                    if (item.status) {
-                        dispatch(
-                            getServicePackageApi({
-                                toDistrict: item.address.quan.DistrictID,
-                                fromDistrict: userAddressAdmin.address.quan.DistrictID
-                            }),
-                        );
-                    }
-                });
-            }
+                    userAddress.items.forEach((item) => {
+                        if (item.status) {
+                            dispatch(
+                                getServicePackageApi({
+                                    toDistrict: item.address.quan.DistrictID,
+                                    fromDistrict: userAddressAdmin.address.quan.DistrictID
+                                }),
+                            );
+                        }
+                    });
+                }
             }
         }
     }, [userAddress, userAddressAdmin, dispatch]);
@@ -424,6 +425,7 @@ function Pay({axiosJWT}) {
         setServiceFee(x);
     }, [feeServiceChange, servicePackage]);
 
+
     const handleCancel = () => {
         if (userAddress) {
             if (!userAddress.items.length) {
@@ -450,69 +452,72 @@ function Pay({axiosJWT}) {
     };
 
     const handleMethodPayProduct = () => {
-        if (!isEmptyObject(valueAddress || {})) {
-            if (payMethod === 'Thanh toán Online') {
-                if (payMethodActive) {
-                    if (feeService) {
-                        switch (payMethodActive.title) {
-                            case 'PayPal':
-                                dispatch(setLoadingAction(true));
-                                dispatch(
-                                    createPayment({
-                                        products,
-                                        email: auth.user.email,
-                                        message,
-                                        paymentFee: feeService,
-                                        serviceTypeId
-                                    }),
-                                );
-                                break;
-                            default:
+        if (!isError) {
+            if (!isEmptyObject(valueAddress || {})) {
+                if (payMethod === 'Thanh toán Online') {
+                    if (payMethodActive) {
+                        if (feeService) {
+                            switch (payMethodActive.title) {
+                                case 'PayPal':
+                                    dispatch(setLoadingAction(true));
+                                    dispatch(
+                                        createPayment({
+                                            products,
+                                            email: auth.user.email,
+                                            message,
+                                            paymentFee: feeService,
+                                            serviceTypeId
+                                        }),
+                                    );
+                                    break;
+                                default:
+                            }
                         }
                     }
-                }
-            } else if (payMethod === 'Thanh Toán Khi Nhận Hàng') {
-                if (auth.tokenAuth) {
-                    if (products.length) {
-                        const productsId = [];
-                        products.forEach((product) => {
-                            productsId.push(product._id);
-                        });
-                        if (productsId.length) {
-                            if (userAddress.items.length) {
-                                if (feeService) {
-                                    userAddress.items.forEach((item) => {
-                                        if (item.status) {
-                                            dispatch(setLoadingAction(true));
-                                            dispatch(
-                                                handleAddOrder({
-                                                    tokenAuth: auth.tokenAuth,
-                                                    username: item.username,
-                                                    phoneNumber:
-                                                        item.phoneNumber,
-                                                    city: item.address,
-                                                    productsID: productsId,
-                                                    isPayment: false,
-                                                    paymentFee: feeService,
-                                                    serviceTypeId,
-                                                    message,
-                                                    axiosJWT
-                                                }),
-                                            );
-                                            setIsRedirectToSuccessPage(true);
-                                        }
-                                    });
+                } else if (payMethod === 'Thanh Toán Khi Nhận Hàng') {
+                    if (auth.tokenAuth) {
+                        if (products.length) {
+                            const productsId = [];
+                            products.forEach((product) => {
+                                productsId.push(product._id);
+                            });
+                            if (productsId.length) {
+                                if (userAddress.items.length) {
+                                    if (feeService) {
+                                        userAddress.items.forEach((item) => {
+                                            if (item.status) {
+                                                dispatch(setLoadingAction(true));
+                                                dispatch(
+                                                    handleAddOrder({
+                                                        tokenAuth: auth.tokenAuth,
+                                                        username: item.username,
+                                                        phoneNumber:
+                                                            item.phoneNumber,
+                                                        city: item.address,
+                                                        productsID: productsId,
+                                                        isPayment: false,
+                                                        paymentFee: feeService,
+                                                        serviceTypeId,
+                                                        message,
+                                                        axiosJWT
+                                                    }),
+                                                );
+                                                setIsRedirectToSuccessPage(true);
+                                            }
+                                        });
+                                    }
                                 }
                             }
                         }
                     }
+                } else {
+                    messageToCart(
+                        false,
+                        'Xin Lỗi, Vui Lòng Chọn Phương Thức Thanh Toán Trước Khi Đặt Hàng!',
+                    );
                 }
-            } else {
-                messageToCart(
-                    false,
-                    'Xin Lỗi, Vui Lòng Chọn Phương Thức Thanh Toán Trước Khi Đặt Hàng!',
-                );
             }
+
         } else {
             messageToCart(
                 false,

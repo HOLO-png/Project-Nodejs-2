@@ -3,8 +3,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import { nav_dashboard } from '../../../assets/fake-data';
+import { useDispatch } from 'react-redux';
+import { handleLogout } from '../../../Store/Reducer/authReducer';
 
 function OptionalNav(props) {
+    const dispatch = useDispatch()
+    const handleUpdateLink = (item) => {
+        if(item.name === 'Logout') {
+            dispatch(handleLogout());
+            return item.link;
+        }else {
+            return item.link;
+        }
+    } 
+
     const renderOptionalNav = nav_dashboard.map((item, index) => {
         return (
             <li className="active" key={index}>
@@ -15,6 +27,7 @@ function OptionalNav(props) {
                         color: '#fff',
                         backgroundColor: '#30a5ff',
                     }}
+                    onClick={()=>handleUpdateLink(item)}
                 >
                     <i className={item.icon}></i> {item.name}
                 </NavLink>

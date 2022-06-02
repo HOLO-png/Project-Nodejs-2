@@ -95,6 +95,7 @@ function AddressUser({axiosJWT}) {
                 updateStatusUserAddress({
                     tokenAuth: auth.tokenAuth,
                     userAddressId: obj._id,
+                    axiosJWT
                 }),
             );
         }
@@ -124,7 +125,6 @@ function AddressUser({axiosJWT}) {
     }, [auth, nameUser, numberPhone, objAddress]);
 
     const handleImportAddressUser = () => {
-        console.log(dataAddress);
         const isCheck = Object.values(dataAddress.address).some((value) => {
             if (!value) {
                 return true;
@@ -133,7 +133,7 @@ function AddressUser({axiosJWT}) {
         });
         setTimeout(() => {
             if (!isCheck) {
-                dispatch(insertUserAddress(dataAddress));
+                dispatch(insertUserAddress({...dataAddress, axiosJWT}));
                 console.log(dataAddress);
             } else {
                 toast.warning('Invalid User Address Data!');
@@ -157,6 +157,7 @@ function AddressUser({axiosJWT}) {
                     deleteUserAddress({
                         tokenAuth: auth.tokenAuth,
                         userAddressId: obj._id,
+                        axiosJWT
                     }),
                 );
             }, 500);
@@ -167,7 +168,7 @@ function AddressUser({axiosJWT}) {
         if (auth.tokenAuth) {
             dispatch(
                 updateUserAddress({
-                    data: { ...newUserAddress, tokenAuth: auth.tokenAuth },
+                    data: { ...newUserAddress, tokenAuth: auth.tokenAuth, axiosJWT},
                     userAddressId,
                 }),
             );

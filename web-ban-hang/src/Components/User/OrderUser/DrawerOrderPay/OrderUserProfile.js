@@ -16,6 +16,7 @@ function OrderUserProfile(props) {
         }
     }, [dataOrder]);
 
+    console.log(dataOrder);
     return (
         <div className="row">
             <div className="col-lg-12">
@@ -80,6 +81,30 @@ function OrderUserProfile(props) {
                         </span>
                         <span className="order__user-date-time-text">
                             {numberWithCommas(dataOrder.paymentFee)} đ
+                        </span>
+                    </div>
+                    <div className="order__user-date-time">
+                        <span className="order__user-date-time-title">
+                            Trạng thái đơn hàng: 
+                        </span>
+                        <span className="order__user-date-time-text">
+                        {dataOrder.isDelivery ? 'Đơn hàng đang được vận chuyển' : 'Đơn hàng đang chờ xử lý'}
+                        </span>
+                    </div>
+                    <div className="order__user-date-time">
+                        <span className="order__user-date-time-title">
+                            Lời nhắn từ hệ thống:
+                        </span>
+                        <span className="order__user-date-time-text">
+                            {dataOrder.returnMessage}
+                        </span>
+                    </div>
+                    <div className="order__user-date-time">
+                        <span className="order__user-date-time-title">
+                            Ngày bàn giao sản phẩm:
+                        </span>
+                        <span className="order__user-date-time-text">
+                            {dataOrder.expectedDeliveryTime}
                         </span>
                     </div>
                 </div>

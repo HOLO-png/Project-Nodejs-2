@@ -13,7 +13,7 @@ import {
 } from '../../../Store/Reducer/userAddressReducer';
 import { authSelector } from '../../../Store/Reducer/authReducer';
 
-function DashboardOrder(props) {
+function DashboardOrder({axiosJWT}) {
     const dispatch = useDispatch();
     const orderSlt = useSelector(orderSelector);
     const userAddressSlt = useSelector(userAddressSelector);
@@ -28,8 +28,6 @@ function DashboardOrder(props) {
             dispatch(handleGetOrdersInStore());
         }
     }, [dispatch, auth]);
-
-    console.log(userAddress);
 
     return (
         <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
@@ -137,7 +135,7 @@ function DashboardOrder(props) {
                 </div>
             </div>
             <div className="tab-order">
-                <TabOrder orders={orders} userAddress={userAddress} userAddressAdmin={userAddressAdmin}/>
+                <TabOrder orders={orders} userAddress={userAddress} userAddressAdmin={userAddressAdmin} axiosJWT={axiosJWT}/>
             </div>
         </div>
     );

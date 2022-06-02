@@ -476,7 +476,7 @@ export const nav_dashboard = [
     },
     {
         name: 'Logout',
-        link: '/login',
+        link: '/buyer/signin',
         icon: 'fad fa-sign-out',
     },
 ];

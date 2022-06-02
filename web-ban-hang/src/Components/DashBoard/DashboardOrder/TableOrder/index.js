@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Popconfirm } from 'antd';
+import { Button, Empty, Popconfirm } from 'antd';
 import {
     DeleteOutlined,
     EditOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
 import numberWithCommas from '../../../../utils/numberWithCommas';
+import { useDispatch } from 'react-redux';
+import { handlePrintOrderOfUser } from '../../../../Store/Reducer/orderReducer';
 
 function TableOrder({ orders, confirm, handleShowNavigation }) {
+    const dispatch = useDispatch();
     const [activeTd, setActiveTd] = useState(null);
 
     const timeCreatedAtOrder = (dataOrder) => {
@@ -19,6 +22,12 @@ function TableOrder({ orders, confirm, handleShowNavigation }) {
     const someHandler = (i, item) => {
         setActiveTd(i);
     };
+
+    const printOrderOfUser = (order) => {
+        if(order) {
+            dispatch(handlePrintOrderOfUser({orderCode: order.orderCode, orderId: order._id}))
+        }
+    }
 
     return (
         <table class="table table-hover">
@@ -34,7 +43,7 @@ function TableOrder({ orders, confirm, handleShowNavigation }) {
                 </tr>
             </thead>
             <tbody>
-                {orders &&
+                {orders && orders.length ?
                     orders.map((order, index) => (
                         <tr
                             key={order.id}
@@ -78,17 +87,19 @@ function TableOrder({ orders, confirm, handleShowNavigation }) {
                                     >
                                         Xem
                                     </Button>
-                                    {/* <Button
-                                        type="dashed"
-                                        icon={<EditOutlined />}
-                                        style={{ marginRight: 10 }}
-                                    >
-                                        Sửa
-                                    </Button>
-
-                                    <Popconfirm
+                                    {
+                                        order.isDelivery ? <Button
+                                            type="dashed"
+                                            icon={<EditOutlined />}
+                                            style={{ marginRight: 10 }}
+                                            onClick={() => printOrderOfUser(order)}
+                                        >
+                                            In
+                                        </Button> : ''
+                                    }
+                                    {/* <Popconfirm
                                         title="Bạn có chắc muốn xóa người dùng này ?"
-                                        onConfirm={() => confirm(item)}
+                                        onConfirm={() => confirm(order)}
                                         onVisibleChange={() =>
                                             console.log('visible change')
                                         }
@@ -104,10 +115,10 @@ function TableOrder({ orders, confirm, handleShowNavigation }) {
                                     </Popconfirm> */}
                                 </td>
                             ) : (
-                                ''
+                                <td></td>
                             )}
                         </tr>
-                    ))}
+                    )): <Empty/>}
             </tbody>
         </table>
     );

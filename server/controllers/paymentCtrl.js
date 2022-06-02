@@ -37,6 +37,7 @@ const paypalProductCtrl = {
             return accumulator + item.price * item.quantity;
         }, 0);
 
+        console.log(total);
         try {
             const create_payment = {
                 intent: 'sale',

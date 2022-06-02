@@ -15,7 +15,6 @@ const orderCtrl = {
             serviceTypeId
         } = req.body;
         const { id } = req.user;
-
         try {
             if (id) {
                 const userCart = await Cart.findOne({ userId: id });
@@ -26,6 +25,8 @@ const orderCtrl = {
                         products.push(item);
                     }
                 });
+
+                console.log({ products: products.length });
 
                 const user = await User.findOne({ _id: id });
                 if (user) {
@@ -39,7 +40,8 @@ const orderCtrl = {
                         isPayment,
                         message,
                         paymentFee,
-                        serviceTypeId
+                        serviceTypeId,
+                        isDelivery: false
                     });
 
                     const newOrder = await order.save();
@@ -78,12 +80,30 @@ const orderCtrl = {
     },
     updateStatusOrder: async (req, res) => {
         const { orderId } = req.params;
-        const { complete } = req.body;
-        console.log({ orderId, complete });
+        const { complete, isDelivery, orderCode, returnMessage, expectedDeliveryTime, tokenPrintCode } = req.body;
 
+        console.log(complete, isDelivery, orderCode, returnMessage, expectedDeliveryTime, tokenPrintCode);
         try {
             const order = await Order.findOne({ _id: orderId });
-            order.complete = complete;
+            if (complete !== undefined) {
+                order.complete = complete;
+            }
+            if (isDelivery !== undefined) {
+                order.isDelivery = isDelivery;
+            }
+            if (orderCode !== undefined) {
+                order.orderCode = orderCode;
+            }
+            if (returnMessage !== undefined) {
+                order.returnMessage = returnMessage;
+            }
+            if (expectedDeliveryTime !== undefined) {
+                order.expectedDeliveryTime = expectedDeliveryTime;
+            }
+            if (tokenPrintCode !== undefined) {
+                order.tokenPrintCode = tokenPrintCode;
+            }
+
             await order.save();
             return res.status(200).json({ order });
         } catch (err) {

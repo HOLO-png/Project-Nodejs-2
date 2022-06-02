@@ -3,11 +3,12 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const tokenKeys = '874008ef-d7ee-11ec-ac64-422c37c6de1b';
-const shopId = 113395;
+const shopId = 114505;
 const url = 'http://localhost:8800/api';
-const dateGetOrder = `https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shift/date`;
+const orderTokenPrintAPI = `https://dev-online-gateway.ghn.vn/shiip/public-api/v2/a5/gen-token`;
 const apiOrderCreate =
     'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create';
+    
 axios.defaults.withCredentials = true;
 
 export const handleAddOrder = createAsyncThunk(
@@ -27,29 +28,33 @@ export const handleAddOrder = createAsyncThunk(
         },
         { rejectWithValue },
     ) => {
-        try {
-            const res = await axiosJWT.post(
-                `${url}/order`,
-                {
-                    username,
-                    phoneNumber,
-                    city,
-                    productsID,
-                    isPayment,
-                    message,
-                    paymentFee,
-                    serviceTypeId
-                },
-                {
-                    headers: { Authorization: tokenAuth },
-                },
-            );
-            return res.data;
-        } catch (err) {
-            toast.warning(`Tạo đơn hàng thất bại!`);
-            console.log(err);
-            return rejectWithValue(err.response.data);
+        if (paymentFee && serviceTypeId) {
+            try {
+                const res = await axiosJWT.post(
+                    `${url}/order`,
+                    {
+                        username,
+                        phoneNumber,
+                        city,
+                        productsID,
+                        isPayment,
+                        message,
+                        paymentFee,
+                        serviceTypeId
+                    },
+                    {
+                        headers: { Authorization: tokenAuth },
+                    },
+                );
+                console.log(res.data);
+                return res.data;
+            } catch (err) {
+                toast.warning(`Tạo đơn hàng thất bại!`);
+                console.log(err);
+                return rejectWithValue(err.response.data);
+            }
         }
+
     },
 );
 
@@ -108,23 +113,14 @@ export const handleCreateOrderToGHN = createAsyncThunk(
         note,
         requiredNote,
         items,
-        pickShift
+        pickShift,
+        orderId
     }) => {
-
-        console.log({
-            "to_address": toAddress,
-            "to_ward_code": toWardCode,
-            "to_district_id": toDistrictId,
-        });
-
         try {
-            // const resDate = await axios.get(dateGetOrder, {
-            //     headers: { token: tokenKeys },
-            // });
-            // console.log(resDate);
-            const res = await axios.post(
-                `${apiOrderCreate}`,
-                {
+            let res = await fetch(apiOrderCreate, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', shop_id: shopId, token: tokenKeys, },
+                body: JSON.stringify({
                     "payment_type_id": paymentTypeId,
                     "note": note,
                     "required_note": requiredNote,
@@ -151,13 +147,20 @@ export const handleCreateOrderToGHN = createAsyncThunk(
                     "coupon": coupon,
                     "pick_shift": pickShift,
                     "items": items
-                },
-                {
-                    headers: { 'Content-Type': 'application/json', ShopId: shopId, token: tokenKeys, },
-                },
-            );
-            console.log(res.data);
-            return res.data;
+                })
+            });
+
+            let commits = await res.json();
+
+            const resOrder = await axios.put(`${url}/order/${orderId}`, {
+                complete: 'confirm',
+                isDelivery: true,
+                orderCode: commits.data.order_code,
+                returnMessage: commits.code_message_value,
+                expectedDeliveryTime: commits.data.expected_delivery_time,
+            });
+            toast.success(`Đơn hàng ${orderId} đã được xác nhận, bạn có thể in đơn hàng!`);
+            return resOrder.data;
         } catch (err) {
             toast.error(`Create order failed!`);
             console.log(err);
@@ -165,15 +168,52 @@ export const handleCreateOrderToGHN = createAsyncThunk(
     },
 );
 
+export const handlePrintOrderOfUser = createAsyncThunk(
+    'handlePrintOrderOfUser/handlePrintOrderOfUserFetch',
+    async ({orderCode, orderId}) => {
+        try {
+            let res = await fetch(orderTokenPrintAPI, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', token: tokenKeys, },
+                body: JSON.stringify({
+                    "order_codes":[orderCode]
+                })
+            });
+
+            let commits = await res.json();
+
+            const resOrder = await axios.put(`${url}/order/${orderId}`, {
+                tokenPrintCode: commits.data.token
+            });
+            if (resOrder.data.order.tokenPrintCode) {
+                const newWindow = window.open(
+                    `https://dev-online-gateway.ghn.vn/a5/public-api/printA5?token=${resOrder.data.order.tokenPrintCode}`,
+                    '_blank',
+                    'noopener,noreferrer',
+                );
+                if (newWindow) newWindow.opener = null;
+            }
+            console.log(resOrder);
+            return resOrder.data;
+        } catch (err) {
+            toast.error(`Get orders failed!`);
+            console.log(err);
+        }
+    },
+);
+
 export const handleUpdateStatusOrder = createAsyncThunk(
     'handleUpdateStatusOrder/handleUpdateStatusOrderFetch',
-    async ({ orderId, complete, tokenAuth, axiosJWT }) => {
+    async ({ orderId, complete, tokenAuth, axiosJWT, isDelivery }) => {
         try {
             const res = await axiosJWT.put(`${url}/order/${orderId}`, {
                 complete,
+                isDelivery
             }, {
                 headers: { Authorization: tokenAuth }
             });
+            toast.success(`Đơn hàng ${orderId} đã được xác nhận!`);
+
             return res.data;
         } catch (err) {
             toast.error(`Get orders failed!`);
@@ -192,13 +232,41 @@ const orderSlice = createSlice({
     reducers: {},
     extraReducers: {
         //fetch activation email
-        [handleGetOrdersInStore.pending]: (state, action) => { },
-        [handleGetOrdersInStore.fulfilled]: (state, action) => {
+        [handleCreateOrderToGHN.pending]: (state, action) => { },
+        [handleCreateOrderToGHN.fulfilled]: (state, action) => {
             if (action.payload) {
-                state.orders = action.payload.orders;
+                const orders = state.orders.map((order) =>
+                    order._id === action.payload.order._id
+                        ? action.payload.order
+                        : order,
+                );
+                state.orders = orders;
             }
         },
-        [handleGetOrdersInStore.rejected]: (state, action) => { },
+        [handleCreateOrderToGHN.rejected]: (state, action) => { },
+
+         //fetch activation email
+         [handlePrintOrderOfUser.pending]: (state, action) => { },
+         [handlePrintOrderOfUser.fulfilled]: (state, action) => {
+             if (action.payload) {
+                 const orders = state.orders.map((order) =>
+                     order._id === action.payload.order._id
+                         ? action.payload.order
+                         : order,
+                 );
+                 state.orders = orders;
+             }
+         },
+         [handlePrintOrderOfUser.rejected]: (state, action) => { },
+
+         //fetch activation email
+         [handleGetOrdersInStore.pending]: (state, action) => { },
+         [handleGetOrdersInStore.fulfilled]: (state, action) => {
+             if (action.payload) {
+                 state.orders = action.payload.orders;
+             }
+         },
+         [handleGetOrdersInStore.rejected]: (state, action) => { },
         //fetch activation email
         [handleAddOrder.pending]: (state, action) => { },
         [handleAddOrder.fulfilled]: (state, action) => {

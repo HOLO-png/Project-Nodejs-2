@@ -136,6 +136,7 @@ function ProductsPay(props) {
         setIsModalVisible(false);
     };
 
+    console.log(serviceFee);
     const renderProductApi = products_api.map((product, index) =>
         loading ? (
             <Skeleton.Button
@@ -159,6 +160,7 @@ function ProductsPay(props) {
     );
 
     const handleSetFeeService = (fee, index) => {
+        console.log(fee);
         setFeeServince(fee.data.total);
         setServiceTypeId(fee.service_type_id);
         setActive(index);
@@ -173,7 +175,6 @@ function ProductsPay(props) {
         }
     }, [serviceFee]);
 
-    console.log(serviceFee);
     return (
         <ProductsPayStyle>
             <div className="products-pay">
@@ -295,13 +296,13 @@ function ProductsPay(props) {
                                                     <Tooltip
                                                         title={`
                                                      Phí dịch vụ: ${numberWithCommas(
-                                                            item.data.service_fee,
+                                                            item.data?.service_fee,
                                                         )}₫. Phí khai giá hàng hóa: ${numberWithCommas(
-                                                            item.data.insurance_fee,
+                                                            item.data?.insurance_fee,
                                                         )}₫. Phí gửi hàng tại bưu cục: ${numberWithCommas(
-                                                            item.data.pick_station_fee,
+                                                            item.data?.pick_station_fee,
                                                         )}₫. Phí giao lại hàng: ${numberWithCommas(
-                                                            item.data.r2s_fee,
+                                                            item.data?.r2s_fee,
                                                         )}₫. `}
                                                         color="#2db7f5"
                                                         className="card"
@@ -328,14 +329,14 @@ function ProductsPay(props) {
                                                                 Tổng chi phí:
                                                                 <p className="payment__price">
                                                                     {numberWithCommas(
-                                                                        item.data.total,
+                                                                        item.data?.total,
                                                                     )}
                                                                     ₫
                                                                 </p>
                                                             </h2>
                                                             <p class="card__apply">
                                                                 <p class="card__link">
-                                                                    Phương thức vận chuyển: {item.short_name}{' '}
+                                                                    Phương thức vận chuyển: {item?.short_name}{' '}
                                                                 </p>
                                                             </p>
                                                         </div>

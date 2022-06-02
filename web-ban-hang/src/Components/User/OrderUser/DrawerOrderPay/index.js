@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Button, Drawer, Space, Modal } from 'antd';
 import OrderUserProfile from './OrderUserProfile';
 import OrderProducts from './OrderProducts';

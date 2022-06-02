@@ -7,7 +7,8 @@ import { userAddressSelector } from '../../../Store/Reducer/userAddressReducer.j
 
 function NavigationCustomer({ visible, handleSetVisible, user }) {
     const [orderCreated, setOrderCreated] = useState('');
-    const userAddress = useSelector(userAddressSelector);
+    const userAddressAll = useSelector(userAddressSelector);
+
     useEffect(() => {
         if (user) {
             const d = new Date(user.createdAt);
@@ -21,7 +22,7 @@ function NavigationCustomer({ visible, handleSetVisible, user }) {
         handleSetVisible(false);
     };
 
-    console.log(userAddress);
+    const { userAddress } = userAddressAll;
 
     return (
         <>
@@ -132,11 +133,11 @@ function NavigationCustomer({ visible, handleSetVisible, user }) {
                                                 title={
                                                     item.address.mota +
                                                     ' ~ ' +
-                                                    item.address.quan +
+                                                    item.address.quan.DistrictName +
                                                     ' ~ ' +
-                                                    item.address.tinh +
+                                                    item.address.tinh.ProvinceName +
                                                     ' ~ ' +
-                                                    item.address.xa
+                                                    item.address.xa.WardName
                                                 }
                                             >
                                                 <div className="img-icon-block mb-4">

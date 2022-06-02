@@ -61,7 +61,7 @@ export const updateUserAddress = createAsyncThunk(
             return res.data;
         } catch (err) {
             console.log(err);
-            toast.error('error');
+            toast.error('update error');
         }
     },
 );

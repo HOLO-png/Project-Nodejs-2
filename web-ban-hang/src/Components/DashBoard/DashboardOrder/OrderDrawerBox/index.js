@@ -4,16 +4,18 @@ import { humanImg } from '../../../../assets/fake-data/human.js';
 import { Button, Drawer, Empty, Tooltip } from 'antd';
 import numberWithCommas from '../../../../utils/numberWithCommas.js';
 import OrderItem from '../OrderItem.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     handleCreateOrderToGHN,
     handleUpdateStatusOrder,
 } from '../../../../Store/Reducer/orderReducer.js';
 import { toast } from 'react-toastify';
+import { authSelector } from '../../../../Store/Reducer/authReducer.js';
 
-function OrderDrawerBox({ visible, setVisible, orderItem, userAddress, userAddressAdmin }) {
+function OrderDrawerBox({ visible, setVisible, orderItem, userAddress, userAddressAdmin, axiosJWT }) {
     const dispatch = useDispatch();
     const [orderCreated, setOrderCreated] = useState('');
+    const auth = useSelector(authSelector);
 
     useEffect(() => {
         if (orderItem) {
@@ -36,6 +38,7 @@ function OrderDrawerBox({ visible, setVisible, orderItem, userAddress, userAddre
                 if (item.status) {
                     dispatch(
                         handleCreateOrderToGHN({
+                            orderId: orderItem._id,
                             toName: orderItem.username,
                             toPhone: orderItem.phoneNumber,
                             toAddress: `${orderItem.city.mota}, ${orderItem.city.xa.WardName}, ${orderItem.city.quan.DistrictName}, ${orderItem.city.tinh.ProvinceName}, Vietnam`,
@@ -133,14 +136,16 @@ function OrderDrawerBox({ visible, setVisible, orderItem, userAddress, userAddre
                 }
             });
 
-            dispatch(
-                handleUpdateStatusOrder({
-                    orderId: order._id,
-                    complete: 'confirm',
-                }),
-            );
+            // dispatch(
+            //     handleUpdateStatusOrder({
+            //         orderId: order._id,
+            //         complete: 'confirm',
+            //         tokenAuth: auth.tokenAuth,
+            //         axiosJWT,
+            //         isDelivery: true
+            //     }),
+            // );
             
-            toast.success(`Đơn hàng ${order._id} đã được xác nhận!`);
             setVisible(false);
         }
     };
@@ -209,13 +214,25 @@ function OrderDrawerBox({ visible, setVisible, orderItem, userAddress, userAddre
                             <div className="col-lg-6">
                                 <div className="main-banner">
                                     <h1 className="display-4 mb-4 font-weight-normal">
-                                        {orderItem && orderItem.username}
+                                        {orderItem?.username}
                                     </h1>
                                     <p className="lead mb-4">
-                                        Gender: {orderItem && orderItem.gender}
+                                        Trạng thái: {orderItem?.isDelivery ? 'Đang vận chuyển' : 'đang chờ xử lý'}
                                     </p>
                                     <p className="lead mb-4">
-                                        Date created: {orderCreated}
+                                        Thanh toán: {orderItem?.isPayment ? 'đã thanh toán': 'chưa thanh toán'}
+                                    </p>
+                                    <p className="lead mb-4">
+                                        Tin nhắn: {orderItem?.message ? orderItem?.message : 'không có'}
+                                    </p>
+                                    <p className="lead mb-4">
+                                        Phí ship: {numberWithCommas(orderItem?.paymentFee)}đ
+                                    </p>
+                                    <p className="lead mb-4">
+                                        Ngày tạo: {orderCreated}
+                                    </p>
+                                    <p className="lead mb-4">
+                                        Địa chỉ nhận hàng: {`${orderItem?.city.mota}, ${orderItem?.city.xa.WardName}, ${orderItem?.city.quan.DistrictName}, ${orderItem?.city.tinh.ProvinceName}, Vietnam`}
                                     </p>
                                 </div>
                             </div>

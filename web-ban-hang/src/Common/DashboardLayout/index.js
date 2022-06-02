@@ -3,14 +3,15 @@ import PropTypes from 'prop-types';
 import { Route } from 'react-router-dom';
 
 export default function DashboardLayout(props) {
-    const { name, component: YourComponent, exact, path } = props;
+    const { name, component: YourComponent, exact, path, axiosJWT } = props;
     return (
         <Route
             name={name}
             exact={exact}
             path={path}
-            render={(props) => <YourComponent {...props} />}
-        />
+        >
+            <YourComponent axiosJWT={axiosJWT}/>
+        </Route>
     );
 }
 

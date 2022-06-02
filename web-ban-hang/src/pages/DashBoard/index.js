@@ -9,7 +9,7 @@ import { DASHBOARD_ROUTES } from '../../constans';
 import { useSelector } from 'react-redux';
 import { authSelector } from '../../Store/Reducer/authReducer';
 
-const renderDashboardRender = (url) => {
+const renderDashboardRender = (url, axiosJWT) => {
     let xhtml = null;
     xhtml = DASHBOARD_ROUTES.map((route, index) => {
         return (
@@ -20,13 +20,14 @@ const renderDashboardRender = (url) => {
                 exact={route.exact}
                 path={route.path}
                 url={url}
+                axiosJWT={axiosJWT}
             />
         );
     });
     return xhtml;
 };
 
-function DashBoard(props) {
+function DashBoard({axiosJWT}) {
     const auth = useSelector(authSelector);
     const { url } = useParams();
 
@@ -35,7 +36,7 @@ function DashBoard(props) {
             <div className="dashboard">
                 <DashboardHeader />
                 <DashboardSideBar admin={auth.user} />
-                <Switch>{renderDashboardRender(url)}</Switch>
+                <Switch>{renderDashboardRender(url, axiosJWT)}</Switch>
             </div>
         </Helmet>
     );

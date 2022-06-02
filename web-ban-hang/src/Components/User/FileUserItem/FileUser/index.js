@@ -40,7 +40,7 @@ const FileUserContent = styled.div`
         margin: 5px 10px;
     }
 `;
-function FileUser(props) {
+function FileUser({axiosJWT}) {
     const [loadings, setLoadings] = useState(false);
     const [dataUser, setDataUser] = useState({
         username: '',
@@ -60,7 +60,7 @@ function FileUser(props) {
             let o = Object.fromEntries(
                 Object.entries(dataUser).filter(([_, v]) => v !== ''),
             );
-            dispatch(updateProfileUser({ tokenAuth: auth.tokenAuth, data: o }));
+            dispatch(updateProfileUser({ tokenAuth: auth.tokenAuth, data: o, axiosJWT }));
 
             setDataUser({
                 username: '',

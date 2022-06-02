@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'antd';
+import { Col, Empty, Row } from 'antd';
 import BasicMap from '../../../BasicMap';
 
 function InfoAddress(props) {
@@ -18,7 +18,8 @@ function InfoAddress(props) {
                     className="gutter-row delivery-address__col--des"
                     span={24}
                 >
-                    <BasicMap />
+                    <Empty/>
+                    {/* <BasicMap /> */}
                 </Col>
             </Row>
         </div>
