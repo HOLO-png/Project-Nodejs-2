@@ -11,7 +11,7 @@
     "install-all": "concurrently \"npm run server-install\" \"npm run client-install\" ",
 
     "dev": "concurrently \"npm start\" \"npm run client\" ",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix web-ban-hang && npm run build --prefix web-ban-hang"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix server && npm install --prefix web-ban-hang && npm run build --prefix web-ban-hang"
   },
   "repository": {
     "type": "git",
