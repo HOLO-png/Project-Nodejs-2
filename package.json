@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "cd server && npm start",
     "server": "cd server && npm start",
     "client": "cd web-ban-hang && npm start",
     "server-install": "cd server && npm install",
