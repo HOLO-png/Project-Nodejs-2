@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "concurrently \"cd server && npm install && npm start\" \"cd web-ban-hang && npm install && npm start\" ",
+    "start": "nodemon server/server.js",
     "server": "cd server && npm start",
-    "client": "cd web-ban-hang && npm start",
+    "client": "npm start --prefix web-ban-hang",
     "server-install": "cd server && npm install",
     "client-install": "cd web-ban-hang && npm install",
     "install-all": "concurrently \"npm run server-install\" \"npm run client-install\" ",
-    "dev": "concurrently \"npm run server\" \"npm run client\" ",
-    "heroku-postbuild": "cd web-ban-hang && npm install && npm run build"
+    "dev": "concurrently \"npm start\" \"npm run client\" ",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix web-ban-hang && npm run build --prefix web-ban-hang"
   },
   "repository": {
     "type": "git",
