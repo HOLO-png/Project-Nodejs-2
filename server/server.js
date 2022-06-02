@@ -1,6 +1,6 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
 const paypal = require('paypal-rest-sdk');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
@@ -85,10 +85,10 @@ app.use('/api/order', orderRoute);
 __dirname = path.resolve();
 
 if(process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, "../web-ban-hang/build")))
+    app.use(express.static(path.join(__dirname, "../web-ban-hang/build")));
     app.get('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, 'web-ban-hang', 'build', 'index.html'));
-    })
+    });
 }else {
     app.get("/", (req, res) => {
         res.send("api in running ...")
